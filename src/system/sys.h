@@ -1,5 +1,5 @@
-#ifndef _SYSTEM_H
-#define _SYSTEM_H
+#ifndef _SYS_H
+#define _SYS_H
 
 #include "cpu.h"
 
@@ -11,4 +11,4 @@ typedef struct system
 
 } system_t;
 
-#endif /* _SYSTEM_H */ 
+#endif /* _SYS_H */ 

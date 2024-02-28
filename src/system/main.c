@@ -4,7 +4,7 @@
 #include <sys/utsname.h>
 #include <linux/sysinfo.h>
 
-#include "system.h"
+#include "sys.h"
 
 int main() {
 
