@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "cpuid.h": "c",
+        "sysinfo.h": "c",
+        "types.h": "c",
+        "unistd.h": "c",
+        "utsname.h": "c",
+        "stat.h": "c",
+        "facilities.h": "c",
+        "cpu.h": "c",
+        "stdint.h": "c"
+    }
+}

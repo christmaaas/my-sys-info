@@ -1,2 +1,4 @@
 all:
-	gcc -g src/main.c TUI/main_window.c -o MySysInfo.exe -lncurses -lpanel
+	gcc -g -ggdb -std=c11 -pedantic -W -Wall -Wextra -lncurses -lpanel -o MySysInfo.out src/system/main.c src/system/cpu.c  
+clean:
+	rm -f *.o MySysInfo.out
