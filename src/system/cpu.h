@@ -1,9 +1,9 @@
 #ifndef _CPU_H
 #define _CPU_H
 
-#include <stdint.h>
-
 #include "facilities.h"
+
+#include <stdint.h>
 
 /* можно сделать так. делаю просто общую структуру cpu, в ней общие данные.
 в ядрах изменяется только кэш, частота, индексы и впр все.
@@ -17,7 +17,7 @@ typedef enum cpu_byte_order
 {
     _LITTLE_ENDIAN_ORDER = 0,
     _BIG_ENDIAN_ORDER = 1
-} byte_order;
+} byteorder_t;
 
 typedef struct cpu_frequency_info 
 {
@@ -43,7 +43,7 @@ typedef struct cpu_cache_info
     uint32_t        number_of_sets;
     uint32_t        physical_line_partition;
     uint32_t        size;
-    char*           type;
+    char*           type_name;
     uint32_t        ways_of_associativity;
     uint32_t        uid; /* uid is unique among caches with the same (type, level) */
     char*           shared_cpu_list; /* some kernel's don't give a uid, so try shared_cpu_list */
@@ -67,7 +67,7 @@ typedef struct cpu_topology_info
 
 } cputopology_t;
 
-typedef struct cpu 
+typedef struct cpu_info 
 {
     char*           model_name;
     char*           vendor_name;
@@ -84,7 +84,7 @@ typedef struct cpu
     uint32_t        cache_size;
     char*           microcode_name; // у них char* и в нем строка типа 0x430, но можно сделать числом
     double          bogomips;
-    byte_order      byte_oder;
+    byteorder_t     byte_oder;
 
     cputopology_t*  cores; // мб не cores а threads и еще по замыслу это будет указатель на массив с этими ядрами/потоками которых у меня 16 
 
