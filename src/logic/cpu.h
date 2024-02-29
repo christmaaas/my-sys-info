@@ -37,7 +37,7 @@ typedef struct cpu_frequency_info
     char*           affected_cpus; // shared_list у них
 } cpufreq_t;
 
-typedef struct cpu_cache_info
+typedef struct cpu_cache_info 
 {
     uint32_t        level;
     uint32_t        number_of_sets;
