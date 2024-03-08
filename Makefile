@@ -1,20 +1,20 @@
 CC=gcc
 CFLAGS=-g -ggdb -std=c11 -pedantic -W -Wall -Wextra
-SRC=src/entity
+SRC=src
 BUILD=build
 BIN=bin
-DEBUG=$(BUILD)/debug
-RELEASE=$(BUILD)/release
-OUT_DIR=$(BIN)/debug/lab1.out
-BUILD_DIST=$(DEBUG)
+DEBUG_DIST=$(BUILD)/debug
+RELEASE_DIST=$(BUILD)/release
+OUT_DIR=$(BIN)/debug
+BUILD_DIST=$(DEBUG_DIST)
 
 ifeq ($(MODE), release)
 	CFLAGS=-std=c11 -pedantic -W -Wall -Wextra -Werror
-	OUT_DIR=$(BIN)/release/lab1.out
-	BUILD_DIST=$(RELEASE)
+	OUT_DIR=$(BIN)/release
+	BUILD_DIST=$(RELEASE_DIST)
 endif
 
-SRCS=$(wildcard $(SRC)/*.c)
+SRCS=$(wildcard $(SRC)/**/*.c)
 OBJS=$(patsubst $(SRC)/%.c, $(BUILD_DIST)/%.o, $(SRCS))
 
 .PHONY: all clean

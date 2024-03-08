@@ -7,6 +7,7 @@
 #define FILE_BUFFER_SIZE 256
 
 char** strsplit(const char* str, const char* delim, int* num_tokens);
+char* strduplicate(const char *str);
 
 
 #endif /* _FACILITIES_H */

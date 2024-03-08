@@ -73,16 +73,19 @@ typedef struct cpu_compound_info
     char*           model_name;
     char*           vendor_name;
 
-    uint32_t        cores_count;
-    uint32_t        threads_count;
-    uint32_t        phys_cpus_count;
+    uint32_t        cores_num;
+    uint32_t        threads_num;
+    uint32_t        phys_cpus_num;  
 
     uint32_t        model_number;  // у них все три эти значения инты, но им вроде соответсвует название, а инт этот как их код, поэтому можно сделать char* 
     uint32_t        family_number;
     uint32_t        stepping_number; // хз что это, наверное выкинуть
 
     char*           architecture_name;
-    uint32_t        cache_size;
+    //uint32_t        cache_size;
+    uint32_t        cpuid_level;
+    uint32_t        clflush_size;
+    uint32_t        cache_alignment;  
     char*           microcode_name; // у них char* и в нем строка типа 0x430, но можно сделать числом
     double          bogomips;
     cpubyteorder_t  byte_oder;
@@ -98,14 +101,12 @@ typedef struct cpu_compound_info
 
     char*           flags;
 
-    char*           fpu; // не уверен, потому что это вроде как флаг
-
     char*           bugs;
 
     char*           energy_performance_pref;
     char*           ernergy_performance_available_pref; 
 
-    char*           adress;
+    char*           address_sizes;
 
     char*           power_management;
 } cpucompound_t;
@@ -138,5 +139,42 @@ typedef struct cpu_info
 
     //GSList *cache;
 
+
+void cpu_init(cpu_t* cpu_info);
+
+typedef enum cpu_info_tokens
+{
+    PROCESSOR_NUM = 0,
+    VENDOR_ID = 1,
+    CPU_FAMILY = 2,
+    MODEL = 3,
+    MODEL_NAME = 4,
+    STEPPING = 5,
+    MICROCODE = 6,
+    FREQUENCY_MHZ = 7,
+    CACHE_SIZE = 8,
+    PHYSICAL_ID = 9,
+    SIBLINGS = 10,
+    CORE_ID = 11,
+    CPU_CORES = 12,
+    APICID = 13,
+    INITIAL_APICID = 14,
+    FPU = 15,
+    FPU_EXCEPTION = 16,
+    CPUID_LEVEL = 17,
+    WP = 18,
+    FLAGS = 19,
+    VMX_FLAGS = 20,
+    BUGS = 21,
+    BOGOMIPS = 22,
+    CLFLUSH_SIZE = 23,
+    CACHE_ALIGNMENT = 24,
+    ADDRESS_SIZES = 25,
+    POWER_MANAGMENT = 26
+} cpu_info_tokens_t;
+
+void scan_cpu_info(cpu_t* cpu);
+void scan_cpu_clocks(cpu_t* cpu);
+void scan_cpu_topology(cpu_t* cpu);
 
 #endif /* _CPU_FACILITY_H */

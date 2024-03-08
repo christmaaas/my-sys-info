@@ -8,6 +8,14 @@
         "stat.h": "c",
         "facilities.h": "c",
         "cpu.h": "c",
-        "stdint.h": "c"
-    }
+        "stdint.h": "c",
+        "sys.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/artem/Documents/MySysInfo/bin",
+            "binaryPath": "/home/artem/Documents/MySysInfo/bin/debug",
+            "binaryArgs": []
+        }
+    ]
 }
