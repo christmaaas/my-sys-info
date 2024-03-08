@@ -16,8 +16,7 @@ char* strduplicate(const char *str)
     return dup;
 }
 
-char** strsplit(const char *str, const char *delim, int *num_tokens) 
-{
+char** strsplit(const char* str, const char* delim, int* num_tokens) {
     char* copy = strduplicate(str); 
     char** tokens = NULL;
 
@@ -27,14 +26,14 @@ char** strsplit(const char *str, const char *delim, int *num_tokens)
     while (token) 
     {
         *token = '\0'; 
-        tokens = realloc(tokens, (count + 1) * sizeof(char*));
+        tokens = (char**)realloc(tokens, (count + 1) * sizeof(char*));
         tokens[count++] = strduplicate(copy);
 
         copy = token + strlen(delim); 
         token = strstr(copy, delim);
     }
-    
-    tokens = realloc(tokens, (count + 1) * sizeof(char*));
+
+    tokens = (char**)realloc(tokens, (count + 1) * sizeof(char*));
     tokens[count++] = strduplicate(copy);
 
     *num_tokens = count;

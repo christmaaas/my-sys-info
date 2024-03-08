@@ -81,8 +81,6 @@ typedef struct cpu_compound_info
     uint32_t        family_number;
     uint32_t        stepping_number; // хз что это, наверное выкинуть
 
-    char*           architecture_name;
-    //uint32_t        cache_size;
     uint32_t        cpuid_level;
     uint32_t        clflush_size;
     uint32_t        cache_alignment;  

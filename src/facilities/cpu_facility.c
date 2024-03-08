@@ -67,7 +67,7 @@ void scan_cpu_info(cpu_t* cpu)
             continue;
         }
 
-        file_tokens = strsplit(file_buffer, "\t: ", &num_tokens);
+        file_tokens = strsplit(file_buffer, ": ", &num_tokens);
 
         all_tokens[tokens_count++] = file_tokens[1];
 
