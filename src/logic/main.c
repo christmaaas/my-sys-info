@@ -17,9 +17,14 @@ int main()
 
     cpu_init(system->cpu);
 
-    scan_cpu_info(system->cpu);
+    scan_cpu_basic_info(system->cpu);
 
     cpucompound_t a = system->cpu->compound[0];
+
+    int bnb = a.cache.l4_line_size;
+    int bnb1 = a.cache.l4_sets_count;
+    int bnb2 = a.cache.l4_size;
+    int bnb3 = a.cache.l4_ways_of_associativity;
 
     free(a.vendor_name);
     free(a.model_name);
@@ -57,6 +62,9 @@ int main()
     free(a4.bugs);
     free(a4.address_sizes);
     cpucompound_t a5 = system->cpu->compound[5];
+
+    cpubyteorder_t peremenaya = a5.byte_oder;
+
     free(a5.vendor_name);
     free(a5.model_name);
     free(a5.microcode_name);

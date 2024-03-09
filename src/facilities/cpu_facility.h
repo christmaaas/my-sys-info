@@ -5,8 +5,9 @@
 
 #include <stdint.h>
 
-#define PATH_CPUINFO_FILE       "/proc/cpuinfo"
-#define PATH_CPUS_ONLINE_FILE   "/sys/devices/system/cpu/online"
+#define PATH_CPUINFO_FILE         "/proc/cpuinfo"
+#define PATH_CPUS_ONLINE_FILE     "/sys/devices/system/cpu/online"
+#define PATH_CPU_BYTE_ORDER_FILE  "/sys/kernel/cpu_byteorder"
 
 /* можно сделать так. делаю просто общую структуру cpu, в ней общие данные.
 в ядрах изменяется только кэш, частота, индексы и впр все.
@@ -18,8 +19,8 @@
 
 typedef enum cpu_byte_order_name
 {
-    _LITTLE_ENDIAN_ORDER = 0,
-    _BIG_ENDIAN_ORDER = 1
+    CPU_LITTLE_ENDIAN_ORDER = 0,
+    CPU_BIG_ENDIAN_ORDER = 1
 } cpubyteorder_t; // насчет _t у enum не уверен
 
 typedef struct cpu_frequency_info 
@@ -42,20 +43,31 @@ typedef struct cpu_frequency_info
 
 typedef struct cpu_cache_info 
 {
-    uint32_t        coherency_line_size;
-    uint32_t        level;
-    uint32_t        sets_count;
-    uint32_t        physical_line_partition;
-    uint32_t        size;
-    char*           type_name;
-    uint32_t        ways_of_associativity;
-    uint32_t        uid; /* uid is unique among caches with the same (type, level) */
-    char*           shared_cpu_list; /* some kernel's don't give a uid, so try shared_cpu_list */
-    uint32_t        phy_sock;
+    uint32_t        levels_num;
 
-    char*           allocation_policy;
-	char*           write_policy;
+    uint32_t        l1_data_size;
+    uint32_t        l1_inst_size;
+    uint32_t        l2_size;
+    uint32_t        l3_size;
+    uint32_t        l4_size;
 
+    uint32_t        l1_data_line_size;
+    uint32_t        l1_inst_line_size;
+    uint32_t        l2_line_size;
+    uint32_t        l3_line_size;
+    uint32_t        l4_line_size;
+
+    uint32_t        l1_data_sets_count;
+    uint32_t        l1_inst_sets_count;
+    uint32_t        l2_sets_count;
+    uint32_t        l3_sets_count;
+    uint32_t        l4_sets_count;
+
+    uint32_t        l1_data_ways_of_associativity;
+    uint32_t        l1_inst_ways_of_associativity;
+    uint32_t        l2_ways_of_associativity;
+    uint32_t        l3_ways_of_associativity;
+    uint32_t        l4_ways_of_associativity;
 } cpucache_t;
 
 typedef struct cpu_topology_info
@@ -92,8 +104,7 @@ typedef struct cpu_compound_info
 
     cpufreq_t       frequency;
 
-    uint32_t        caches_num;
-    cpucache_t*     cache;      // по сути должно быть массив на 4 элемента, но мб кэш будет разный на разных процах
+    cpucache_t      cache;      // по сути должно быть массив на 4 элемента, но мб кэш будет разный на разных процах
     
     cputopology_t   topology; // мб не cores а threads и еще по замыслу это будет указатель на массив с этими ядрами/потоками которых у меня 16 
 
@@ -142,37 +153,48 @@ void cpu_init(cpu_t* cpu_info);
 
 typedef enum cpu_info_tokens
 {
-    PROCESSOR_NUM = 0,
-    VENDOR_ID = 1,
-    CPU_FAMILY = 2,
-    MODEL = 3,
-    MODEL_NAME = 4,
-    STEPPING = 5,
-    MICROCODE = 6,
-    FREQUENCY_MHZ = 7,
-    CACHE_SIZE = 8,
-    PHYSICAL_ID = 9,
-    SIBLINGS = 10,
-    CORE_ID = 11,
-    CPU_CORES = 12,
-    APICID = 13,
-    INITIAL_APICID = 14,
-    FPU = 15,
-    FPU_EXCEPTION = 16,
-    CPUID_LEVEL = 17,
-    WP = 18,
-    FLAGS = 19,
-    VMX_FLAGS = 20,
-    BUGS = 21,
-    BOGOMIPS = 22,
-    CLFLUSH_SIZE = 23,
-    CACHE_ALIGNMENT = 24,
-    ADDRESS_SIZES = 25,
-    POWER_MANAGMENT = 26
+    PROCESSOR_NUM       = 0,
+    VENDOR_ID           = 1,
+    CPU_FAMILY          = 2,
+    MODEL               = 3,
+    MODEL_NAME          = 4,
+    STEPPING            = 5,
+    MICROCODE           = 6,
+    FREQUENCY_MHZ       = 7,
+    CACHE_SIZE          = 8,
+    PHYSICAL_ID         = 9,
+    SIBLINGS            = 10,
+    CORE_ID             = 11,
+    CPU_CORES           = 12,
+    APICID              = 13,
+    INITIAL_APICID      = 14,
+    FPU                 = 15,
+    FPU_EXCEPTION       = 16,
+    CPUID_LEVEL         = 17,
+    WP                  = 18,
+    FLAGS               = 19,
+    VMX_FLAGS           = 20,
+    BUGS                = 21,
+    BOGOMIPS            = 22,
+    CLFLUSH_SIZE        = 23,
+    CACHE_ALIGNMENT     = 24,
+    ADDRESS_SIZES       = 25,
+    POWER_MANAGMENT     = 26
 } cpu_info_tokens_t;
 
-void scan_cpu_info(cpu_t* cpu);
+void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
 void scan_cpu_topology(cpu_t* cpu);
+
+typedef enum cpu_cache_levels
+{
+    L1_DATA_LEVEL           = 0,
+    L1_INSTRUCTION_LEVEL    = 1,
+    L2_LEVEL                = 2,
+    L3_LEVEL                = 3,
+    L4_LEVEL                = 4
+} cache_level_t;
+
+void scan_cpu_cache(cpucache_t* cache, int processor_id);
 
 #endif /* _CPU_FACILITY_H */
