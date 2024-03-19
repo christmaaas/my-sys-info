@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
-#define PATH_CPUINFO_FILE         "/proc/cpuinfo"
-#define PATH_CPUS_ONLINE_FILE     "/sys/devices/system/cpu/online"
-#define PATH_CPU_BYTE_ORDER_FILE  "/sys/kernel/cpu_byteorder"
+#define PATH_CPUINFO_FILE          "/proc/cpuinfo"
+#define PATH_CPUS_PRESENT_FILE     "/sys/devices/system/cpu/present"
+#define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
 
 /* можно сделать так. делаю просто общую структуру cpu, в ней общие данные.
 в ядрах изменяется только кэш, частота, индексы и впр все.
@@ -19,8 +19,8 @@
 
 typedef enum cpu_byte_order_name
 {
-    CPU_LITTLE_ENDIAN_ORDER = 0,
-    CPU_BIG_ENDIAN_ORDER = 1
+    LITTLE_ENDIAN_ORDER = 0,
+    BIG_ENDIAN_ORDER = 1
 } cpubyteorder_t; // насчет _t у enum не уверен
 
 typedef struct cpu_frequency_info 
@@ -38,7 +38,7 @@ typedef struct cpu_frequency_info
     char*           freq_scaling_governor;
     char*           freq_scaling_available_governors;
 
-    char*           affected_cpus; // shared_list у них
+    uint32_t        affected_cpus; // shared_list у них
 } cpufreq_t;
 
 typedef struct cpu_cache_info 
@@ -100,8 +100,6 @@ typedef struct cpu_compound_info
     double          bogomips;
     cpubyteorder_t  byte_oder;
 
-    char**          clocks; // у hardinfo - clocks,  но насчет них не уверен
-
     cpufreq_t       frequency;
 
     cpucache_t      cache;      // по сути должно быть массив на 4 элемента, но мб кэш будет разный на разных процах
@@ -112,12 +110,10 @@ typedef struct cpu_compound_info
 
     char*           bugs;
 
-    char*           energy_performance_pref;
-    char*           ernergy_performance_available_pref; 
+    char*           energy_performance_preference;
+    char*           ernergy_performance_available_preference; 
 
     char*           address_sizes;
-
-    char*           power_management;
 } cpucompound_t;
 
 typedef struct cpu_info 
@@ -195,6 +191,6 @@ typedef enum cpu_cache_levels
     L4_LEVEL                = 4
 } cache_level_t;
 
-void scan_cpu_cache(cpucache_t* cache, int processor_id);
+void scan_cpu_cache(cpu_t* cpu);
 
 #endif /* _CPU_FACILITY_H */

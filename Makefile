@@ -23,7 +23,7 @@ all: $(OUT_DIR)
 
 $(OUT_DIR): $(OBJS)
 	@mkdir -p $(dir $(OUT_DIR))
-	$(CC) $(CFLAGS) -o $(OUT_DIR) $^
+	$(CC) -o $(OUT_DIR) $^ -lncurses -lpanel
 
 $(BUILD_DIST)/%.o : $(SRC)/%.c
 	@mkdir -p $(dir $@)

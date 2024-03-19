@@ -55,7 +55,7 @@ char* strconcat(const char* str1, const char* str2)
     return result;
 }
 
-char* get_file_content(const char* filename) 
+char* get_file(const char* filename) 
 {
     FILE* file_ptr = NULL;
 
@@ -71,13 +71,24 @@ char* get_file_content(const char* filename)
 
     char* buffer = (char*)malloc(file_size + 1);
 
-    size_t result = fread(buffer, 1, file_size, file_ptr);
+    fread(buffer, sizeof(char), file_size, file_ptr);
 
-    buffer[file_size] = '\0'; 
+    CUT_STRING_BY_LENGTH(buffer); 
 
     fclose(file_ptr);
 
     return buffer;
+}
+
+int get_file_int(const char* filename) 
+{
+    char* file_content = get_file(filename);
+
+    int file_content_int = atoi(file_content);
+
+    free(file_content);
+
+    return file_content_int;
 }
 
 int get_count_of_files_name(const char* path, const char* name)

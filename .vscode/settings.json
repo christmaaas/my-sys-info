@@ -9,7 +9,10 @@
         "facilities.h": "c",
         "cpu.h": "c",
         "stdint.h": "c",
-        "sys.h": "c"
+        "sys.h": "c",
+        "cpu_facility.h": "c",
+        "ncurses.h": "c",
+        "panel.h": "c"
     },
     "makefile.launchConfigurations": [
         {
