@@ -5,7 +5,7 @@
 #include <linux/sysinfo.h>
 
 #include "sys.h"
-#include "../facilities/cpu_facility.h"
+#include "cpu_utils.h"
 #include "../ui/main_ui.h"
 
 int main() 

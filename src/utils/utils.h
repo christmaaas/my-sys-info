@@ -1,5 +1,5 @@
-#ifndef _FACILITIES_H
-#define _FACILITIES_H
+#ifndef _UTILS_H
+#define _UTILS_H
 
 // здесь будет что-то типа utils
 // т.е. функции для чтения файлов, парсинга из них инфы и т.д.
@@ -19,4 +19,4 @@ int get_file_int(const char* filename);
 int get_count_of_files_name(const char* path, const char* name);
 
 
-#endif /* _FACILITIES_H */
+#endif /* _UTILS_H */

@@ -1,7 +1,7 @@
-#ifndef _CPU_FACILITY_H
-#define _CPU_FACILITY_H
+#ifndef _CPU_UTILS_H
+#define _CPU_UTILS_H
 
-#include "facilities.h"
+#include "../utils/utils.h"
 
 #include <stdint.h>
 
@@ -193,4 +193,4 @@ typedef enum cpu_cache_levels
 
 void scan_cpu_cache(cpu_t* cpu);
 
-#endif /* _CPU_FACILITY_H */
+#endif /* _CPU_UTILS_H */
