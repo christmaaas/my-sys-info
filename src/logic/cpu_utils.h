@@ -57,17 +57,17 @@ typedef struct cpu_cache_info
     uint32_t        l3_line_size;
     uint32_t        l4_line_size;
 
-    uint32_t        l1_data_sets_count;
-    uint32_t        l1_inst_sets_count;
-    uint32_t        l2_sets_count;
-    uint32_t        l3_sets_count;
-    uint32_t        l4_sets_count;
+    uint32_t        l1_data_sets;
+    uint32_t        l1_inst_sets;
+    uint32_t        l2_sets;
+    uint32_t        l3_sets;
+    uint32_t        l4_sets;
 
-    uint32_t        l1_data_ways_of_associativity;
-    uint32_t        l1_inst_ways_of_associativity;
-    uint32_t        l2_ways_of_associativity;
-    uint32_t        l3_ways_of_associativity;
-    uint32_t        l4_ways_of_associativity;
+    uint32_t        l1_data_ways;
+    uint32_t        l1_inst_ways;
+    uint32_t        l2_ways;
+    uint32_t        l3_ways;
+    uint32_t        l4_ways;
 } cpucache_t;
 
 typedef struct cpu_topology_info
@@ -145,7 +145,7 @@ typedef struct cpu_info
     //GSList *cache;
 
 
-void cpu_init(cpu_t* cpu_info);
+void init_cpu_cores(cpu_t* cpu_info);
 
 typedef enum cpu_info_tokens
 {
@@ -180,6 +180,7 @@ typedef enum cpu_info_tokens
 
 void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
+void refresh_cpu_clocks(cpu_t* cpu, int processor_id);
 void scan_cpu_topology(cpu_t* cpu);
 
 typedef enum cpu_cache_levels

@@ -2,14 +2,14 @@
 
 #include <stdlib.h>
 
-void get_cpu_info(cpu_t** cpu)
+void init_cpu(cpu_t** cpu)
 {
     if(*cpu)
         free_cpu(*cpu);
 
-    *cpu = (cpu_t*)malloc(sizeof(cpu_t));
+    *cpu = (cpu_t*)calloc(1, sizeof(cpu_t));
     
-    cpu_init(*cpu);
+    init_cpu_cores(*cpu);
 
     scan_cpu_basic_info(*cpu);
     scan_cpu_cache(*cpu);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void cpu_init(cpu_t* cpu)
+void init_cpu_cores(cpu_t* cpu)
 {
     FILE* file_ptr = NULL;
     char file_buffer[FILE_BUFFER_SIZE];
@@ -33,7 +33,7 @@ void cpu_init(cpu_t* cpu)
 
     cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens and +1 cause of indexes
 
-    cpu->compound = (cpucompound_t*)malloc(cpu->processors_num * sizeof(cpucompound_t));
+    cpu->compound = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
 
     for (size_t i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);
@@ -69,7 +69,8 @@ void scan_cpu_basic_info(cpu_t* cpu)
 
         file_tokens = strsplit(file_buffer, ": ", &num_tokens);
 
-        CUT_STRING_BY_LENGTH(file_tokens[1]);
+        if(num_tokens != 1)
+            CUT_STRING_BY_LENGTH(file_tokens[1]);
 
         all_tokens[tokens_count++] = file_tokens[1];
 
@@ -205,7 +206,7 @@ void scan_cpu_basic_info(cpu_t* cpu)
             free(all_tokens[FPU_EXCEPTION]);
             free(all_tokens[WP]);
             free(all_tokens[VMX_FLAGS]);
-            free(all_tokens[POWER_MANAGMENT]);
+            //free(all_tokens[POWER_MANAGMENT]);
             free(byte_order_str);
         }
     }
@@ -245,46 +246,46 @@ void scan_cpu_cache(cpu_t* cpu)
             {
                 case L1_DATA_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l1_data_size                   = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l1_data_line_size              = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l1_data_sets_count             = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l1_data_ways_of_associativity  = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l1_data_size        = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l1_data_line_size   = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l1_data_sets        = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l1_data_ways        = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L1_INSTRUCTION_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l1_inst_size                   = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l1_inst_line_size              = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l1_inst_sets_count             = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l1_inst_ways_of_associativity  = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l1_inst_size        = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l1_inst_line_size   = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l1_inst_sets        = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l1_inst_ways        = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L2_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l2_size                        = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l2_line_size                   = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l2_sets_count                  = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l2_ways_of_associativity       = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l2_size             = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l2_line_size        = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l2_sets             = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l2_ways             = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L3_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l3_size                        = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l3_line_size                   = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l3_sets_count                  = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l3_ways_of_associativity       = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l3_size             = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l3_line_size        = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l3_sets             = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l3_ways             = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L4_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l4_size                        = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l4_line_size                   = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l4_sets_count                  = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l4_ways_of_associativity       = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l4_size             = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l4_line_size        = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l4_sets             = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l4_ways             = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
@@ -355,6 +356,16 @@ void scan_cpu_clocks(cpu_t* cpu)
         cpu->compound[cpu_id].ernergy_performance_available_preference = get_file(policy_content_path);
         free(policy_content_path);
     }
+}
+
+void refresh_cpu_clocks(cpu_t* cpu, int processor_id)
+{
+    char policy_path[MAX_FILE_PATH_LEN];
+    snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%ld", processor_id);
+
+    char* policy_content_path = strconcat(policy_path, "/scaling_cur_freq");
+    cpu->compound[processor_id].frequency.freq_cur = get_file_int(policy_content_path);
+    free(policy_content_path);
 }
 
 void scan_cpu_topology(cpu_t* cpu)
