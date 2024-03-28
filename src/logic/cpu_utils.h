@@ -8,25 +8,18 @@
 #define PATH_CPUINFO_FILE          "/proc/cpuinfo"
 #define PATH_CPUS_PRESENT_FILE     "/sys/devices/system/cpu/present"
 #define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
+#define PATH_STAT_FILE             "/proc/stat"
 
-/* можно сделать так. делаю просто общую структуру cpu, в ней общие данные.
-в ядрах изменяется только кэш, частота, индексы и впр все.
-значит можно сделать в cpu указатель на структуры freq, cache, topology.
-потом уже в моих функциях, просто парсить количество ядер и выделять память на массив из ядер,
-а точнее на freq, cache, topology которых будет столько сколько ядер(потоков) в проце.
-
- */
+#define MAX_LOAD_HISTORY_SIZE       200
 
 typedef enum cpu_byte_order_name
 {
     LITTLE_ENDIAN_ORDER = 0,
     BIG_ENDIAN_ORDER = 1
-} cpubyteorder_t; // насчет _t у enum не уверен
+} cpubyteorder_t;
 
 typedef struct cpu_frequency_info 
 {
-    //uint32_t thread_id; в общей структуре для ядер будет id
-
     uint32_t        freq_max;
     uint32_t        freq_base;
     uint32_t        freq_cur;
@@ -38,7 +31,7 @@ typedef struct cpu_frequency_info
     char*           freq_scaling_governor;
     char*           freq_scaling_available_governors;
 
-    uint32_t        affected_cpus; // shared_list у них
+    uint32_t        affected_cpus;
 } cpufreq_t;
 
 typedef struct cpu_cache_info 
@@ -72,12 +65,9 @@ typedef struct cpu_cache_info
 
 typedef struct cpu_topology_info
 {
-    uint32_t        thread_id;  // у меня последний 16
-    uint32_t        socket_id;  // как я понял это physical_id из /proc/cpuinfo
-    uint32_t        core_id;    // у меня последний 24
-
-    //...
-
+    uint32_t        thread_id; 
+    uint32_t        socket_id;  
+    uint32_t        core_id;    
 } cputopology_t;
 
 typedef struct cpu_compound_info
@@ -89,22 +79,22 @@ typedef struct cpu_compound_info
     uint32_t        threads_num;
     uint32_t        phys_cpus_num;  
 
-    uint32_t        model_number;  // у них все три эти значения инты, но им вроде соответсвует название, а инт этот как их код, поэтому можно сделать char* 
+    uint32_t        model_number; 
     uint32_t        family_number;
-    uint32_t        stepping_number; // хз что это, наверное выкинуть
+    uint32_t        stepping_number;
 
     uint32_t        cpuid_level;
     uint32_t        clflush_size;
     uint32_t        cache_alignment;  
-    char*           microcode_name; // у них char* и в нем строка типа 0x430, но можно сделать числом
+    char*           microcode_name; 
     double          bogomips;
     cpubyteorder_t  byte_oder;
 
     cpufreq_t       frequency;
 
-    cpucache_t      cache;      // по сути должно быть массив на 4 элемента, но мб кэш будет разный на разных процах
+    cpucache_t      cache;     
     
-    cputopology_t   topology; // мб не cores а threads и еще по замыслу это будет указатель на массив с этими ядрами/потоками которых у меня 16 
+    cputopology_t   topology; 
 
     char*           flags;
 
@@ -116,34 +106,38 @@ typedef struct cpu_compound_info
     char*           address_sizes;
 } cpucompound_t;
 
+typedef struct cpu_load_type
+{
+    uint64_t user;
+    uint64_t nice;
+    uint64_t sys;
+    uint64_t idle;
+    uint64_t wait;
+} loadtype_t;
+
+typedef struct cpu_load_percent
+{
+    double user;
+    double sys;
+    double idle;
+    double wait;
+} loadpercent_t;
+
+typedef struct cpu_load
+{
+    loadtype_t  total;
+    loadtype_t* cores;
+} cpuload_t;
+
 typedef struct cpu_info 
 {
-    uint32_t        processors_num; // мб название поменять, да и в целом названия во всех страктах посмотреть
+    uint32_t        processors_num; 
     cpucompound_t*  compound;
+
+    cpuload_t*      current_load;
+    uint32_t        cur_point;
+    loadpercent_t   load_history[MAX_LOAD_HISTORY_SIZE];
 } cpu_t;
-
-
-// может что из того что ниже пригодится 
-
-    //char *flags;
-    //char *bugs;
-    //char *pm;             /* power management features */
-    //int cache_size;
-    //float bogomips;
-    //char *microcode;
-
-    //int id;
-    //cpu_topology_data *cputopo;
-    //cpufreq_data *cpufreq;
-
-    //char *has_fpu;
-    //char *bug_fdiv, *bug_hlt, *bug_f00f, *bug_coma;
-
-    //nt model, family, stepping;
-    //char *strmodel;
-
-    //GSList *cache;
-
 
 void init_cpu_cores(cpu_t* cpu_info);
 
@@ -181,7 +175,7 @@ typedef enum cpu_info_tokens
 void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
 void refresh_cpu_clocks(cpu_t* cpu, int processor_id);
-void scan_cpu_topology(cpu_t* cpu);
+void scan_cpu_load_stat(cpu_t* cpu);
 
 typedef enum cpu_cache_levels
 {

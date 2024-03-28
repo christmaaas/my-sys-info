@@ -7,11 +7,11 @@
 typedef struct system
 {
     cpu_t* cpu;
-    double time;
 
 
 } system_t;
 
-void init_system_data(system_t* data);
+void init_system_data(system_t** data);
+void free_system_data(system_t* data);
 
 #endif /* _SYS_H */ 

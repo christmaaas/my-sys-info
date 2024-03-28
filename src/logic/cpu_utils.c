@@ -33,7 +33,9 @@ void init_cpu_cores(cpu_t* cpu)
 
     cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens and +1 cause of indexes
 
-    cpu->compound = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
+    cpu->compound            = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
+    cpu->current_load        = (cpuload_t*)calloc(1, sizeof(cpuload_t));
+    cpu->current_load->cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
 
     for (size_t i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);
@@ -41,13 +43,13 @@ void init_cpu_cores(cpu_t* cpu)
     free(readed_tokens);
 }
 
-#define CPUINFO_FILE_BUFFER_SIZE 2048 // flags line can be longer than 1024, so 2048 is optimal
+#define CPU_FILE_BUFFER_SIZE 2048 // flags line can be longer than 1024, so 2048 is optimal
 #define COUNT_OF_PROCESSOR_TOKENS 27
 
 void scan_cpu_basic_info(cpu_t* cpu)
 {
     FILE* file_ptr = NULL;
-    char file_buffer[CPUINFO_FILE_BUFFER_SIZE];
+    char file_buffer[CPU_FILE_BUFFER_SIZE];
 
     if ((file_ptr = fopen(PATH_CPUINFO_FILE, "r")) == NULL)
     {   
@@ -59,7 +61,7 @@ void scan_cpu_basic_info(cpu_t* cpu)
     char* all_tokens[COUNT_OF_PROCESSOR_TOKENS];
     int num_tokens = 0, tokens_count = 0, processor_id = 0;
 
-    while (fgets(file_buffer, CPUINFO_FILE_BUFFER_SIZE, file_ptr))
+    while (fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr))
     {
         if (file_buffer[0] == '\n') // info in "cpuinfo.txt" mapped by blocks separated by new line
         {
@@ -368,7 +370,58 @@ void refresh_cpu_clocks(cpu_t* cpu, int processor_id)
     free(policy_content_path);
 }
 
-void scan_cpu_topology(cpu_t* cpu)
+void scan_cpu_load_stat(cpu_t* cpu)
 {
-    //TODO
+    FILE* file_ptr = NULL;
+    char file_buffer[CPU_FILE_BUFFER_SIZE];
+
+    if ((file_ptr = fopen(PATH_STAT_FILE, "r")) == NULL)
+    {   
+        perror("Error to open file in \"cpu_facility.c\" : scan_cpu_stat()");
+        return;
+    }
+
+    uint64_t user = 0, nice = 0, sys = 0, idle = 0, wait = 0;
+
+    fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr);
+
+    if (strncmp(file_buffer, "cpu", 3))
+		return;
+        
+    sscanf(file_buffer + 5, "%llu %llu %llu %llu %llu", 
+                                            &user,
+                                            &nice,
+                                            &sys,
+                                            &idle,
+                                            &wait);
+		
+	cpu->current_load->total.user = user + nice;
+	cpu->current_load->total.sys  = sys;
+	cpu->current_load->total.idle = idle;
+    cpu->current_load->total.nice = nice;
+    cpu->current_load->total.wait = wait;
+
+    int core = 0;
+    while (fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr) && core != cpu->processors_num)
+    {
+        if (strncmp(file_buffer, "cpu", 3))
+			break;
+		
+        sscanf(file_buffer + 5, "%llu %llu %llu %llu %llu", 
+		                                        &user,
+		                                        &nice,
+		                                        &sys,
+		                                        &idle,
+                                                &wait);
+
+        cpu->current_load->cores[core].user = user + nice;
+        cpu->current_load->cores[core].sys  = sys;
+	    cpu->current_load->cores[core].idle = idle;
+        cpu->current_load->cores[core].nice = nice;
+        cpu->current_load->cores[core].wait = wait;
+
+        core++;
+    }
+
+    fclose(file_ptr);
 }
