@@ -302,83 +302,46 @@ void print_cpu_info_page()
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
 
-void plot_snap(WINDOW * pad)
+#define MAX_CPU_GRAPH_HEIGHT	 20
+#define GRAPH_POINT_OFFSET 	 	 6
+#define GRAPH_DELIM_LINE_OFFSET  4
+
+void draw_cpu_load_graph()
 {
-    int i;
-    int j;
-    double k;
-	
+	PAGE("CPU Total Load");
 
-	mvwprintw(pad, 0, 0, "100%%");
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 1, 0, "100%%");
+	mvwprintw(main_page, 6, 1, "75%%");
+	mvwprintw(main_page, 11, 1, "50%%");
+	mvwprintw(main_page, 16, 1, "25%%");
+	mvwprintw(main_page, 20, 1, "<5%%");
 
-	mvwprintw(pad, 6, 1, "75%%");
-	
-	mvwprintw(pad, 11, 1, "50%%");
-	
-	mvwprintw(pad, 16, 1, "25%%");
-
-	mvwprintw(pad, 20, 1, " 5%%");
-
-	for(int i = 0; i < MAX_COLS_COUNT; i++)
+	for (int x = 0; x < MAX_COLS_COUNT; x++) 
 	{
-		mvwhline(pad, 0,i,ACS_HLINE,1);
-		mvwhline(pad, 6,i, ACS_HLINE, 1);
-		mvwhline(pad, 11,i, ACS_HLINE, 1);
-		mvwhline(pad, 16,i, ACS_HLINE, 1);
-		mvwhline(pad, 20,i, ACS_HLINE, 1);
-	}
-	
-	wnoutrefresh(stdscr);
-	doupdate();
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-
-	for(int i = 0; i < MAX_COLS_COUNT; i++)
-		mvwprintw(pad, 21, i + 4, "-");
-	
-	wattrset(pad, COLOR_PAIR(2));
-	mvwprintw(pad, 0, 26, "User%%");
-	wattrset(pad, COLOR_PAIR(1));
-	mvwprintw(pad, 0, 36, "System%%");
-	wattrset(pad, COLOR_PAIR(4));
-	mvwprintw(pad, 0, 49, "Wait%%");
-	wattrset(pad, COLOR_PAIR(5));
-	mvwprintw(pad, 0, 59, "Steal%%");
-	wattrset(pad, COLOR_PAIR(0));
-
-	for (j = 0; j < MAX_COLS_COUNT; j++) {
-	    for (i = 0; i < 20; i++) {
-		wmove(pad, 20 - i, j + 6);
-		if (data->cpu->load_history[j].user + data->cpu->load_history[j].sys + data->cpu->load_history[j].wait + data->cpu->load_history[j].idle == 0) {	/* if not all zeros */
-		     wattrset(pad, COLOR_PAIR(0));
-		    wprintw(pad, " ");
-		} else if ((data->cpu->load_history[j].user / 100 * 20) >
-			   i + 0.5) {
-		     wattrset(pad, COLOR_PAIR(9));
-		    wprintw(pad, "U");
-		} else if ((data->cpu->load_history[j].user + data->cpu->load_history[j].sys) / 100 *
-			   20 > i + 0.5) {
-		     wattrset(pad, COLOR_PAIR(8));
-		    wprintw(pad, "s");
-		} else
-		    if ((data->cpu->load_history[j].user + data->cpu->load_history[j].sys +
-			 data->cpu->load_history[j].wait) / 100 * 20 >
-			i + 0.5) {
-		     wattrset(pad, COLOR_PAIR(10));
-		    wprintw(pad, "w");
-		} else if ((data->cpu->load_history[j].user + data->cpu->load_history[j].sys + data->cpu->load_history[j].wait + data->cpu->load_history[j].idle) / 100 * 20 > i) {	/*no +0.5 or too few Steal's */
-		     wattrset(pad, COLOR_PAIR(0));
-		    wprintw(pad, " ");
-		} else if (data->cpu->load_history[j].user + data->cpu->load_history[j].sys + data->cpu->load_history[j].wait + data->cpu->load_history[j].idle > i) {	/* if not all zeros */
-		     wattrset(pad, COLOR_PAIR(5));
-		    wprintw(pad, "S");
+	    for (int y = 0; y < MAX_CPU_GRAPH_HEIGHT; y++) 
+		{
+			if(y == 1 || y == 6 || y == 11 || y == 16)
+			{
+				wattrset(main_page, COLOR_PAIR(15));
+				mvwaddch(main_page, y, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
+			}
+			if ((data->cpu->load_history[x].user 
+				+ data->cpu->load_history[x].sys 
+				+ data->cpu->load_history[x].wait) / 100 * MAX_CPU_GRAPH_HEIGHT > y + 0.5)
+			{
+				wattrset(main_page, COLOR_PAIR(9));
+				mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
+				wattrset(main_page, COLOR_PAIR(0));
+			}
+			else
+			{
+				wattrset(main_page, COLOR_PAIR(5));
+				mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
+			}
 		}
-	    }
-	    k = data->cpu->load_history[j].user + data->cpu->load_history[j].sys + data->cpu->load_history[j].wait;
-	    if (0.1 < k && k < 5.0) {	/*  not zero but less than 5% */
-		wmove(pad, 20, j + 6);
-		 wattrset(pad, COLOR_PAIR(2));
-		wprintw(pad, "_");
-	    }
+		wattrset(main_page, COLOR_PAIR(15));
+		mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT + 1, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 	}
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
@@ -439,8 +402,8 @@ int main_window()
 		}
 		case P_CPU_LOAD:
 		{
-			calculate_current_load(data->cpu, current_cols);
-			plot_snap(main_page);
+			calculate_current_load(data->cpu, current_cols - 8); // -8 cause the graph itself starts with indent of 6
+			draw_cpu_load_graph();
 			break;
 		}
 		case P_INPUT_TIME:
