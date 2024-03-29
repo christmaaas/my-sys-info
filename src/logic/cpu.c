@@ -13,7 +13,7 @@ void init_cpu(cpu_t** cpu)
     scan_cpu_clocks(*cpu);
 }
 
-void calculate_current_load(cpu_t* cpu, int points_num)
+void calculate_total_cpu_load(cpu_t* cpu, int points_num)
 {
     uint64_t user   = cpu->current_load->total.user; 
     uint64_t sys    = cpu->current_load->total.sys;
@@ -43,6 +43,42 @@ void calculate_current_load(cpu_t* cpu, int points_num)
 
         cpu->cur_point = points_num - 1;
     }
+}
+
+loadpercent_t* calculate_cpu_cores_load(cpu_t* cpu)
+{
+    loadtype_t*     cores_load = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
+    loadpercent_t*  cores_load_percent = (loadpercent_t*)calloc(cpu->processors_num, sizeof(loadpercent_t));
+    uint64_t        sum_of_loads = 0;
+
+    for (int i = 0; i < cpu->processors_num; i++)
+    {
+        cores_load[i].user   = cpu->current_load->cores[i].user;
+        cores_load[i].sys    = cpu->current_load->cores[i].sys;
+        cores_load[i].wait   = cpu->current_load->cores[i].wait;
+        cores_load[i].idle   = cpu->current_load->cores[i].idle;
+    }
+
+    scan_cpu_load_stat(cpu);
+
+    for (int i = 0; i < cpu->processors_num; i++)
+    {
+        cores_load[i].user          = cpu->current_load->cores[i].user - cores_load[i].user;
+        cores_load[i].sys           = cpu->current_load->cores[i].sys - cores_load[i].sys;
+        cores_load[i].wait          = cpu->current_load->cores[i].wait - cores_load[i].wait;
+        cores_load[i].idle          = cpu->current_load->cores[i].idle - cores_load[i].idle;
+        sum_of_loads                    = cores_load[i].user + cores_load[i].sys 
+                                            + cores_load[i].wait + cores_load[i].idle;
+
+        cores_load_percent[i].user  = ((double)cores_load[i].user / (double)sum_of_loads) * 100.0;
+        cores_load_percent[i].sys   = ((double)cores_load[i].sys / (double)sum_of_loads) * 100.0;
+        cores_load_percent[i].wait  = ((double)cores_load[i].wait / (double)sum_of_loads) * 100.0;
+        cores_load_percent[i].idle  = ((double)cores_load[i].idle / (double)sum_of_loads) * 100.0;
+    }
+
+    free(cores_load);
+
+    return cores_load_percent;
 }
 
 void free_cpu(cpu_t* cpu)

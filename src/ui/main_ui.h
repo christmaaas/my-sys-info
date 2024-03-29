@@ -6,11 +6,12 @@
 
 typedef enum active_page
 {
-    P_DEFAULT    = 0,
-    P_HELP       = 1,
-    P_CPU_INFO   = 2,
-    P_CPU_LOAD   = 3,
-    P_INPUT_TIME = 4,
+    P_DEFAULT          = 0,
+    P_HELP             = 1,
+    P_CPU_INFO         = 2,
+    P_CPU_LOAD         = 3,
+    P_INPUT_TIME       = 4,
+    P_CPU_CORES_LOAD   = 5
 } page_t;
 
 

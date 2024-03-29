@@ -45,6 +45,7 @@ void init_pairs(int color)
 		init_pair((short)15, (short)COLOR_RED, (short)COLOR_WHITE);
 		init_pair((short)16, (short)COLOR_GREEN, (short)COLOR_WHITE);
 		init_pair((short)17, (short)COLOR_YELLOW, (short)COLOR_WHITE);
+		init_pair((short)18, (short)COLOR_RED, (short)COLOR_GREEN);
 	}
 }
 
@@ -128,6 +129,12 @@ int input_check()
 					wclear(main_page);
 					break;
 				}
+				case 'l':
+				{
+					active_page = P_CPU_CORES_LOAD;
+					wclear(main_page);
+					break;
+				}
 				case 'q':
 				{
 					return -1;
@@ -166,8 +173,8 @@ void print_start_page()
 	mvwprintw(main_page, 3, 3, "Here are the options:");
 
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 4, 3, "  'c' - CPU info         l = CPU Long-term     t = Set refresh time");
-	mvwprintw(main_page, 5, 3, "  'C' - CPU load  U = Utilisation       + = Slower screen updates");
+	mvwprintw(main_page, 4, 3, "  'c' - CPU info         l = CPU cores load     t = Set refresh time");
+	mvwprintw(main_page, 5, 3, "  'C' - CPU total load  U = Utilisation       + = Slower screen updates");
 	mvwprintw(main_page, 6, 3, "  m = Memory      V = Virtual memory    j = File Systems");
 	mvwprintw(main_page, 7, 3, "  d = Disks       n = Network           . = only busy disks/procs");
 	mvwprintw(main_page, 8, 3, "  r = Resource    N = NFS               h = more options");
@@ -186,7 +193,7 @@ void print_help_page()
 	mvwprintw(main_page, 1, 1,
 			  "'h' - Help                       	 | r = Resources OS & Proc");
 	mvwprintw(main_page, 2, 1,
-			  "'c' - CPU info ('<' - prev | '>' - next) | l = longer term CPU averages");
+			  "'c' - CPU info ('<' - prev | '>' - next) | l = CPU cores load");
 	mvwprintw(main_page, 3, 1,
 			  "'m' - Memory & Swap                   	| V = Virtual Memory");
 	mvwprintw(main_page, 4, 1,
@@ -306,22 +313,22 @@ void print_cpu_info_page()
 #define GRAPH_POINT_OFFSET 	 	 6
 #define GRAPH_DELIM_LINE_OFFSET  4
 
-void draw_cpu_load_graph()
+void print_cpu_load_graph()
 {
 	PAGE("CPU Total Load");
 
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 1, 0, "100%%");
-	mvwprintw(main_page, 6, 1, "75%%");
-	mvwprintw(main_page, 11, 1, "50%%");
-	mvwprintw(main_page, 16, 1, "25%%");
-	mvwprintw(main_page, 20, 1, "<5%%");
+	mvwprintw(main_page, 0, 0, "100%%");
+	mvwprintw(main_page, 5, 1, "75%%");
+	mvwprintw(main_page, 10, 1, "50%%");
+	mvwprintw(main_page, 15, 1, "25%%");
+	mvwprintw(main_page, 21, 1, "<5%%");
 
 	for (int x = 0; x < MAX_COLS_COUNT; x++) 
 	{
 	    for (int y = 0; y < MAX_CPU_GRAPH_HEIGHT; y++) 
 		{
-			if(y == 1 || y == 6 || y == 11 || y == 16)
+			if (y == 0 || y == 5 || y == 10 || y == 15)
 			{
 				wattrset(main_page, COLOR_PAIR(15));
 				mvwaddch(main_page, y, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
@@ -344,6 +351,47 @@ void draw_cpu_load_graph()
 		mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT + 1, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 	}
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
+}
+
+#define MAX_CPU_CORES_LOAD_GRAPH 50
+
+void print_cpu_cores_load()
+{
+	PAGE("CPU Cores Load");
+
+	loadpercent_t* cores_load = calculate_cpu_cores_load(data->cpu);
+
+	for (int i = 0; i < data->cpu->processors_num; i++)
+	{
+		wattrset(main_page, COLOR_PAIR(14));
+		mvwprintw(main_page, i, 0, "CORE #%d", i + 1);
+
+		mvwprintw(main_page, i, 10, "[");
+		mvwprintw(main_page, i, 51, "]");
+
+		double core_load = cores_load[i].user + cores_load[i].wait + cores_load[i].sys;
+
+		for (int j = 0; j < MAX_CPU_CORES_LOAD_GRAPH - 10; j++)
+		{
+			if (core_load / 100 * MAX_CPU_CORES_LOAD_GRAPH > j + 0.5)
+			{
+				wattrset(main_page, COLOR_PAIR(18));
+				mvwaddch(main_page, i, j + 11, '|');
+			}
+			else
+			{
+				wattrset(main_page, COLOR_PAIR(0));
+				mvwaddch(main_page, i, j + 11, '.');
+			}
+		}
+
+		wattrset(main_page, COLOR_PAIR(13));
+		mvwprintw_clr(main_page, i, 53, "%0.2f%%", core_load);
+	}
+
+	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
+
+	free(cores_load);
 }
 
 int main_window()
@@ -402,8 +450,13 @@ int main_window()
 		}
 		case P_CPU_LOAD:
 		{
-			calculate_current_load(data->cpu, current_cols - 8); // -8 cause the graph itself starts with indent of 6
-			draw_cpu_load_graph();
+			calculate_total_cpu_load(data->cpu, current_cols - 8); // -8 cause the graph itself starts with indent of 6
+			print_cpu_load_graph();
+			break;
+		}
+		case P_CPU_CORES_LOAD:
+		{
+			print_cpu_cores_load();
 			break;
 		}
 		case P_INPUT_TIME:
