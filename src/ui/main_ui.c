@@ -351,6 +351,7 @@ void print_cpu_load_graph()
 
 #define GRAPH_BOUNDARY_OFFSET 	 15
 #define CORES_LOAD_GRAPH_OFFSET  11
+#define INITIAL_GRAPH_OFFSET  	 10
 
 void print_cpu_cores_load()
 {
@@ -365,11 +366,11 @@ void print_cpu_cores_load()
 	{
 		wattrset(main_page, COLOR_PAIR(14));
 		mvwprintw(main_page, i + 1, 0, "CORE #%d", i + 1);
-		mvwprintw(main_page, i + 1, 10, "[");
+		mvwprintw(main_page, i + 1, INITIAL_GRAPH_OFFSET, "[");
 		mvwprintw(main_page, i + 1, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
 
 		double core_load = cores_load[i].user + cores_load[i].wait + cores_load[i].sys;
-		for (int j = 0; j < current_cols - GRAPH_BOUNDARY_OFFSET - 10; j++)
+		for (int j = 0; j < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; j++)
 		{
 			if (core_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > j + 0.5)
 			{
@@ -388,11 +389,11 @@ void print_cpu_cores_load()
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, data->cpu->processors_num + 2, 0, "AVG load");
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, data->cpu->processors_num + 2, 10, "[");
+	mvwprintw(main_page, data->cpu->processors_num + 2, INITIAL_GRAPH_OFFSET, "[");
 	mvwprintw(main_page, data->cpu->processors_num + 2, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
 
 	double avg_cores_load = get_avg_cores_load(data->cpu, cores_load);
-	for (int i = 0; i < current_cols - GRAPH_BOUNDARY_OFFSET - 10; i++)
+	for (int i = 0; i < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; i++)
 	{
 		if (avg_cores_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > i + 0.5)
 		{
@@ -413,6 +414,8 @@ void print_cpu_cores_load()
 
 	free(cores_load);
 }
+
+#define GRAPH_RIGHT_BOUNDARY 8
 
 int main_window()
 {
@@ -437,7 +440,7 @@ int main_window()
 	wbkgd(stdscr, COLOR_PAIR(14));
 	wbkgd(main_page, COLOR_PAIR(14));
 
-	fflush(NULL); // mb nuzhno a mb net
+	fflush(NULL); // think about it
 
 	current_lines = LINES;
 	current_cols = COLS;
@@ -470,7 +473,7 @@ int main_window()
 		}
 		case P_CPU_LOAD:
 		{
-			calculate_total_cpu_load(data->cpu, current_cols - 8); // -8 cause the graph itself starts with indent of 6
+			calculate_total_cpu_load(data->cpu, current_cols - GRAPH_RIGHT_BOUNDARY); // -8 for correct boundary 
 			print_cpu_load_graph();
 			break;
 		}
