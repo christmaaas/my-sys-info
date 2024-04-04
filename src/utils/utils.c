@@ -93,9 +93,9 @@ int get_file_int(const char* filename)
 
 int get_count_of_files_name(const char* path, const char* name)
 {
-    DIR* dir;
-    struct dirent* entry;
-    int count = 0;
+    DIR*            dir;
+    struct dirent*  entry;
+    int             count = 0;
 
     dir = opendir(path);
     if (dir == NULL) 

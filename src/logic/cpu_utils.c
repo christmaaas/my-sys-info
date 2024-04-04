@@ -33,9 +33,8 @@ void init_cpu_cores(cpu_t* cpu)
 
     cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens and +1 cause of indexes
 
-    cpu->compound            = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
-    cpu->current_load        = (cpuload_t*)calloc(1, sizeof(cpuload_t));
-    cpu->current_load->cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
+    cpu->compound           = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
+    cpu->current_load.cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
 
     for (size_t i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);
@@ -395,11 +394,11 @@ void scan_cpu_load_stat(cpu_t* cpu)
                                             &idle,
                                             &wait);
 		
-	cpu->current_load->total.user = user + nice;
-	cpu->current_load->total.sys  = sys;
-	cpu->current_load->total.idle = idle;
-    cpu->current_load->total.nice = nice;
-    cpu->current_load->total.wait = wait;
+	cpu->current_load.total.user = user + nice;
+	cpu->current_load.total.sys  = sys;
+	cpu->current_load.total.idle = idle;
+    cpu->current_load.total.nice = nice;
+    cpu->current_load.total.wait = wait;
 
     int core = 0;
     while (fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr) && core != cpu->processors_num)
@@ -414,14 +413,19 @@ void scan_cpu_load_stat(cpu_t* cpu)
 		                                        &idle,
                                                 &wait);
 
-        cpu->current_load->cores[core].user = user + nice;
-        cpu->current_load->cores[core].sys  = sys;
-	    cpu->current_load->cores[core].idle = idle;
-        cpu->current_load->cores[core].nice = nice;
-        cpu->current_load->cores[core].wait = wait;
+        cpu->current_load.cores[core].user = user + nice;
+        cpu->current_load.cores[core].sys  = sys;
+	    cpu->current_load.cores[core].idle = idle;
+        cpu->current_load.cores[core].nice = nice;
+        cpu->current_load.cores[core].wait = wait;
 
         core++;
     }
 
     fclose(file_ptr);
+}
+
+void scan_cpu_temperature_stat(cpu_t* cpu)
+{
+    // TODO
 }

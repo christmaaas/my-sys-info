@@ -64,6 +64,7 @@ int input_refresh_time()
 {
     noecho();
     keypad(stdscr, TRUE);
+    wclear(stdscr);
 
     init_color_pairs();
 

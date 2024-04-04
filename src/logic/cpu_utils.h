@@ -10,7 +10,7 @@
 #define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
 #define PATH_STAT_FILE             "/proc/stat"
 
-#define MAX_LOAD_HISTORY_SIZE       200
+#define MAX_HISTORY_SIZE           200
 
 typedef enum cpu_byte_order_name
 {
@@ -125,18 +125,26 @@ typedef struct cpu_load_percent
 
 typedef struct cpu_load
 {
-    loadtype_t  total;
-    loadtype_t* cores;
+    loadtype_t      total;
+    loadtype_t*     cores;
+    loadpercent_t   load_history[MAX_HISTORY_SIZE];
+    uint32_t        cur_point;
 } cpuload_t;
+
+typedef struct cpu_temperature
+{
+    uint16_t    total;
+    uint16_t    temp_history[MAX_HISTORY_SIZE];
+    uint16_t*   cores;
+} cputemp_t; // TODO
 
 typedef struct cpu_info 
 {
     uint32_t        processors_num; 
     cpucompound_t*  compound;
 
-    cpuload_t*      current_load;
-    uint32_t        cur_point;
-    loadpercent_t   load_history[MAX_LOAD_HISTORY_SIZE];
+    cpuload_t       current_load;
+    cputemp_t       current_temp; // TODO
 } cpu_t;
 
 void init_cpu_cores(cpu_t* cpu_info);
@@ -176,6 +184,7 @@ void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
 void refresh_cpu_clocks(cpu_t* cpu, int processor_id);
 void scan_cpu_load_stat(cpu_t* cpu);
+void scan_cpu_temperature_stat(cpu_t* cpu);
 
 typedef enum cpu_cache_levels
 {
