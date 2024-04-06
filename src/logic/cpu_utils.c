@@ -11,7 +11,7 @@ void init_cpu_cores(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_CPUS_PRESENT_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_facility.c\" : get_num_of_processors()");
+        perror("Error to open file in \"cpu_utils.c\" : get_num_of_processors()");
         return;
     }
 
@@ -19,7 +19,7 @@ void init_cpu_cores(cpu_t* cpu)
     {
         fclose(file_ptr);
 
-        perror("Error to read file in \"cpu_facility.c\" : get_num_of_processors()");
+        perror("Error to read file in \"cpu_utils.c\" : get_num_of_processors()");
 
         return;
     }
@@ -52,7 +52,7 @@ void scan_cpu_basic_info(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_CPUINFO_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_facility.c\" : mem_alloc_for_cores()");
+        perror("Error to open file in \"cpu_utils.c\" : mem_alloc_for_cores()");
         return;
     }
 
@@ -376,7 +376,7 @@ void scan_cpu_load_stat(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_STAT_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_facility.c\" : scan_cpu_stat()");
+        perror("Error to open file in \"cpu_utils.c\" : scan_cpu_stat()");
         return;
     }
 

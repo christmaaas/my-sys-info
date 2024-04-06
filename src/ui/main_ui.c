@@ -46,6 +46,13 @@ void init_pairs(int color)
 		init_pair((short)16, (short)COLOR_GREEN, (short)COLOR_WHITE);
 		init_pair((short)17, (short)COLOR_YELLOW, (short)COLOR_WHITE);
 		init_pair((short)18, (short)COLOR_RED, (short)COLOR_GREEN);
+		init_pair((short)19, (short)COLOR_MAGENTA, (short)COLOR_WHITE);
+		init_pair((short)20, (short)COLOR_MAGENTA, (short)COLOR_MAGENTA);
+		init_pair((short)21, (short)COLOR_YELLOW, (short)COLOR_YELLOW);
+		init_pair((short)22, (short)COLOR_GREEN, (short)COLOR_GREEN);
+		init_pair((short)23, (short)COLOR_BLUE, (short)COLOR_BLUE);
+		init_pair((short)24, (short)COLOR_WHITE, (short)COLOR_CYAN);
+		init_pair((short)25, (short)COLOR_WHITE, (short)COLOR_BLUE);
 	}
 }
 
@@ -132,6 +139,12 @@ int input_check()
 				case 'l':
 				{
 					active_page = P_CPU_CORES_LOAD;
+					wclear(main_page);
+					break;
+				}
+				case 'm':
+				{
+					active_page = P_MEMORY;
 					wclear(main_page);
 					break;
 				}
@@ -415,6 +428,121 @@ void print_cpu_cores_load()
 	free(cores_load);
 }
 
+#define NUMBER_OF_MEMORY_GRAPHS 6
+
+void print_memory_page()
+{
+	PAGE("Memory"); 
+
+	calculate_memory_load_percentage(data->memory);
+
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 0,  0, "Pages:");
+	mvwprintw(main_page, 1,  0, "Anon pages: ");
+	mvwprintw(main_page, 2,  0, "Page tables: ");
+	wattrset(main_page, COLOR_PAIR(24));
+	mvwprintw_clr(main_page, 1,  13, "%.1fMB", data->memory->memory_load.anon_pages / 1024.0);
+	mvwprintw_clr(main_page, 2,  13, "%.1fMB", data->memory->memory_load.page_tables / 1024.0);
+
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 0,  25, "Activity:");
+	mvwprintw(main_page, 1,  25, "Active: ");
+	mvwprintw(main_page, 2,  25, "Inactive: ");
+	wattrset(main_page, COLOR_PAIR(24));
+	mvwprintw_clr(main_page, 1,  35, "%.1fMB", data->memory->memory_load.active / 1024.0);
+	mvwprintw_clr(main_page, 2,  35, "%.1fMB", data->memory->memory_load.inactive / 1024.0);
+
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 1,  47, "Shared: ");
+	mvwprintw(main_page, 2,  47, "Mapped: ");
+	wattrset(main_page, COLOR_PAIR(24));
+	mvwprintw_clr(main_page, 1,  55, "%.1fMB", data->memory->memory_load.shmem / 1024.0);
+	mvwprintw_clr(main_page, 2,  55, "%.1fMB", data->memory->memory_load.mapped / 1024.0);
+
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total)", data->memory->memory_load.total / 1024.0);
+	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total)", data->memory->memory_load.swap_total / 1024.0);
+
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 4, 0, "Usage");
+	wattrset(main_page, COLOR_PAIR(17));
+	mvwprintw_clr(main_page, 5, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.usage / 1024.0, 
+														data->memory->memory_percentage.usage);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 7, 0, "Buffers");
+	wattrset(main_page, COLOR_PAIR(19));
+	mvwprintw_clr(main_page, 8, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.buffers / 1024.0,
+														data->memory->memory_percentage.buffers);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 10, 0, "Cached");
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw_clr(main_page, 11, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.cached / 1024.0,
+														 data->memory->memory_percentage.cached);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 13, 0, "Free");
+	wattrset(main_page, COLOR_PAIR(16));
+	mvwprintw_clr(main_page, 14, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.free / 1024.0,
+														 data->memory->memory_percentage.free);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 16, 0, "Usage");
+	wattrset(main_page, COLOR_PAIR(17));
+	mvwprintw_clr(main_page, 17, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.swap_usage / 1024.0,
+														 data->memory->memory_percentage.swap_usage);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 19, 0, "Free");
+	wattrset(main_page, COLOR_PAIR(16));
+	mvwprintw_clr(main_page, 20, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.swap_free / 1024.0,
+														 data->memory->memory_percentage.swap_free);
+	wmove(main_page, 5, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.usage / 2)); i++)
+	{
+		wattrset(main_page, COLOR_PAIR(21));
+		wprintw(main_page, " ");
+	}
+	wmove(main_page, 8, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.buffers) / 2); i++)
+	{
+		wattrset(main_page, COLOR_PAIR(20));
+		wprintw(main_page, " ");
+	}
+	wmove(main_page, 11, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.cached) / 2); i++)
+	{		
+		wattrset(main_page, COLOR_PAIR(23));
+		wprintw(main_page, " ");
+	}
+	wmove(main_page, 14, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.free) / 2); i++)
+	{
+		wattrset(main_page, COLOR_PAIR(22));
+		wprintw(main_page, " ");
+	}
+	wmove(main_page, 17, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_usage) / 2); i++)
+	{
+		wattrset(main_page, COLOR_PAIR(20));
+		wprintw(main_page, " ");
+	}
+	wmove(main_page, 20, 28);
+	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_free) / 2); i++)
+	{
+		wattrset(main_page, COLOR_PAIR(22));
+		wprintw(main_page, " ");
+	}
+	for (int i = 0; i < NUMBER_OF_MEMORY_GRAPHS * 3; i += 3)
+	{
+		wattrset(main_page, COLOR_PAIR(13));
+		mvwprintw(main_page, i + 3, 27, "+-------------------------------------------------+");
+		mvwprintw(main_page, i + 4, 27, "|0%%         |25%%        |50%%         |75%%     100%%|");
+		mvwprintw(main_page, i + 5, 27, "|");
+		mvwprintw(main_page, i + 5, 77, "|");
+	}
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 21, 27, "+-------------------------------------------------+");
+
+	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
+}
+
 #define GRAPH_RIGHT_BOUNDARY 8
 
 int main_window()
@@ -480,6 +608,13 @@ int main_window()
 		case P_CPU_CORES_LOAD:
 		{
 			print_cpu_cores_load();
+			break;
+		}
+		case P_MEMORY:
+		{
+			// TODO
+			scan_memory(data->memory);
+			print_memory_page();
 			break;
 		}
 		case P_INPUT_TIME:

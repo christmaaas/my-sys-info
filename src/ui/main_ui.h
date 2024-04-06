@@ -11,7 +11,8 @@ typedef enum active_page
     P_CPU_INFO         = 2,
     P_CPU_LOAD         = 3,
     P_INPUT_TIME       = 4,
-    P_CPU_CORES_LOAD   = 5
+    P_CPU_CORES_LOAD   = 5,
+    P_MEMORY           = 6
 } page_t;
 
 
