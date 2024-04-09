@@ -11,16 +11,14 @@ void init_cpu_cores(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_CPUS_PRESENT_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_utils.c\" : get_num_of_processors()");
+        perror("Error to open file in \"cpu_utils.c\" : init_cpu_cores()");
         return;
     }
 
     if (!fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr))
     {
         fclose(file_ptr);
-
-        perror("Error to read file in \"cpu_utils.c\" : get_num_of_processors()");
-
+        perror("Error to read file in \"cpu_utils.c\" : init_cpu_cores()");
         return;
     }
 
@@ -36,7 +34,7 @@ void init_cpu_cores(cpu_t* cpu)
     cpu->compound           = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
     cpu->current_load.cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
 
-    for (size_t i = 0; i < tokens_num; ++i)
+    for (int i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);
 
     free(readed_tokens);
@@ -52,7 +50,7 @@ void scan_cpu_basic_info(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_CPUINFO_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_utils.c\" : mem_alloc_for_cores()");
+        perror("Error to open file in \"cpu_utils.c\" : scan_cpu_basic_info()");
         return;
     }
 
@@ -188,14 +186,12 @@ void scan_cpu_basic_info(cpu_t* cpu)
                 }
             }
 
-            const char* byte_order_str = get_file(PATH_CPU_BYTE_ORDER_FILE);
+            char* byte_order_str = get_file(PATH_CPU_BYTE_ORDER_FILE);
 
             if (!strcmp(byte_order_str, "little"))
                 cpu->compound[processor_id].byte_oder = LITTLE_ENDIAN_ORDER;
             else
                 cpu->compound[processor_id].byte_oder = BIG_ENDIAN_ORDER;
-
-            //scan_cpu_cache(&(cpu->compound[processor_id].cache), processor_id);
 
             processor_id++;
 
@@ -212,12 +208,6 @@ void scan_cpu_basic_info(cpu_t* cpu)
         }
     }
     fclose(file_ptr);
-
-    //scan_cpu_clocks(cpu->compound);
-
-    // TODO
-    // вызвать функция для получения архитектуры и т.д.
-    // которых нет в cpuinfo
 }
 
 void scan_cpu_cache(cpu_t* cpu)
@@ -226,17 +216,17 @@ void scan_cpu_cache(cpu_t* cpu)
     char cache_index_path[MAX_FILE_PATH_LEN];
 
     char *size_path = NULL, *line_size_path = NULL, *sets_count = NULL, *ways_of_associativity_path = NULL;
-    for (size_t cpu_id = 0; cpu_id < cpu->processors_num; ++cpu_id)
+    for (uint32_t cpu_id = 0; cpu_id < cpu->processors_num; ++cpu_id)
     {
-        snprintf(cache_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpu%ld/cache", cpu_id);
+        snprintf(cache_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpu%u/cache", cpu_id);
 
         int count_of_cache_files = get_count_of_files_name(cache_path, "index");
 
         cpu->compound[cpu_id].cache.levels_num = count_of_cache_files - 1; // -1 cause of l1 cache has 2 files except one
 
-        for (size_t level = 0; level < count_of_cache_files; ++level)
+        for (int level = 0; level < count_of_cache_files; ++level)
         {
-            snprintf(cache_index_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpu%ld/cache/index%ld", cpu_id, level);
+            snprintf(cache_index_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpu%u/cache/index%d", cpu_id, level);
 
             size_path                       = strconcat(cache_index_path, "/size");
             line_size_path                  = strconcat(cache_index_path, "/coherency_line_size");
@@ -293,7 +283,6 @@ void scan_cpu_cache(cpu_t* cpu)
                 default:
                     break;
             }
-
             free(size_path);
             free(line_size_path);
             free(sets_count);
@@ -309,9 +298,9 @@ void scan_cpu_clocks(cpu_t* cpu)
     int count_of_freq_files = get_count_of_files_name("/sys/devices/system/cpu/cpufreq", "policy");
 
     char* policy_content_path = NULL;
-    for(size_t cpu_id = 0; cpu_id < count_of_freq_files; ++cpu_id)
+    for(int cpu_id = 0; cpu_id < count_of_freq_files; ++cpu_id)
     {
-        snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%ld", cpu_id);
+        snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%d", cpu_id);
 
         policy_content_path = strconcat(policy_path, "/base_frequency");
         cpu->compound[cpu_id].frequency.freq_base = get_file_int(policy_content_path);
@@ -362,7 +351,7 @@ void scan_cpu_clocks(cpu_t* cpu)
 void refresh_cpu_clocks(cpu_t* cpu, int processor_id)
 {
     char policy_path[MAX_FILE_PATH_LEN];
-    snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%ld", processor_id);
+    snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%d", processor_id);
 
     char* policy_content_path = strconcat(policy_path, "/scaling_cur_freq");
     cpu->compound[processor_id].frequency.freq_cur = get_file_int(policy_content_path);
@@ -376,7 +365,7 @@ void scan_cpu_load_stat(cpu_t* cpu)
 
     if ((file_ptr = fopen(PATH_STAT_FILE, "r")) == NULL)
     {   
-        perror("Error to open file in \"cpu_utils.c\" : scan_cpu_stat()");
+        perror("Error to open file in \"cpu_utils.c\" : scan_cpu_load_stat()");
         return;
     }
 
@@ -387,7 +376,7 @@ void scan_cpu_load_stat(cpu_t* cpu)
     if (strncmp(file_buffer, "cpu", 3))
 		return;
         
-    sscanf(file_buffer + 5, "%llu %llu %llu %llu %llu", 
+    sscanf(file_buffer + 5, "%lu %lu %lu %lu %lu", 
                                             &user,
                                             &nice,
                                             &sys,
@@ -400,13 +389,13 @@ void scan_cpu_load_stat(cpu_t* cpu)
     cpu->current_load.total.nice = nice;
     cpu->current_load.total.wait = wait;
 
-    int core = 0;
+    uint32_t core = 0;
     while (fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr) && core != cpu->processors_num)
     {
         if (strncmp(file_buffer, "cpu", 3))
 			break;
 		
-        sscanf(file_buffer + 5, "%llu %llu %llu %llu %llu", 
+        sscanf(file_buffer + 5, "%lu %lu %lu %lu %lu", 
 		                                        &user,
 		                                        &nice,
 		                                        &sys,

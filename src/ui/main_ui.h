@@ -1,8 +1,7 @@
 #ifndef _MAIN_UI_H
 #define _MAIN_UI_H
 
-#define MAX_ROWS_COUNT 256
-#define MAX_COLS_COUNT 200
+#include "macro_ui.h"
 
 typedef enum active_page
 {
@@ -12,10 +11,11 @@ typedef enum active_page
     P_CPU_LOAD         = 3,
     P_INPUT_TIME       = 4,
     P_CPU_CORES_LOAD   = 5,
-    P_MEMORY           = 6
+    P_MEMORY           = 6,
+    P_MEMORY_LOAD      = 7
 } page_t;
 
 
-int main_window();
+int start_main_ui();
 
 #endif /* _MAIN_UI_H */

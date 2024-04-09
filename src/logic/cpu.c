@@ -36,9 +36,9 @@ void calculate_total_cpu_load(cpu_t* cpu, int graph_points_num)
 
     cpu->current_load.cur_point++;
 
-    if (cpu->current_load.cur_point >= graph_points_num || cpu->current_load.cur_point >= MAX_HISTORY_SIZE)
+    if (cpu->current_load.cur_point >= graph_points_num || cpu->current_load.cur_point >= MAX_CPU_LOAD_HISTORY_SIZE)
     {
-        for (int i = 0; i < graph_points_num - 1 && i < MAX_HISTORY_SIZE - 1; ++i)
+        for (int i = 0; i < graph_points_num - 1 && i < MAX_CPU_LOAD_HISTORY_SIZE - 1; ++i)
             cpu->current_load.load_history[i] = cpu->current_load.load_history[i + 1];
 
         cpu->current_load.cur_point = graph_points_num - 1;
@@ -51,7 +51,7 @@ loadpercent_t* calculate_cpu_cores_load(cpu_t* cpu)
     loadpercent_t*  cores_load_percent = (loadpercent_t*)calloc(cpu->processors_num, sizeof(loadpercent_t));
     uint64_t        sum_of_loads = 0;
 
-    for (int i = 0; i < cpu->processors_num; i++)
+    for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
         cores_load[i].user  = cpu->current_load.cores[i].user;
         cores_load[i].sys   = cpu->current_load.cores[i].sys;
@@ -61,7 +61,7 @@ loadpercent_t* calculate_cpu_cores_load(cpu_t* cpu)
 
     scan_cpu_load_stat(cpu);
 
-    for (int i = 0; i < cpu->processors_num; i++)
+    for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
         cores_load[i].user  = cpu->current_load.cores[i].user - cores_load[i].user;
         cores_load[i].sys   = cpu->current_load.cores[i].sys - cores_load[i].sys;
@@ -84,7 +84,7 @@ loadpercent_t* calculate_cpu_cores_load(cpu_t* cpu)
 double get_avg_cores_load(cpu_t* cpu, loadpercent_t* cores_load_percent)
 {
     double avg_cores_load;
-    for (int i = 0; i < cpu->processors_num; i++)
+    for (uint32_t i = 0; i < cpu->processors_num; i++)
         avg_cores_load += cores_load_percent[i].user + cores_load_percent[i].sys + cores_load_percent[i].wait;
 
     return avg_cores_load / cpu->processors_num;
@@ -95,7 +95,7 @@ void free_cpu(cpu_t* cpu)
     if (!cpu)
         return;
         
-    for (size_t cpu_id = 0; cpu_id < cpu->processors_num; ++cpu_id)
+    for (uint32_t cpu_id = 0; cpu_id < cpu->processors_num; cpu_id++)
     {
         free(cpu->compound[cpu_id].frequency.freq_scaling_available_governors);
         free(cpu->compound[cpu_id].frequency.freq_scaling_governor);

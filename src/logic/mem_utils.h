@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 
-#define PATH_MEMINFO_FILE "/proc/meminfo"
+#define PATH_MEMINFO_FILE 		"/proc/meminfo"
 
-typedef struct memory_load
+#define MAX_MEM_LOAD_HISTORY_SIZE	200
+
+typedef struct memory_usage
 {
 	uint64_t usage;
 	uint64_t total;
@@ -23,7 +25,7 @@ typedef struct memory_load
 	uint64_t mapped;
 	uint64_t shmem;
 	uint64_t page_tables;
-} memload_t;
+} memusage_t;
 
 typedef struct memory_percentage
 {
@@ -36,10 +38,18 @@ typedef struct memory_percentage
 	double swap_free;
 } mempercent_t;
 
+typedef struct mem_load
+{
+    double   ram_load_history[MAX_MEM_LOAD_HISTORY_SIZE];
+	double   swap_load_history[MAX_MEM_LOAD_HISTORY_SIZE];
+    uint32_t cur_point;
+} memload_t;
+
 typedef struct memory_info
 {
-    memload_t 	  memory_load;
+    memusage_t 	  memory_usage;
 	mempercent_t  memory_percentage;
+	memload_t	  current_load;
 } mem_t;
 
 void scan_memory(mem_t* memory);

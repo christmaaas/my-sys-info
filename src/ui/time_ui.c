@@ -1,14 +1,14 @@
-#include "time.h"
+#include "time_ui.h"
 
 #include <ncurses.h>
 #include <panel.h>
 
 #define MAX_INPUT_LENGTH 3
 
-#define FRAME()                                                 \
-	{                                                           \
-		box(win, 0, 0);                                         \
-		mvwprintw(win, 0, getmaxx(win) / 3.3, "Refresh Time");  \
+#define FRAME() \
+	{ \
+		box(win, 0, 0); \
+		mvwprintw(win, 0, getmaxx(win) / 3.3, "Refresh Time"); \
 	}
 
 WINDOW* create_input_window(int starty, int startx, int height, int width) 
@@ -81,8 +81,10 @@ int input_refresh_time()
     draw_input_field(input_win, input_length, input_buffer);
 
     int ch;
-    while ((ch = getch()) != '\n') {
-        switch (ch) {
+    while ((ch = getch()) != '\n') 
+    {
+        switch (ch) 
+        {
             case KEY_BACKSPACE:
             case 127:
             {

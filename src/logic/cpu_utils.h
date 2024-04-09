@@ -1,7 +1,8 @@
 #ifndef _CPU_UTILS_H
 #define _CPU_UTILS_H
 
-#include "../utils/utils.h"
+#include "../utils/file_utils.h"
+#include "../utils/string_utils.h"
 
 #include <stdint.h>
 
@@ -10,7 +11,7 @@
 #define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
 #define PATH_STAT_FILE             "/proc/stat"
 
-#define MAX_HISTORY_SIZE           200
+#define MAX_CPU_LOAD_HISTORY_SIZE      200
 
 typedef enum cpu_byte_order_name
 {
@@ -127,14 +128,14 @@ typedef struct cpu_load
 {
     loadtype_t      total;
     loadtype_t*     cores;
-    loadpercent_t   load_history[MAX_HISTORY_SIZE];
+    loadpercent_t   load_history[MAX_CPU_LOAD_HISTORY_SIZE];
     uint32_t        cur_point;
 } cpuload_t;
 
 typedef struct cpu_temperature
 {
     uint16_t    total;
-    uint16_t    temp_history[MAX_HISTORY_SIZE];
+    uint16_t    temp_history[MAX_CPU_LOAD_HISTORY_SIZE];
     uint16_t*   cores;
 } cputemp_t; // TODO
 

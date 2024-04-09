@@ -1,7 +1,9 @@
-#include "main_ui.h"
 #include "../logic/sys.h"
+#include "main_ui.h"
+#include "cpu_ui.h"
+#include "mem_ui.h"
+#include "time_ui.h"
 
-#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,6 +55,11 @@ void init_pairs(int color)
 		init_pair((short)23, (short)COLOR_BLUE, (short)COLOR_BLUE);
 		init_pair((short)24, (short)COLOR_WHITE, (short)COLOR_CYAN);
 		init_pair((short)25, (short)COLOR_WHITE, (short)COLOR_BLUE);
+		init_pair((short)26, (short)COLOR_CYAN, (short)COLOR_BLUE);
+		init_pair((short)27, (short)COLOR_GREEN, (short)COLOR_BLUE);
+		init_pair((short)28, (short)COLOR_RED, (short)COLOR_BLUE);
+		init_pair((short)29, (short)COLOR_YELLOW, (short)COLOR_BLUE);
+		init_pair((short)30, (short)COLOR_BLUE, (short)COLOR_YELLOW);
 	}
 }
 
@@ -148,6 +155,12 @@ int input_check()
 					wclear(main_page);
 					break;
 				}
+				case 'M':
+				{
+					active_page = P_MEMORY_LOAD;
+					wclear(main_page);
+					break;
+				}
 				case 'q':
 				{
 					return -1;
@@ -162,36 +175,21 @@ int input_check()
 	return 0;
 }
 
-#define PAGE(page_name)                     \
-	{                                       \
-		wattrset(main_page, COLOR_PAIR(0)); \
-		mvprintw(0, 7, page_name);          \
-		wnoutrefresh(stdscr);               \
-	}
-
-#define mvwprintw_clr(win, y, x, ...)      \ 
-	{                                      \
-		mvwprintw(win, y, x, __VA_ARGS__); \
-		wclrtoeol(win);                    \
-	}
-
 void print_start_page()
 {
 	PAGE("Menu");
 
-	wattrset(main_page, COLOR_PAIR(15));
-	mvwprintw(main_page, 0, 3, "=====MySysInfo=====");
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 1, 3, "Utility provides information about the system and its devices");
-	mvwprintw(main_page, 3, 3, "Here are the options:");
+	mvwprintw(main_page, 1, 0, "MySysInfo is a program that collects and displays system data and resources.");
+	mvwprintw(main_page, 2, 0, "Users can monitor and analyze processor workload, memory, and network load.");
+	mvwprintw(main_page, 3, 0, "It operates in the terminal, providing detailed information about the system.");
+	mvwprintw(main_page, 4, 0, "Dynamic graphs and visualization tools are used to present the information.");
+	mvwprintw(main_page, 8, 0, "Here are the options:");
 
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 4, 3, "  'c' - CPU info         l = CPU cores load     t = Set refresh time");
-	mvwprintw(main_page, 5, 3, "  'C' - CPU total load  U = Utilisation       + = Slower screen updates");
-	mvwprintw(main_page, 6, 3, "  m = Memory      V = Virtual memory    j = File Systems");
-	mvwprintw(main_page, 7, 3, "  d = Disks       n = Network           . = only busy disks/procs");
-	mvwprintw(main_page, 8, 3, "  r = Resource    N = NFS               h = more options");
-	mvwprintw(main_page, 9, 3, "  k = Kernel      t = Top-processes     q = Quit");
+	mvwprintw(main_page, 9, 0, " 'c' - CPU Info        	'l' - CPU Cores Load      't' - Set Refresh Time");
+	mvwprintw(main_page, 10, 0, " 'C' - CPU Total Load   'U' - Utilisation");
+	mvwprintw(main_page, 11, 0, " 'm' - Memory Usage     'V' - Virtual memory");
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 	wnoutrefresh(stdscr);
 }
@@ -202,7 +200,7 @@ void print_help_page()
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 0, 1, "Available options:");
-	wattrset(main_page, COLOR_PAIR(16));
+	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 1, 1,
 			  "'h' - Help                       	 | r = Resources OS & Proc");
 	mvwprintw(main_page, 2, 1,
@@ -235,317 +233,16 @@ void print_help_page()
 	mvwprintw(main_page, 16, 1,
 			  ". = Display only busy disks & CPU     	| 'q' - Quit");
 
-	wattrset(main_page, COLOR_PAIR(17));
+	wattrset(main_page, COLOR_PAIR(29));
 	mvwprintw_clr(main_page, 17, 1, "Refresh interval: %0.1f sec", (double)refresh_time / 10);
 	wattrset(main_page, COLOR_PAIR(0));
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
 
-void print_cpu_info_page()
-{
-	cpucompound_t processor = data->cpu->compound[selected_processor_id];
-
-	PAGE("CPU");
-
-	wattrset(main_page, COLOR_PAIR(17));
-	mvwprintw_clr(main_page, 0, 1, "Processor ID: %d", selected_processor_id);
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 1, 1, "Name: %s", processor.model_name);
-	mvwprintw_clr(main_page, 2, 1, "Cores: %u", processor.cores_num);
-	mvwprintw_clr(main_page, 3, 1, "Threads: %u", processor.threads_num);
-	mvwprintw_clr(main_page, 4, 1, "Model number: %u", processor.model_number);
-	mvwprintw_clr(main_page, 5, 1, "Family number: %u", processor.family_number);
-	mvwprintw_clr(main_page, 6, 1, "Stepping number: %u", processor.stepping_number);
-	mvwprintw_clr(main_page, 7, 1, "Cpuid level: %u", processor.cpuid_level);
-	mvwprintw_clr(main_page, 8, 1, "Clflush size: %u", processor.clflush_size);
-	mvwprintw_clr(main_page, 9, 1, "Cache allignment: %u", processor.cache_alignment);
-	mvwprintw_clr(main_page, 10, 1, "Physical number: %u", processor.phys_cpus_num);
-	mvwprintw_clr(main_page, 11, 1, "Microcode name: %s", processor.microcode_name);
-	mvwprintw_clr(main_page, 12, 1, "Byte order: %s",
-				  processor.byte_oder == LITTLE_ENDIAN_ORDER ? "little endian" : "big endian");
-	mvwprintw_clr(main_page, 13, 1, "Bogomips: %0.2f", processor.bogomips);
-	mvwprintw_clr(main_page, 14, 1, "Core ID: %d", processor.topology.core_id);
-
-	wattrset(main_page, COLOR_PAIR(16));
-	mvwprintw_clr(main_page, 16, 1, "Frequency:");
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 17, 1, "Max: %0.2fMHz", (double)processor.frequency.freq_max / 1000);
-	mvwprintw_clr(main_page, 18, 1, "Current: %0.2fMHz", (double)processor.frequency.freq_cur / 1000);
-	mvwprintw_clr(main_page, 17, 20, " | Latency: %d", processor.frequency.transition_latency);
-	mvwprintw_clr(main_page, 18, 20, " | Affected processors: %d", processor.frequency.affected_cpus);
-	mvwprintw_clr(main_page, 19, 1, "Base: %0.2fMHz", (double)processor.frequency.freq_base / 1000);
-	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / 1000);
-	mvwprintw_clr(main_page, 21, 1, "Scaling governor: %s", processor.frequency.freq_scaling_governor);
-
-	wattrset(main_page, COLOR_PAIR(15));
-	mvwprintw_clr(main_page, 0, 50, "Cache:");
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 1, 50, "Level 1 (D) size: %uKB", processor.cache.l1_data_size);
-	mvwprintw_clr(main_page, 2, 50, "Level 1 (I) size: %uKB", processor.cache.l1_inst_size);
-	mvwprintw_clr(main_page, 3, 50, "Level 2 size: %uKB", processor.cache.l2_size);
-	mvwprintw_clr(main_page, 4, 50, "Level 3 size: %uKB", processor.cache.l3_size);
-
-	mvwprintw_clr(main_page, 6, 50, "Level 1 (D) line size: %uKB", processor.cache.l1_data_line_size);
-	mvwprintw_clr(main_page, 7, 50, "Level 1 (I) line size: %uKB", processor.cache.l1_inst_line_size);
-	mvwprintw_clr(main_page, 8, 50, "Level 2 line size: %uKB", processor.cache.l2_line_size);
-	mvwprintw_clr(main_page, 9, 50, "Level 3 line size: %uKB", processor.cache.l3_line_size);
-
-	mvwprintw_clr(main_page, 11, 50, "Level 1 (D) sets: %u", processor.cache.l1_data_sets);
-	mvwprintw_clr(main_page, 12, 50, "Level 1 (I) sets: %u", processor.cache.l1_inst_sets);
-	mvwprintw_clr(main_page, 13, 50, "Level 2 sets: %u", processor.cache.l2_sets);
-	mvwprintw_clr(main_page, 14, 50, "Level 3 sets: %u", processor.cache.l3_sets);
-
-	mvwprintw_clr(main_page, 16, 50, "Level 1 (D) ways: %u", processor.cache.l1_data_ways);
-	mvwprintw_clr(main_page, 17, 50, "Level 1 (I) ways: %u", processor.cache.l1_inst_ways);
-	mvwprintw_clr(main_page, 18, 50, "Level 2 ways: %u", processor.cache.l2_ways);
-	mvwprintw_clr(main_page, 19, 50, "Level 3 ways: %u", processor.cache.l3_ways);
-
-	if (processor.cache.levels_num > 3)
-	{
-		mvwprintw_clr(main_page, 21, 50, "Level 4 size: %u", processor.cache.l4_size);
-		mvwprintw_clr(main_page, 22, 50, "Level 4 line size: %u", processor.cache.l4_line_size);
-		mvwprintw_clr(main_page, 23, 50, "Level 4 sets: %u", processor.cache.l4_sets);
-		mvwprintw_clr(main_page, 24, 50, "Level 4 ways: %u", processor.cache.l4_ways);
-	}
-
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-}
-
-#define MAX_CPU_GRAPH_HEIGHT	 20
-#define GRAPH_POINT_OFFSET 	 	 6
-#define GRAPH_DELIM_LINE_OFFSET  4
-
-void print_cpu_load_graph()
-{
-	PAGE("CPU Total Load");
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 1, 0, "100%%");
-	mvwprintw(main_page, 6, 1, "75%%");
-	mvwprintw(main_page, 11, 1, "50%%");
-	mvwprintw(main_page, 16, 1, "25%%");
-	mvwprintw(main_page, 21, 1, "<5%%");
-
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw_clr(main_page, 0, 0, "CPU AVGload/time graph | time: %0.1f sec", (double)refresh_time / 10);
-
-	for (int x = 0; x < MAX_COLS_COUNT; x++) 
-	{
-	    for (int y = 0; y < MAX_CPU_GRAPH_HEIGHT; y++) 
-		{
-			if (y == 1 || y == 6 || y == 11 || y == 16)
-			{
-				wattrset(main_page, COLOR_PAIR(15));
-				mvwaddch(main_page, y, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
-			}
-			if ((data->cpu->current_load.load_history[x].user 
-				+ data->cpu->current_load.load_history[x].sys 
-				+ data->cpu->current_load.load_history[x].wait) / 100 * MAX_CPU_GRAPH_HEIGHT > y + 0.5)
-			{
-				wattrset(main_page, COLOR_PAIR(9));
-				mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
-				wattrset(main_page, COLOR_PAIR(0));
-			}
-			else
-			{
-				wattrset(main_page, COLOR_PAIR(5));
-				mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
-			}
-		}
-		wattrset(main_page, COLOR_PAIR(15));
-		mvwaddch(main_page, MAX_CPU_GRAPH_HEIGHT + 1, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
-	}
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-}
-
-#define GRAPH_BOUNDARY_OFFSET 	 15
-#define CORES_LOAD_GRAPH_OFFSET  11
-#define INITIAL_GRAPH_OFFSET  	 10
-
-void print_cpu_cores_load()
-{
-	PAGE("CPU Cores Load");
-
-	loadpercent_t* cores_load = calculate_cpu_cores_load(data->cpu);
-
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 0, 0, "CPUs load/time graph | time: %0.1f sec", (double)refresh_time / 10);
-
-	for (int i = 0; i < data->cpu->processors_num; i++)
-	{
-		wattrset(main_page, COLOR_PAIR(14));
-		mvwprintw(main_page, i + 1, 0, "CORE #%d", i + 1);
-		mvwprintw(main_page, i + 1, INITIAL_GRAPH_OFFSET, "[");
-		mvwprintw(main_page, i + 1, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
-
-		double core_load = cores_load[i].user + cores_load[i].wait + cores_load[i].sys;
-		for (int j = 0; j < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; j++)
-		{
-			if (core_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > j + 0.5)
-			{
-				wattrset(main_page, COLOR_PAIR(18));
-				mvwaddch(main_page, i + 1, j + CORES_LOAD_GRAPH_OFFSET, '|');
-			}
-			else
-			{
-				wattrset(main_page, COLOR_PAIR(0));
-				mvwaddch(main_page, i + 1, j + CORES_LOAD_GRAPH_OFFSET, '.');
-			}
-		}
-		wattrset(main_page, COLOR_PAIR(13));
-		mvwprintw_clr(main_page, i + 1, current_cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", core_load);
-	}
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, data->cpu->processors_num + 2, 0, "AVG load");
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, data->cpu->processors_num + 2, INITIAL_GRAPH_OFFSET, "[");
-	mvwprintw(main_page, data->cpu->processors_num + 2, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
-
-	double avg_cores_load = get_avg_cores_load(data->cpu, cores_load);
-	for (int i = 0; i < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; i++)
-	{
-		if (avg_cores_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > i + 0.5)
-		{
-			wattrset(main_page, COLOR_PAIR(18));
-			mvwaddch(main_page, data->cpu->processors_num + 2, i + CORES_LOAD_GRAPH_OFFSET, '|'); 
-		}
-		else
-		{
-			wattrset(main_page, COLOR_PAIR(0));
-			mvwaddch(main_page, data->cpu->processors_num + 2, i + CORES_LOAD_GRAPH_OFFSET, '.');
-		}
-	}
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw_clr(main_page, data->cpu->processors_num + 2, 
-					current_cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", avg_cores_load);
-
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-
-	free(cores_load);
-}
-
-#define NUMBER_OF_MEMORY_GRAPHS 6
-
-void print_memory_page()
-{
-	PAGE("Memory"); 
-
-	calculate_memory_load_percentage(data->memory);
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 0,  0, "Pages:");
-	mvwprintw(main_page, 1,  0, "Anon pages: ");
-	mvwprintw(main_page, 2,  0, "Page tables: ");
-	wattrset(main_page, COLOR_PAIR(24));
-	mvwprintw_clr(main_page, 1,  13, "%.1fMB", data->memory->memory_load.anon_pages / 1024.0);
-	mvwprintw_clr(main_page, 2,  13, "%.1fMB", data->memory->memory_load.page_tables / 1024.0);
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 0,  25, "Activity:");
-	mvwprintw(main_page, 1,  25, "Active: ");
-	mvwprintw(main_page, 2,  25, "Inactive: ");
-	wattrset(main_page, COLOR_PAIR(24));
-	mvwprintw_clr(main_page, 1,  35, "%.1fMB", data->memory->memory_load.active / 1024.0);
-	mvwprintw_clr(main_page, 2,  35, "%.1fMB", data->memory->memory_load.inactive / 1024.0);
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 1,  47, "Shared: ");
-	mvwprintw(main_page, 2,  47, "Mapped: ");
-	wattrset(main_page, COLOR_PAIR(24));
-	mvwprintw_clr(main_page, 1,  55, "%.1fMB", data->memory->memory_load.shmem / 1024.0);
-	mvwprintw_clr(main_page, 2,  55, "%.1fMB", data->memory->memory_load.mapped / 1024.0);
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total)", data->memory->memory_load.total / 1024.0);
-	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total)", data->memory->memory_load.swap_total / 1024.0);
-
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 4, 0, "Usage");
-	wattrset(main_page, COLOR_PAIR(17));
-	mvwprintw_clr(main_page, 5, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.usage / 1024.0, 
-														data->memory->memory_percentage.usage);
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 7, 0, "Buffers");
-	wattrset(main_page, COLOR_PAIR(19));
-	mvwprintw_clr(main_page, 8, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.buffers / 1024.0,
-														data->memory->memory_percentage.buffers);
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 10, 0, "Cached");
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 11, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.cached / 1024.0,
-														 data->memory->memory_percentage.cached);
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 13, 0, "Free");
-	wattrset(main_page, COLOR_PAIR(16));
-	mvwprintw_clr(main_page, 14, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.free / 1024.0,
-														 data->memory->memory_percentage.free);
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 16, 0, "Usage");
-	wattrset(main_page, COLOR_PAIR(17));
-	mvwprintw_clr(main_page, 17, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.swap_usage / 1024.0,
-														 data->memory->memory_percentage.swap_usage);
-	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 19, 0, "Free");
-	wattrset(main_page, COLOR_PAIR(16));
-	mvwprintw_clr(main_page, 20, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_load.swap_free / 1024.0,
-														 data->memory->memory_percentage.swap_free);
-	wmove(main_page, 5, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.usage / 2)); i++)
-	{
-		wattrset(main_page, COLOR_PAIR(21));
-		wprintw(main_page, " ");
-	}
-	wmove(main_page, 8, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.buffers) / 2); i++)
-	{
-		wattrset(main_page, COLOR_PAIR(20));
-		wprintw(main_page, " ");
-	}
-	wmove(main_page, 11, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.cached) / 2); i++)
-	{		
-		wattrset(main_page, COLOR_PAIR(23));
-		wprintw(main_page, " ");
-	}
-	wmove(main_page, 14, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.free) / 2); i++)
-	{
-		wattrset(main_page, COLOR_PAIR(22));
-		wprintw(main_page, " ");
-	}
-	wmove(main_page, 17, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_usage) / 2); i++)
-	{
-		wattrset(main_page, COLOR_PAIR(20));
-		wprintw(main_page, " ");
-	}
-	wmove(main_page, 20, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_free) / 2); i++)
-	{
-		wattrset(main_page, COLOR_PAIR(22));
-		wprintw(main_page, " ");
-	}
-	for (int i = 0; i < NUMBER_OF_MEMORY_GRAPHS * 3; i += 3)
-	{
-		wattrset(main_page, COLOR_PAIR(13));
-		mvwprintw(main_page, i + 3, 27, "+-------------------------------------------------+");
-		mvwprintw(main_page, i + 4, 27, "|0%%         |25%%        |50%%         |75%%     100%%|");
-		mvwprintw(main_page, i + 5, 27, "|");
-		mvwprintw(main_page, i + 5, 77, "|");
-	}
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 21, 27, "+-------------------------------------------------+");
-
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-}
-
 #define GRAPH_RIGHT_BOUNDARY 8
 
-int main_window()
+int start_main_ui()
 {
 	bool is_time_changed = false;
 
@@ -595,26 +292,30 @@ int main_window()
 		}
 		case P_CPU_INFO:
 		{
-			print_cpu_info_page();
+			print_cpu_info_page(main_page, data, selected_processor_id);
 			refresh_cpu_clocks(data->cpu, selected_processor_id);
 			break;
 		}
 		case P_CPU_LOAD:
 		{
 			calculate_total_cpu_load(data->cpu, current_cols - GRAPH_RIGHT_BOUNDARY); // -8 for correct boundary 
-			print_cpu_load_graph();
+			print_cpu_load_graph(main_page, data, refresh_time);
 			break;
 		}
 		case P_CPU_CORES_LOAD:
 		{
-			print_cpu_cores_load();
+			print_cpu_cores_load(main_page, data, refresh_time, current_cols);
 			break;
 		}
 		case P_MEMORY:
 		{
-			// TODO
-			scan_memory(data->memory);
-			print_memory_page();
+			print_memory_page(main_page, data);
+			break;
+		}
+		case P_MEMORY_LOAD:
+		{
+			calculate_total_memory_load(data->memory, current_cols - GRAPH_RIGHT_BOUNDARY);
+			print_memory_load_graph(main_page, data, refresh_time);
 			break;
 		}
 		case P_INPUT_TIME:

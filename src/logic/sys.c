@@ -1,5 +1,7 @@
 #include "sys.h"
 
+#include <stdlib.h>
+
 void init_system_data(system_t** data)
 {
     *data = (system_t*)calloc(1, sizeof(system_t));
