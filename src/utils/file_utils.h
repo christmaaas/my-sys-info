@@ -11,5 +11,6 @@
 char* get_file(const char* filename);
 int get_file_int(const char* filename);
 int get_count_of_files_name(const char* path, const char* name);
+int get_count_of_files(const char* path);
 
 #endif /* _FILE_UTILS_H */

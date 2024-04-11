@@ -10,8 +10,9 @@
 #define PATH_CPUS_PRESENT_FILE     "/sys/devices/system/cpu/present"
 #define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
 #define PATH_STAT_FILE             "/proc/stat"
+#define PATH_CPUFREQ_FILE          "/sys/devices/system/cpu/cpufreq"
 
-#define MAX_CPU_LOAD_HISTORY_SIZE      200
+#define MAX_CPU_LOAD_HISTORY_SIZE  200
 
 typedef enum cpu_byte_order_name
 {

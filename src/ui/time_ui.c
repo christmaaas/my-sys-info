@@ -5,6 +5,10 @@
 
 #define MAX_INPUT_LENGTH 3
 
+#define MAX_REFRESH_TIME 100
+#define DEFAULT_REFRESH_TIME 1
+#define MIN_REFRESH_TIME 0
+
 #define FRAME() \
 	{ \
 		box(win, 0, 0); \
@@ -108,10 +112,10 @@ int input_refresh_time()
 
     int refresh_time = atoi(input_buffer);
 
-    if (refresh_time == 0)
-        refresh_time = 1; 
-    else if (refresh_time > 100)
-        refresh_time = 100;
+    if (refresh_time == MIN_REFRESH_TIME)
+        refresh_time = DEFAULT_REFRESH_TIME; 
+    else if (refresh_time > MAX_REFRESH_TIME)
+        refresh_time = MAX_REFRESH_TIME;
     
     destroy_input_panel(input_win, input_pan);
 

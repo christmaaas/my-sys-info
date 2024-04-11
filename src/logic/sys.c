@@ -8,6 +8,7 @@ void init_system_data(system_t** data)
     
     init_cpu(&((*data)->cpu));
     init_memory(&((*data)->memory));
+    init_network(&((*data)->network));
 
     // ...
 }
@@ -19,6 +20,7 @@ void free_system_data(system_t* data)
     
     free_cpu(data->cpu);
     free_memory(data->memory);
+    free_network(data->network);
 
     // ...
 

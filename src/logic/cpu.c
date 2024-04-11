@@ -75,7 +75,6 @@ loadpercent_t* calculate_cpu_cores_load(cpu_t* cpu)
         cores_load_percent[i].wait  = ((double)cores_load[i].wait / (double)sum_of_loads) * 100.0;
         cores_load_percent[i].idle  = ((double)cores_load[i].idle / (double)sum_of_loads) * 100.0;
     }
-
     free(cores_load);
 
     return cores_load_percent;
@@ -100,7 +99,6 @@ void free_cpu(cpu_t* cpu)
         free(cpu->compound[cpu_id].frequency.freq_scaling_available_governors);
         free(cpu->compound[cpu_id].frequency.freq_scaling_governor);
         free(cpu->compound[cpu_id].frequency.freq_scaling_driver);
-
         free(cpu->compound[cpu_id].vendor_name);
         free(cpu->compound[cpu_id].model_name);
         free(cpu->compound[cpu_id].microcode_name);
@@ -111,8 +109,6 @@ void free_cpu(cpu_t* cpu)
         free(cpu->compound[cpu_id].ernergy_performance_available_preference);
     }   
     free(cpu->compound);
-
     free(cpu->current_load.cores);
-    
     free(cpu);
 }

@@ -3,12 +3,13 @@
 
 #include "cpu.h"
 #include "mem.h"
-
+#include "net.h"
 
 typedef struct system
 {
     cpu_t* cpu;
     mem_t* memory;
+    net_t* network;
 
 } system_t;
 

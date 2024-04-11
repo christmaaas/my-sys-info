@@ -2,6 +2,7 @@
 #include "main_ui.h"
 #include "cpu_ui.h"
 #include "mem_ui.h"
+#include "net_ui.h"
 #include "time_ui.h"
 
 #include <stdio.h>
@@ -14,7 +15,8 @@
 int current_lines;
 int current_cols;
 
-int selected_processor_id = 0;
+uint32_t selected_processor_id = 0;
+uint32_t selected_net_intf = 0;
 
 int active_page = P_DEFAULT;
 int prev_page;
@@ -22,7 +24,6 @@ int prev_page;
 int refresh_time = 10; // in milliseconds
 
 WINDOW *main_page;
-
 system_t *data;
 
 void init_pairs(int color)
@@ -60,6 +61,10 @@ void init_pairs(int color)
 		init_pair((short)28, (short)COLOR_RED, (short)COLOR_BLUE);
 		init_pair((short)29, (short)COLOR_YELLOW, (short)COLOR_BLUE);
 		init_pair((short)30, (short)COLOR_BLUE, (short)COLOR_YELLOW);
+		init_pair((short)31, (short)COLOR_RED, (short)COLOR_RED);
+		init_pair((short)32, (short)COLOR_CYAN, (short)COLOR_CYAN);
+		init_pair((short)33, (short)COLOR_WHITE, (short)COLOR_RED);
+		init_pair((short)34, (short)COLOR_WHITE, (short)COLOR_CYAN);
 	}
 }
 
@@ -119,16 +124,32 @@ int input_check()
 				case '>':
 				{
 					if (active_page == P_CPU_INFO && selected_processor_id < data->cpu->processors_num - 1)
+					{
 						selected_processor_id++;
-
-					break;
+						break;
+					}
+					else if (active_page == P_NETWORK_STATS && selected_net_intf < data->network->interfaces_num - 1)
+					{
+						selected_net_intf++;
+						break;
+					}
+					else
+						return 0;
 				}
 				case '<':
 				{
 					if (active_page == P_CPU_INFO && selected_processor_id > 0)
+					{
 						selected_processor_id--;
-
-					break;
+						break;
+					}
+					else if (active_page == P_NETWORK_STATS && selected_net_intf > 0)
+					{
+						selected_net_intf--;
+						break;
+					}
+					else
+						return 0;
 				}
 				case 'C':
 				{
@@ -158,6 +179,12 @@ int input_check()
 				case 'M':
 				{
 					active_page = P_MEMORY_LOAD;
+					wclear(main_page);
+					break;
+				}
+				case 'n':
+				{
+					active_page = P_NETWORK_STATS;
 					wclear(main_page);
 					break;
 				}
@@ -240,8 +267,6 @@ void print_help_page()
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
 
-#define GRAPH_RIGHT_BOUNDARY 8
-
 int start_main_ui()
 {
 	bool is_time_changed = false;
@@ -292,30 +317,36 @@ int start_main_ui()
 		}
 		case P_CPU_INFO:
 		{
-			print_cpu_info_page(main_page, data, selected_processor_id);
 			refresh_cpu_clocks(data->cpu, selected_processor_id);
+			print_cpu_info_page(main_page, data->cpu, selected_processor_id);
 			break;
 		}
 		case P_CPU_LOAD:
 		{
 			calculate_total_cpu_load(data->cpu, current_cols - GRAPH_RIGHT_BOUNDARY); // -8 for correct boundary 
-			print_cpu_load_graph(main_page, data, refresh_time);
+			print_cpu_load_graph(main_page, data->cpu, refresh_time);
 			break;
 		}
 		case P_CPU_CORES_LOAD:
 		{
-			print_cpu_cores_load(main_page, data, refresh_time, current_cols);
+			print_cpu_cores_load(main_page, data->cpu, refresh_time, current_cols);
 			break;
 		}
 		case P_MEMORY:
 		{
-			print_memory_page(main_page, data);
+			print_memory_page(main_page, data->memory);
 			break;
 		}
 		case P_MEMORY_LOAD:
 		{
 			calculate_total_memory_load(data->memory, current_cols - GRAPH_RIGHT_BOUNDARY);
-			print_memory_load_graph(main_page, data, refresh_time);
+			print_memory_load_graph(main_page, data->memory, refresh_time);
+			break;
+		}
+		case P_NETWORK_STATS:
+		{
+			calculate_network_bandwidth(data->network, refresh_time, selected_net_intf, current_cols - GRAPH_RIGHT_BOUNDARY);
+			print_network_bandwitdh_graph(main_page, data->network, refresh_time, selected_net_intf);
 			break;
 		}
 		case P_INPUT_TIME:
@@ -328,7 +359,6 @@ int start_main_ui()
 		default:
 			break;
 		}
-
 		wmove(stdscr, 0, 0);
 		wrefresh(stdscr);
 		doupdate();
@@ -340,6 +370,7 @@ int start_main_ui()
 			input_value = input_check();
 			if (input_value == -1)
 			{
+				//TODO: free main_page
 				free_system_data(data);
 				nocbreak();
 				endwin();

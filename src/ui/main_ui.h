@@ -1,7 +1,7 @@
 #ifndef _MAIN_UI_H
 #define _MAIN_UI_H
 
-#include "macro_ui.h"
+#include "common_ui.h"
 
 typedef enum active_page
 {
@@ -12,9 +12,9 @@ typedef enum active_page
     P_INPUT_TIME       = 4,
     P_CPU_CORES_LOAD   = 5,
     P_MEMORY           = 6,
-    P_MEMORY_LOAD      = 7
+    P_MEMORY_LOAD      = 7,
+    P_NETWORK_STATS    = 8
 } page_t;
-
 
 int start_main_ui();
 

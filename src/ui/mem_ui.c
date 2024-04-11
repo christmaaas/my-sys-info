@@ -3,101 +3,101 @@
 #define NUMBER_OF_MEMORY_GRAPHS 6
 #define LOAD_LINE_START_POINT 	0
 
-void print_memory_page(WINDOW* main_page, system_t* data)
+void print_memory_page(WINDOW* main_page, mem_t* memory)
 {
 	PAGE("Memory Usage"); 
 
-	calculate_memory_usage_percentage(data->memory);
+	calculate_memory_usage_percentage(memory);
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 0,  0, "Pages:");
 	mvwprintw(main_page, 1,  0, "Anon pages: ");
 	mvwprintw(main_page, 2,  0, "Page tables: ");
 	wattrset(main_page, COLOR_PAIR(26));
-	mvwprintw_clr(main_page, 1,  13, "%.1fMB", data->memory->memory_usage.anon_pages / 1024.0);
-	mvwprintw_clr(main_page, 2,  13, "%.1fMB", data->memory->memory_usage.page_tables / 1024.0);
+	mvwprintw_clr(main_page, 1,  13, "%.1fMB", memory->memory_usage.anon_pages / KB);
+	mvwprintw_clr(main_page, 2,  13, "%.1fMB", memory->memory_usage.page_tables / KB);
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 0,  25, "Activity:");
 	mvwprintw(main_page, 1,  25, "Active: ");
 	mvwprintw(main_page, 2,  25, "Inactive: ");
 	wattrset(main_page, COLOR_PAIR(26));
-	mvwprintw_clr(main_page, 1,  35, "%.1fMB", data->memory->memory_usage.active / 1024.0);
-	mvwprintw_clr(main_page, 2,  35, "%.1fMB", data->memory->memory_usage.inactive / 1024.0);
+	mvwprintw_clr(main_page, 1,  35, "%.1fMB", memory->memory_usage.active / KB);
+	mvwprintw_clr(main_page, 2,  35, "%.1fMB", memory->memory_usage.inactive / KB);
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 1,  47, "Shared: ");
 	mvwprintw(main_page, 2,  47, "Mapped: ");
 	wattrset(main_page, COLOR_PAIR(26));
-	mvwprintw_clr(main_page, 1,  55, "%.1fMB", data->memory->memory_usage.shmem / 1024.0);
-	mvwprintw_clr(main_page, 2,  55, "%.1fMB", data->memory->memory_usage.mapped / 1024.0);
+	mvwprintw_clr(main_page, 1,  55, "%.1fMB", memory->memory_usage.shmem / KB);
+	mvwprintw_clr(main_page, 2,  55, "%.1fMB", memory->memory_usage.mapped / KB);
 
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total)", data->memory->memory_usage.total / 1024.0);
-	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total)", data->memory->memory_usage.swap_total / 1024.0);
+	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total)", memory->memory_usage.total / KB);
+	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total)", memory->memory_usage.swap_total / KB);
 
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 4, 0, "Usage");
 	wattrset(main_page, COLOR_PAIR(17));
-	mvwprintw_clr(main_page, 5, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.usage / 1024.0, 
-														data->memory->memory_percentage.usage);
+	mvwprintw_clr(main_page, 5, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.usage / KB, 
+														memory->memory_percentage.usage);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 7, 0, "Buffers");
 	wattrset(main_page, COLOR_PAIR(19));
-	mvwprintw_clr(main_page, 8, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.buffers / 1024.0,
-														data->memory->memory_percentage.buffers);
+	mvwprintw_clr(main_page, 8, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.buffers / KB,
+														memory->memory_percentage.buffers);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 10, 0, "Cached");
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 11, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.cached / 1024.0,
-														 data->memory->memory_percentage.cached);
+	mvwprintw_clr(main_page, 11, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.cached / KB,
+														 memory->memory_percentage.cached);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 13, 0, "Free");
 	wattrset(main_page, COLOR_PAIR(16));
-	mvwprintw_clr(main_page, 14, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.free / 1024.0,
-														 data->memory->memory_percentage.free);
+	mvwprintw_clr(main_page, 14, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.free / KB,
+														 memory->memory_percentage.free);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 16, 0, "Usage");
 	wattrset(main_page, COLOR_PAIR(17));
-	mvwprintw_clr(main_page, 17, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.swap_usage / 1024.0,
-														 data->memory->memory_percentage.swap_usage);
+	mvwprintw_clr(main_page, 17, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.swap_usage / KB,
+														 memory->memory_percentage.swap_usage);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 19, 0, "Free");
 	wattrset(main_page, COLOR_PAIR(16));
-	mvwprintw_clr(main_page, 20, 0, "%.1fMB(%3.1lf%%)", data->memory->memory_usage.swap_free / 1024.0,
-														 data->memory->memory_percentage.swap_free);
+	mvwprintw_clr(main_page, 20, 0, "%.1fMB(%3.1lf%%)", memory->memory_usage.swap_free / KB,
+														 memory->memory_percentage.swap_free);
 	wmove(main_page, LOAD_LINE_START_POINT + 5, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.usage / 2)); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.usage / 2)); i++)
 	{
 		wattrset(main_page, COLOR_PAIR(21));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 8, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.buffers) / 2); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.buffers) / 2); i++)
 	{
 		wattrset(main_page, COLOR_PAIR(20));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 11, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.cached) / 2); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.cached) / 2); i++)
 	{		
 		wattrset(main_page, COLOR_PAIR(23));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 14, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.free) / 2); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.free) / 2); i++)
 	{
 		wattrset(main_page, COLOR_PAIR(22));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 17, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_usage) / 2); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.swap_usage) / 2); i++)
 	{
 		wattrset(main_page, COLOR_PAIR(20));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 20, 28);
-	for (int i = 0; i < (int)((data->memory->memory_percentage.swap_free) / 2); i++)
+	for (int i = 0; i < (int)((memory->memory_percentage.swap_free) / 2); i++)
 	{
 		wattrset(main_page, COLOR_PAIR(22));
 		wprintw(main_page, " ");
@@ -116,13 +116,10 @@ void print_memory_page(WINDOW* main_page, system_t* data)
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
 
-#define MAX_RAM_GRAPH_HEIGHT	 9
-#define MAX_SWAP_GRAPH_HEIGHT	 9
-#define SWAP_GRAPH_BOTTOM_BOUND	 20
-#define GRAPH_POINT_OFFSET 	 	 6
-#define GRAPH_DELIM_LINE_OFFSET  4
+#define MAX_RAM_GRAPH_HEIGHT  9
+#define MAX_SWAP_GRAPH_HEIGHT 9
 
-void print_memory_load_graph(WINDOW* main_page, system_t* data, int refresh_time)
+void print_memory_load_graph(WINDOW* main_page, mem_t* memory, int refresh_time)
 {
 	PAGE("Memory Load");
 
@@ -152,7 +149,7 @@ void print_memory_load_graph(WINDOW* main_page, system_t* data, int refresh_time
 				wattrset(main_page, COLOR_PAIR(14));
 				mvwaddch(main_page, y, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 			}
-			if ((data->memory->current_load.ram_load_history[x]) / 100 * MAX_RAM_GRAPH_HEIGHT > y + 0.5)
+			if ((memory->current_load.ram_load_history[x]) / 100 * MAX_RAM_GRAPH_HEIGHT > y + GRAPH_CORRECTION)
 			{
 				wattrset(main_page, COLOR_PAIR(11));
 				mvwaddch(main_page, MAX_RAM_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
@@ -171,25 +168,25 @@ void print_memory_load_graph(WINDOW* main_page, system_t* data, int refresh_time
 	{
 	    for (int y = 0; y < MAX_SWAP_GRAPH_HEIGHT; y++) 
 		{
-			if (y == SWAP_GRAPH_BOTTOM_BOUND - 12)
+			if (y == GRAPH_BOTTOM_BOUND - 12)
 			{
 				wattrset(main_page, COLOR_PAIR(14));
-				mvwaddch(main_page, SWAP_GRAPH_BOTTOM_BOUND - 8, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
+				mvwaddch(main_page, GRAPH_BOTTOM_BOUND - 8, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 			}
-			if ((data->memory->current_load.swap_load_history[x]) / 100 * MAX_SWAP_GRAPH_HEIGHT > y + 0.5)
+			if ((memory->current_load.swap_load_history[x]) / 100 * MAX_SWAP_GRAPH_HEIGHT > y + GRAPH_CORRECTION)
 			{
 				wattrset(main_page, COLOR_PAIR(9));
-				mvwaddch(main_page, SWAP_GRAPH_BOTTOM_BOUND - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
+				mvwaddch(main_page, GRAPH_BOTTOM_BOUND - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
 				wattrset(main_page, COLOR_PAIR(0));
 			}
 			else
 			{
 				wattrset(main_page, COLOR_PAIR(4));
-				mvwaddch(main_page, SWAP_GRAPH_BOTTOM_BOUND - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
+				mvwaddch(main_page, GRAPH_BOTTOM_BOUND - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
 			}
 		}
 		wattrset(main_page, COLOR_PAIR(14));
-		mvwaddch(main_page, SWAP_GRAPH_BOTTOM_BOUND + 1, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
+		mvwaddch(main_page, GRAPH_BOTTOM_BOUND + 1, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 	}
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }

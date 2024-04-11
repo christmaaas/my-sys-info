@@ -29,14 +29,13 @@ void init_cpu_cores(cpu_t* cpu)
 
     readed_tokens = strsplit(file_buffer, "-", &tokens_num); // "-" is a delim str for num of processors in "online" file
 
-    cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens and +1 cause of indexes
-
+    cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens
+                                                      // and +1 cause of indexes              
     cpu->compound           = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
     cpu->current_load.cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
 
     for (int i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);
-
     free(readed_tokens);
 }
 
@@ -295,7 +294,7 @@ void scan_cpu_clocks(cpu_t* cpu)
 {
     char policy_path[MAX_FILE_PATH_LEN];
 
-    int count_of_freq_files = get_count_of_files_name("/sys/devices/system/cpu/cpufreq", "policy");
+    int count_of_freq_files = get_count_of_files_name(PATH_CPUFREQ_FILE, "policy");
 
     char* policy_content_path = NULL;
     for(int cpu_id = 0; cpu_id < count_of_freq_files; ++cpu_id)
@@ -410,7 +409,6 @@ void scan_cpu_load_stat(cpu_t* cpu)
 
         core++;
     }
-
     fclose(file_ptr);
 }
 
