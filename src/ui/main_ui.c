@@ -1,4 +1,4 @@
-#include "../logic/sys.h"
+#include "../logic/info/sys.h"
 #include "main_ui.h"
 #include "cpu_ui.h"
 #include "mem_ui.h"

@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-#define PATH_MEMINFO_FILE 		"/proc/meminfo"
+#define PATH_MEMINFO_FILE "/proc/meminfo"
 
-#define MAX_MEM_LOAD_HISTORY_SIZE	200
+#define MAX_MEM_LOAD_HISTORY_SIZE 200
 
 typedef struct memory_usage
 {

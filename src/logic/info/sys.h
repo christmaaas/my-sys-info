@@ -11,6 +11,8 @@ typedef struct system
     mem_t* memory;
     net_t* network;
 
+    // ...
+    
 } system_t;
 
 void init_system_data(system_t** data);

@@ -1,9 +1,6 @@
 #ifndef _CPU_UTILS_H
 #define _CPU_UTILS_H
 
-#include "../utils/file_utils.h"
-#include "../utils/string_utils.h"
-
 #include <stdint.h>
 
 #define PATH_CPUINFO_FILE          "/proc/cpuinfo"

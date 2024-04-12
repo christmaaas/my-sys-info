@@ -14,7 +14,7 @@ ifeq ($(MODE), release)
 	BUILD_DIST=$(RELEASE_DIST)
 endif
 
-SRCS=$(wildcard $(SRC)/**/*.c)
+SRCS=$(shell find $(SRC) -name '*.c')
 OBJS=$(patsubst $(SRC)/%.c, $(BUILD_DIST)/%.o, $(SRCS))
 
 .PHONY: all clean
