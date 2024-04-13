@@ -13,7 +13,8 @@ typedef enum active_page
     P_CPU_CORES_LOAD   = 5,
     P_MEMORY           = 6,
     P_MEMORY_LOAD      = 7,
-    P_NETWORK_STATS    = 8
+    P_NETWORK_STATS    = 8,
+    P_REPORT           = 9
 } page_t;
 
 int start_main_ui();

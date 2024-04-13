@@ -127,6 +127,8 @@ typedef struct cpu_load
     loadtype_t      total;
     loadtype_t*     cores;
     loadpercent_t   load_history[MAX_CPU_LOAD_HISTORY_SIZE];
+    loadpercent_t*  cores_load;
+    double          avg_load;
     uint32_t        cur_point;
 } cpuload_t;
 

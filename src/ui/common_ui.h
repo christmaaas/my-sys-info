@@ -14,8 +14,9 @@
 #define GRAPH_RIGHT_BOUNDARY 	8
 #define GRAPH_CORRECTION		0.5
 
-#define KB 1024.0
-#define MB (KB * KB)
+#define KB 	1024.0
+#define MB 	(KB * KB)
+#define SEC 10
 
 #define PAGE(page_name) \
 	{ \

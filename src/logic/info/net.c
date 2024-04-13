@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#define SEC 10
+
 void calculate_network_bandwidth(net_t* network, int refresh_time, int intf, int graph_points_num)
 {
     uint64_t r_bytes_at_moment = network->stat[intf].r_bytes;
@@ -12,8 +14,8 @@ void calculate_network_bandwidth(net_t* network, int refresh_time, int intf, int
     r_bytes_at_moment = network->stat[intf].r_bytes - r_bytes_at_moment;
     t_bytes_at_moment = network->stat[intf].t_bytes - t_bytes_at_moment;
 
-    network->stat[intf].r_bandwith.cur = (double)r_bytes_at_moment / (double)refresh_time * 10;
-    network->stat[intf].t_bandwith.cur = (double)t_bytes_at_moment / (double)refresh_time * 10;
+    network->stat[intf].r_bandwith.cur = (double)r_bytes_at_moment / ((double)refresh_time / SEC);
+    network->stat[intf].t_bandwith.cur = (double)t_bytes_at_moment / ((double)refresh_time / SEC);
 
     network->current_load[intf].r_load_history[network->current_load[intf].cur_point] = network->stat[intf].r_bandwith.cur;
     network->current_load[intf].t_load_history[network->current_load[intf].cur_point] = network->stat[intf].t_bandwith.cur;

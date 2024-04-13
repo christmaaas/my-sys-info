@@ -119,9 +119,11 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 #define MAX_RAM_GRAPH_HEIGHT  9
 #define MAX_SWAP_GRAPH_HEIGHT 9
 
-void print_memory_load_graph(WINDOW* main_page, mem_t* memory, int refresh_time)
+void print_memory_load_graph(WINDOW* main_page, mem_t* memory, int refresh_time, int graph_points_num)
 {
 	PAGE("Memory Load");
+
+	calculate_total_memory_load(memory, graph_points_num);
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 1, 0, "100%%");
@@ -130,8 +132,8 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, int refresh_time)
 	mvwprintw(main_page, 21, 1, "<5%%");
 
 	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw_clr(main_page, 0, 0, "RAM/time graph | time: %0.1f sec", (double)refresh_time / 10);
-	mvwprintw_clr(main_page, 11, 0, "Swap/time graph | time: %0.1f sec", (double)refresh_time / 10);
+	mvwprintw_clr(main_page, 0, 0, "RAM/time graph | time: %0.1f sec", (double)refresh_time / SEC);
+	mvwprintw_clr(main_page, 11, 0, "Swap/time graph | time: %0.1f sec", (double)refresh_time / SEC);
 	wattrset(main_page, COLOR_PAIR(21));
 	mvwprintw(main_page, 0, 45, " ");
 	wattrset(main_page, COLOR_PAIR(22));

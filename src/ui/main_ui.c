@@ -1,4 +1,5 @@
 #include "../logic/info/sys.h"
+#include "../logic/report/report.h"
 #include "main_ui.h"
 #include "cpu_ui.h"
 #include "mem_ui.h"
@@ -16,7 +17,7 @@ int current_lines;
 int current_cols;
 
 uint32_t selected_processor_id = 0;
-uint32_t selected_net_intf = 0;
+uint32_t selected_intf = 0;
 
 int active_page = P_DEFAULT;
 int prev_page;
@@ -128,9 +129,9 @@ int input_check()
 						selected_processor_id++;
 						break;
 					}
-					else if (active_page == P_NETWORK_STATS && selected_net_intf < data->network->interfaces_num - 1)
+					else if (active_page == P_NETWORK_STATS && selected_intf < data->network->interfaces_num - 1)
 					{
-						selected_net_intf++;
+						selected_intf++;
 						break;
 					}
 					else
@@ -143,9 +144,9 @@ int input_check()
 						selected_processor_id--;
 						break;
 					}
-					else if (active_page == P_NETWORK_STATS && selected_net_intf > 0)
+					else if (active_page == P_NETWORK_STATS && selected_intf > 0)
 					{
-						selected_net_intf--;
+						selected_intf--;
 						break;
 					}
 					else
@@ -188,6 +189,13 @@ int input_check()
 					wclear(main_page);
 					break;
 				}
+				case 'r':
+				{
+					prev_page = active_page;
+					active_page = P_REPORT;
+					wclear(main_page);
+					break;
+				}
 				case 'q':
 				{
 					return -1;
@@ -217,6 +225,20 @@ void print_start_page()
 	mvwprintw(main_page, 9, 0, " 'c' - CPU Info        	'l' - CPU Cores Load      't' - Set Refresh Time");
 	mvwprintw(main_page, 10, 0, " 'C' - CPU Total Load   'U' - Utilisation");
 	mvwprintw(main_page, 11, 0, " 'm' - Memory Usage     'V' - Virtual memory");
+	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
+	wnoutrefresh(stdscr);
+}
+
+void print_report_page()
+{
+	PAGE("System Report");
+
+	make_system_report(data);
+
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 1, 0, "*********************************");
+	mvwprintw(main_page, 2, 0, "******* REPORT CREATED **********");
+	mvwprintw(main_page, 3, 0, "*********************************");
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 	wnoutrefresh(stdscr);
 }
@@ -317,14 +339,12 @@ int start_main_ui()
 		}
 		case P_CPU_INFO:
 		{
-			refresh_cpu_clocks(data->cpu, selected_processor_id);
 			print_cpu_info_page(main_page, data->cpu, selected_processor_id);
 			break;
 		}
 		case P_CPU_LOAD:
 		{
-			calculate_total_cpu_load(data->cpu, current_cols - GRAPH_RIGHT_BOUNDARY); // -8 for correct boundary 
-			print_cpu_load_graph(main_page, data->cpu, refresh_time);
+			print_cpu_load_graph(main_page, data->cpu, refresh_time, current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_CPU_CORES_LOAD:
@@ -339,14 +359,19 @@ int start_main_ui()
 		}
 		case P_MEMORY_LOAD:
 		{
-			calculate_total_memory_load(data->memory, current_cols - GRAPH_RIGHT_BOUNDARY);
-			print_memory_load_graph(main_page, data->memory, refresh_time);
+			print_memory_load_graph(main_page, data->memory, refresh_time, current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_NETWORK_STATS:
 		{
-			calculate_network_bandwidth(data->network, refresh_time, selected_net_intf, current_cols - GRAPH_RIGHT_BOUNDARY);
-			print_network_bandwitdh_graph(main_page, data->network, refresh_time, selected_net_intf);
+			print_network_bandwitdh_graph(main_page, data->network, refresh_time, selected_intf, current_cols - GRAPH_RIGHT_BOUNDARY);
+			break;
+		}
+		case P_REPORT:
+		{
+			print_report_page();
+			active_page = prev_page;
+			wclear(main_page);
 			break;
 		}
 		case P_INPUT_TIME:

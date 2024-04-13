@@ -33,8 +33,9 @@ void init_cpu_cores(cpu_t* cpu)
 
     cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens
                                                       // and +1 cause of indexes              
-    cpu->compound           = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
-    cpu->current_load.cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
+    cpu->compound                = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
+    cpu->current_load.cores      = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
+    cpu->current_load.cores_load = (loadpercent_t*)calloc(cpu->processors_num, sizeof(loadpercent_t));
 
     for (int i = 0; i < tokens_num; ++i)
         free(readed_tokens[i]);

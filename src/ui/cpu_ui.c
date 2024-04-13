@@ -2,11 +2,15 @@
 
 #include <stdlib.h>
 
+#define MHZ 1000
+
 void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_id)
 {
-	cpucompound_t processor = cpu->compound[selected_processor_id];
-
 	PAGE("CPU Info");
+
+	refresh_cpu_clocks(cpu, selected_processor_id);
+
+	cpucompound_t processor = cpu->compound[selected_processor_id];
 
 	wattrset(main_page, COLOR_PAIR(29));
 	mvwprintw(main_page, 0, 1, "Processor ID:");
@@ -34,12 +38,12 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_i
 	mvwprintw_clr(main_page, 16, 1, "Frequency:");
 
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw_clr(main_page, 17, 1, "Max: %0.2fMHz", (double)processor.frequency.freq_max / 1000);
-	mvwprintw_clr(main_page, 18, 1, "Current: %0.2fMHz", (double)processor.frequency.freq_cur / 1000);
+	mvwprintw_clr(main_page, 17, 1, "Max: %0.2fMHz", (double)processor.frequency.freq_max / MHZ);
+	mvwprintw_clr(main_page, 18, 1, "Current: %0.2fMHz", (double)processor.frequency.freq_cur / MHZ);
 	mvwprintw_clr(main_page, 17, 20, " | Latency: %d", processor.frequency.transition_latency);
 	mvwprintw_clr(main_page, 18, 20, " | Affected processors: %d", processor.frequency.affected_cpus);
-	mvwprintw_clr(main_page, 19, 1, "Base: %0.2fMHz", (double)processor.frequency.freq_base / 1000);
-	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / 1000);
+	mvwprintw_clr(main_page, 19, 1, "Base: %0.2fMHz", (double)processor.frequency.freq_base / MHZ);
+	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / MHZ);
 	mvwprintw_clr(main_page, 21, 1, "Scaling governor: %s", processor.frequency.freq_scaling_governor);
 
 	wattrset(main_page, COLOR_PAIR(28));
@@ -79,9 +83,11 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_i
 
 #define MAX_CPU_GRAPH_HEIGHT 20
 
-void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, int refresh_time)
+void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, int refresh_time, int graph_points_num)
 {
 	PAGE("CPU Total Load");
+
+	calculate_total_cpu_load(cpu, graph_points_num);
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 1, 0, "100%%");
@@ -91,7 +97,7 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, int refresh_time)
 	mvwprintw(main_page, 21, 1, "<5%%");
 
 	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw_clr(main_page, 0, 0, "CPU AVGload/time graph | time: %0.1f sec", (double)refresh_time / 10);
+	mvwprintw_clr(main_page, 0, 0, "CPU AVGload/time graph | time: %0.1f sec", (double)refresh_time / SEC);
 	wattrset(main_page, COLOR_PAIR(22));
 	mvwprintw(main_page, 0, 45, " ");
 	wattrset(main_page, COLOR_PAIR(13));
@@ -134,10 +140,10 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 {
 	PAGE("CPU Cores Load");
 
-	loadpercent_t* cores_load = calculate_cpu_cores_load(cpu);
+	calculate_cpu_cores_load(cpu);
 
 	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 0, 0, "CPUs load/time graph | time: %0.1f sec", (double)refresh_time / 10);
+	mvwprintw(main_page, 0, 0, "CPUs load/time graph | time: %0.1f sec", (double)refresh_time / SEC);
 
 	for (uint32_t i = 0; i < cpu->processors_num; i++)
 	{
@@ -146,7 +152,9 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 		mvwprintw(main_page, i + 1, INITIAL_GRAPH_OFFSET, "[");
 		mvwprintw(main_page, i + 1, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
 
-		double core_load = cores_load[i].user + cores_load[i].wait + cores_load[i].sys;
+		double core_load = cpu->current_load.cores_load[i].user 
+							+ cpu->current_load.cores_load[i].wait 
+							+ cpu->current_load.cores_load[i].sys;
 		for (int j = 0; j < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; j++)
 		{
 			if (core_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > j + GRAPH_CORRECTION)
@@ -169,10 +177,9 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 	mvwprintw(main_page, cpu->processors_num + 2, INITIAL_GRAPH_OFFSET, "[");
 	mvwprintw(main_page, cpu->processors_num + 2, current_cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
 
-	double avg_cores_load = get_avg_cores_load(cpu, cores_load);
 	for (int i = 0; i < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; i++)
 	{
-		if (avg_cores_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > i + GRAPH_CORRECTION)
+		if (cpu->current_load.avg_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > i + GRAPH_CORRECTION)
 		{
 			wattrset(main_page, COLOR_PAIR(18));
 			mvwaddch(main_page, cpu->processors_num + 2, i + CORES_LOAD_GRAPH_OFFSET, '|'); 
@@ -185,9 +192,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 	}
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw_clr(main_page, cpu->processors_num + 2, 
-					current_cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", avg_cores_load);
+					current_cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", cpu->current_load.avg_load);
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-
-	free(cores_load);
 }

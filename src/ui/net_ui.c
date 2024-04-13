@@ -2,9 +2,11 @@
 
 #define MAX_NETWORK_GRAPH_HEIGHT 12  
 
-void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, int refresh_time, int selected_intf)
+void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, int refresh_time, int selected_intf, int graph_points_num)
 {
 	PAGE("Network Bandwidth");
+
+	calculate_network_bandwidth(network, refresh_time, selected_intf, graph_points_num);
 
 	wattrset(main_page, COLOR_PAIR(25));
     mvwprintw_clr(main_page, 0, 0, "Interface %s (%d/%d)", network->stat[selected_intf].interface_name, selected_intf + 1, network->interfaces_num);
@@ -38,7 +40,7 @@ void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, int refres
     mvwprintw_clr(main_page, 7, 50, "Transmitted drop: %lu", network->stat[selected_intf].t_drop);
 
 	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw_clr(main_page, 8, 0, "Network Bandwitdh/time graph | time: %0.1f sec", (double)refresh_time / 10);
+	mvwprintw_clr(main_page, 8, 0, "Network Bandwitdh/time graph | time: %0.1f sec", (double)refresh_time / SEC);
 	wattrset(main_page, COLOR_PAIR(32));
 	mvwprintw(main_page, 8, 47, " ");
 	wattrset(main_page, COLOR_PAIR(31));
