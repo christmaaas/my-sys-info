@@ -4,6 +4,7 @@
 #include "cpu_ui.h"
 #include "mem_ui.h"
 #include "net_ui.h"
+#include "pci_ui.h"
 #include "time_ui.h"
 
 #include <stdio.h>
@@ -18,14 +19,15 @@ int current_cols;
 
 uint32_t selected_processor_id = 0;
 uint32_t selected_intf = 0;
+uint32_t selected_pci_dev = 0;
 
 int active_page = P_DEFAULT;
 int prev_page;
 
 int refresh_time = 10; // in milliseconds
 
-WINDOW *main_page;
-system_t *data;
+WINDOW* main_page;
+system_t* data;
 
 void init_pairs(int color)
 {
@@ -134,6 +136,11 @@ int input_check()
 						selected_intf++;
 						break;
 					}
+					else if (active_page == P_PCI_INFO && selected_pci_dev < data->pci->pci_dev_num - 1)
+					{
+						selected_pci_dev++;
+						break;
+					}
 					else
 						return 0;
 				}
@@ -147,6 +154,11 @@ int input_check()
 					else if (active_page == P_NETWORK_STATS && selected_intf > 0)
 					{
 						selected_intf--;
+						break;
+					}
+					else if (active_page == P_PCI_INFO && selected_pci_dev > 0)
+					{
+						selected_pci_dev--;
 						break;
 					}
 					else
@@ -193,6 +205,12 @@ int input_check()
 				{
 					prev_page = active_page;
 					active_page = P_REPORT;
+					wclear(main_page);
+					break;
+				}
+				case 'p':
+				{
+					active_page = P_PCI_INFO;
 					wclear(main_page);
 					break;
 				}
@@ -365,6 +383,11 @@ int start_main_ui()
 		case P_NETWORK_STATS:
 		{
 			print_network_bandwitdh_graph(main_page, data->network, refresh_time, selected_intf, current_cols - GRAPH_RIGHT_BOUNDARY);
+			break;
+		}
+		case P_PCI_INFO:
+		{
+			print_pci_devices_page(main_page, data->pci, selected_pci_dev);
 			break;
 		}
 		case P_REPORT:

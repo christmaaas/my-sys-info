@@ -40,7 +40,7 @@ void make_system_report(system_t* data)
 
     //refresh_cpu_clocks(data->cpu, selected_processor_id);
     fprintf(file_ptr, "CPU Information:\n");
-    for (int i = 0; i < data->cpu->processors_num; i++)
+    for (uint32_t i = 0; i < data->cpu->processors_num; i++)
     {
         fprintf(file_ptr, " - Processor ID: %d\n", i);
         fprintf(file_ptr, "   - Name: %s\n", data->cpu->compound[i].model_name);
@@ -95,7 +95,7 @@ void make_system_report(system_t* data)
     fprintf(file_ptr, "\n - Current CPU AVG Load: %0.1f%%\n\n", data->cpu->current_load.avg_load);
     //calculate_cpu_cores_load(data->cpu); 
     fprintf(file_ptr, " - Current Cores Load:\n");
-    for (int i = 0; i < data->cpu->processors_num; i++)
+    for (uint32_t i = 0; i < data->cpu->processors_num; i++)
         fprintf(file_ptr, "   - CORE#%d: %0.2f%%\n", i, data->cpu->current_load.cores_load[i].user 
                                                     + data->cpu->current_load.cores_load[i].wait 
                                                     + data->cpu->current_load.cores_load[i].sys);
@@ -124,7 +124,7 @@ void make_system_report(system_t* data)
 														 data->memory->memory_percentage.swap_free);
 
     fprintf(file_ptr, "Network Information:\n");
-    for (int i = 0 ; i < data->network->interfaces_num; i++)
+    for (uint32_t i = 0 ; i < data->network->interfaces_num; i++)
     {
         fprintf(file_ptr, " - Interface %s (%d/%d)\n", data->network->stat[i].interface_name, 
                                                         i + 1, 
@@ -147,7 +147,25 @@ void make_system_report(system_t* data)
         fprintf(file_ptr, "   - Transmitted packets: %lu\n", data->network->stat[i].t_packets);
         fprintf(file_ptr, "   - Transmitted errors:  %lu\n", data->network->stat[i].t_errs);
         fprintf(file_ptr, "   - Transmitted drop:    %lu\n", data->network->stat[i].t_drop);
-    }                                                   
+    }
+
+    fprintf(file_ptr, "\nPCI Devices Information:\n");
+    for (uint32_t i = 0 ; i < data->pci->pci_dev_num; i++)
+    {
+        fprintf(file_ptr, " - Device: (%d/%d)\n", i + 1, data->pci->pci_dev_num);
+        fprintf(file_ptr, "   - Slot: %s\n", data->pci->devices[i].slot_name);
+        fprintf(file_ptr, "   - Class: %s\n", data->pci->devices[i].class_name);
+        fprintf(file_ptr, "   - Subclass: %s\n", 
+                            data->pci->devices[i].subclass_name ? data->pci->devices[i].subclass_name : "Not Found");
+        fprintf(file_ptr, "   - Interface: %s\n", 
+                            data->pci->devices[i].interface_name ? data->pci->devices[i].interface_name : "Not Found");
+        fprintf(file_ptr, "   - Vendor Name: %s\n", data->pci->devices[i].vendor_name);
+        fprintf(file_ptr, "   - Vendor ID: %s\n", data->pci->devices[i].vendor_id);
+        fprintf(file_ptr, "   - Device Name: %s\n",
+                            data->pci->devices[i].device_name ? data->pci->devices[i].device_name : "Not Found");
+        fprintf(file_ptr, "   - Device ID: %s\n", data->pci->devices[i].device_id);
+        fprintf(file_ptr, "   - Modalias: %s\n", data->pci->devices[i].modalias);
+    }                                                                       
                             
     fclose(file_ptr);
 }

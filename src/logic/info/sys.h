@@ -4,12 +4,14 @@
 #include "cpu.h"
 #include "mem.h"
 #include "net.h"
+#include "pci.h"
 
 typedef struct system
 {
     cpu_t* cpu;
     mem_t* memory;
     net_t* network;
+    pci_t* pci;
 
     // ...
     

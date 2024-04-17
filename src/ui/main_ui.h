@@ -14,7 +14,8 @@ typedef enum active_page
     P_MEMORY           = 6,
     P_MEMORY_LOAD      = 7,
     P_NETWORK_STATS    = 8,
-    P_REPORT           = 9
+    P_REPORT           = 9,
+    P_PCI_INFO         = 10
 } page_t;
 
 int start_main_ui();

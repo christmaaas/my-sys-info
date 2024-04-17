@@ -8,7 +8,6 @@
 char* get_file(const char* filename) 
 {
     FILE* file_ptr = NULL;
-
     if ((file_ptr = fopen(filename, "r")) == NULL) 
     {
         perror("Error to open file in \"file_utils.c\" : get_file()");
@@ -43,16 +42,14 @@ int get_file_int(const char* filename)
 
 int get_count_of_files_name(const char* path, const char* name)
 {
-    DIR* dir;
-    struct dirent* entry;
-
-    dir = opendir(path);
+    DIR* dir = opendir(path);
     if (dir == NULL) 
     {
         perror("Error to open directory in \"file_utils.c\" : get_count_of_files_name()");
         return -1;
     }
     int count = 0;
+    struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) 
     {
         if (strstr(entry->d_name, name) != NULL) 
@@ -65,16 +62,14 @@ int get_count_of_files_name(const char* path, const char* name)
 
 int get_count_of_files(const char* path)
 {
-    DIR* dir;
-    struct dirent* entry;
-
-    dir = opendir(path);
+    DIR* dir = opendir(path);
     if (dir == NULL) 
     {
         perror("Error to open directory in \"file_utils.c\" : get_count_of_files()");
         return -1;
     }
     int count = 0;
+    struct dirent* entry;
     while ((entry = readdir(dir)) != NULL)
     {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
