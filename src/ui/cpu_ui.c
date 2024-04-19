@@ -157,7 +157,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 							+ cpu->current_load.cores_load[i].sys;
 		for (int j = 0; j < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; j++)
 		{
-			if (core_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > j + GRAPH_CORRECTION)
+			if (core_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET) > j + GRAPH_CORRECTION)
 			{
 				wattrset(main_page, COLOR_PAIR(18));
 				mvwaddch(main_page, i + 1, j + CORES_LOAD_GRAPH_OFFSET, '|');
@@ -179,7 +179,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int c
 
 	for (int i = 0; i < current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; i++)
 	{
-		if (cpu->current_load.avg_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET) > i + GRAPH_CORRECTION)
+		if (cpu->current_load.avg_load / 100 * (current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET) > i + GRAPH_CORRECTION)
 		{
 			wattrset(main_page, COLOR_PAIR(18));
 			mvwaddch(main_page, cpu->processors_num + 2, i + CORES_LOAD_GRAPH_OFFSET, '|'); 

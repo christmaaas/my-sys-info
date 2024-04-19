@@ -74,7 +74,7 @@ void calculate_cpu_cores_load(cpu_t* cpu)
         cpu->current_load.cores_load[i].wait  = ((double)cur_cores[i].wait / (double)sum_of_loads) * 100.0;
         cpu->current_load.cores_load[i].idle  = ((double)cur_cores[i].idle / (double)sum_of_loads) * 100.0;
     }
-
+    cpu->current_load.avg_load = 0;
     for (uint32_t i = 0; i < cpu->processors_num; i++)
         cpu->current_load.avg_load += cpu->current_load.cores_load[i].user 
                                         + cpu->current_load.cores_load[i].sys 

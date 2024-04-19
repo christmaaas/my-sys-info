@@ -414,8 +414,3 @@ void scan_cpu_load_stat(cpu_t* cpu)
     }
     fclose(file_ptr);
 }
-
-void scan_cpu_temperature_stat(cpu_t* cpu)
-{
-    // TODO
-}

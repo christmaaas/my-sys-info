@@ -5,6 +5,7 @@
 #include "mem_ui.h"
 #include "net_ui.h"
 #include "pci_ui.h"
+#include "sensors_ui.h"
 #include "time_ui.h"
 
 #include <stdio.h>
@@ -214,6 +215,18 @@ int input_check()
 					wclear(main_page);
 					break;
 				}
+				case 'g':
+				{
+					active_page = P_GENERAL_INFO;
+					wclear(main_page);
+					break;
+				}
+				case 's':
+				{
+					active_page = P_SENSORS;
+					wclear(main_page);
+					break;
+				}
 				case 'q':
 				{
 					return -1;
@@ -253,7 +266,7 @@ void print_report_page()
 
 	make_system_report(data);
 
-	wattrset(main_page, COLOR_PAIR(14));
+	wattrset(main_page, COLOR_PAIR(27));
 	mvwprintw(main_page, 1, 0, "*********************************");
 	mvwprintw(main_page, 2, 0, "******* REPORT CREATED **********");
 	mvwprintw(main_page, 3, 0, "*********************************");
@@ -388,6 +401,16 @@ int start_main_ui()
 		case P_PCI_INFO:
 		{
 			print_pci_devices_page(main_page, data->pci, selected_pci_dev);
+			break;
+		}
+		case P_GENERAL_INFO:
+		{
+			// TODO
+			break;
+		}
+		case P_SENSORS:
+		{
+			print_sensors_page(main_page, data->sensor, current_cols);
 			break;
 		}
 		case P_REPORT:

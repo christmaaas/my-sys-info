@@ -152,7 +152,7 @@ void make_system_report(system_t* data)
     fprintf(file_ptr, "\nPCI Devices Information:\n");
     for (uint32_t i = 0 ; i < data->pci->pci_dev_num; i++)
     {
-        fprintf(file_ptr, " - Device: (%d/%d)\n", i + 1, data->pci->pci_dev_num);
+        fprintf(file_ptr, " - Device (%d/%d)\n", i + 1, data->pci->pci_dev_num);
         fprintf(file_ptr, "   - Slot: %s\n", data->pci->devices[i].slot_name);
         fprintf(file_ptr, "   - Class: %s\n", data->pci->devices[i].class_name);
         fprintf(file_ptr, "   - Subclass: %s\n", 
@@ -165,7 +165,17 @@ void make_system_report(system_t* data)
                             data->pci->devices[i].device_name ? data->pci->devices[i].device_name : "Not Found");
         fprintf(file_ptr, "   - Device ID: %s\n", data->pci->devices[i].device_id);
         fprintf(file_ptr, "   - Modalias: %s\n", data->pci->devices[i].modalias);
-    }                                                                       
+    }
+
+    fprintf(file_ptr, "\nSystem Sensors Statistics:\n");
+    for (uint32_t i = 0 ; i < data->sensor->sensors_num; i++)
+    {
+        fprintf(file_ptr, " - Sensor (%d/%d)\n", i + 1, data->sensor->sensors_num);
+        fprintf(file_ptr, "   - Sensor name: %s\n", data->sensor->sensors[i].name);
+        fprintf(file_ptr, "   - Current temperature: %d\n", data->sensor->sensors[i].cur_temp);
+        fprintf(file_ptr, "   - Min temperature: %d\n", data->sensor->sensors[i].min_temp);
+        fprintf(file_ptr, "   - Max temperature: %d\n", data->sensor->sensors[i].max_temp);
+    }                                                                               
                             
     fclose(file_ptr);
 }

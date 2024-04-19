@@ -12,8 +12,8 @@
 
 void init_pci_devices(pci_t* pci)
 {
-    pci->pci_dev_num = get_count_of_files(PATH_PCI_DEVICES_FILE);
-    pci->devices = (pcidev_t*)calloc(pci->pci_dev_num, sizeof(pcidev_t));
+    pci->pci_dev_num = get_count_of_files(PATH_PCI_DEVICES_DIR);
+    pci->devices     = (pcidev_t*)calloc(pci->pci_dev_num, sizeof(pcidev_t));
 }
 
 // To check if current string of pci.ids file is vendor id
@@ -27,7 +27,7 @@ void get_pci_vendor_device(pcidev_t* pci_dev, char* vendor, char* device)
     FILE* file_ptr = NULL;
     if ((file_ptr = fopen(PATH_PCI_IDS_FILE, "r")) == NULL) 
     {
-        perror("Error to open file in \"pci_utils.c\" : get_pci_device_name()");
+        perror("Error to open file in \"pci_utils.c\" : get_pci_vendor_device()");
         return;
     }
 
@@ -39,7 +39,7 @@ void get_pci_vendor_device(pcidev_t* pci_dev, char* vendor, char* device)
 
     while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr)) 
     {
-        if (strstr(file_buffer, vendor) != NULL && file_buffer[0] != '\t')
+        if (strstr(file_buffer, vendor) != NULL && file_buffer[0] != '\t') // one tab <-- class name 
         {
             vendor_tokens = strsplit(file_buffer, "  ", &tokens_num);
             pci_dev->vendor_name = strduplicate(vendor_tokens[1]);
@@ -70,7 +70,7 @@ void get_pci_vendor_device(pcidev_t* pci_dev, char* vendor, char* device)
     fclose(file_ptr);
 }
 
-// pci.ids
+// pci.ids frame:
 // # List of known device classes, subclasses and programming interfaces
 
 // # Syntax:        
@@ -124,9 +124,9 @@ void get_pci_class_attributes(pcidev_t* pci_dev, char* class)
             pci_dev->class_name = strduplicate(class_tokens[1]);
             CUT_STRING_BY_LENGTH(pci_dev->class_name);
 
-            while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr) && file_buffer[0] == '\t')
+            while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr) && file_buffer[0] == '\t') // one tab <-- class name 
             {
-                if (strstr(file_buffer, file_subclass) != NULL && file_buffer[1] != '\t')
+                if (strstr(file_buffer, file_subclass) != NULL && file_buffer[1] != '\t') // not intf
                 {
                     subclass_tokens = strsplit(file_buffer, "  ", &tokens_num);
                     pci_dev->subclass_name = strduplicate(subclass_tokens[1]);
@@ -134,7 +134,7 @@ void get_pci_class_attributes(pcidev_t* pci_dev, char* class)
 
                     while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr) && file_buffer[0] == '\t' && file_buffer[1] == '\t')
                     {
-                        if (strstr(file_buffer, file_prog_if) != NULL)
+                        if (strstr(file_buffer, file_prog_if) != NULL) // two tabs <-- <-- intf name 
                         {
                             prog_if_tokens = strsplit(file_buffer, "  ", &tokens_num);
                             pci_dev->interface_name = strduplicate(prog_if_tokens[1]);
@@ -191,7 +191,7 @@ char* get_file_without_hex_prefix(const char* path)
 
 void scan_pci_devices_info(pci_t* pci)
 {
-    DIR* dir = opendir(PATH_PCI_DEVICES_FILE);
+    DIR* dir = opendir(PATH_PCI_DEVICES_DIR);
     if (dir == NULL) 
     {
         perror("Error to open directory in \"pci_utils.c\" : scan_pci_devices_info()");

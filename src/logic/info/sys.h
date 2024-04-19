@@ -5,13 +5,15 @@
 #include "mem.h"
 #include "net.h"
 #include "pci.h"
+#include "sensors.h"
 
 typedef struct system
 {
-    cpu_t* cpu;
-    mem_t* memory;
-    net_t* network;
-    pci_t* pci;
+    cpu_t*    cpu;
+    mem_t*    memory;
+    net_t*    network;
+    pci_t*    pci;
+    sensor_t* sensor;
 
     // ...
     

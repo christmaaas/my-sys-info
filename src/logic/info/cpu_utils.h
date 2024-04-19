@@ -132,20 +132,12 @@ typedef struct cpu_load
     uint32_t        cur_point;
 } cpuload_t;
 
-typedef struct cpu_temperature
-{
-    uint16_t    total;
-    uint16_t    temp_history[MAX_CPU_LOAD_HISTORY_SIZE];
-    uint16_t*   cores;
-} cputemp_t; // TODO
-
 typedef struct cpu_info 
 {
     uint32_t        processors_num; 
     cpucompound_t*  compound;
 
     cpuload_t       current_load;
-    cputemp_t       current_temp; // TODO
 } cpu_t;
 
 void init_cpu_cores(cpu_t* cpu_info);
@@ -185,7 +177,6 @@ void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
 void refresh_cpu_clocks(cpu_t* cpu, int processor_id);
 void scan_cpu_load_stat(cpu_t* cpu);
-void scan_cpu_temperature_stat(cpu_t* cpu);
 
 typedef enum cpu_cache_levels
 {
