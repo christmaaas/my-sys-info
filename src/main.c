@@ -1,19 +1,25 @@
-#include "logic/info/sys.h"
-#include "logic/info/cpu_utils.h"
+#include "utils/opt_utils.h"
 #include "ui/main_ui.h"
 
-#include <cpuid.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/utsname.h>
-#include <linux/sysinfo.h>
 
 #define MAIN_UI_FINISHED 0
+#define UI_EXEC_ERROR   -2
 
-int main() 
+int main(int argc, char **argv) 
 {
-    if (start_main_ui() == MAIN_UI_FINISHED)
-        return 0;
+    int opt;
+    while ((opt = getopt(argc, argv, "h")) != -1) 
+    {
+        switch (opt) 
+        {
+            case 'h': { print_opt_help(); exit(0); }
+            default: break;
+        }
+    }
+    if (start_main_ui() != MAIN_UI_FINISHED)
+        exit(UI_EXEC_ERROR);
 
     return 0;
 }

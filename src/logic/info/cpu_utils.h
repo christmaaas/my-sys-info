@@ -19,90 +19,73 @@ typedef enum cpu_byte_order_name
 
 typedef struct cpu_frequency_info 
 {
-    uint32_t        freq_max;
-    uint32_t        freq_base;
-    uint32_t        freq_cur;
-    uint32_t        freq_min;
-
-    int             transition_latency;
-
-    char*           freq_scaling_driver;
-    char*           freq_scaling_governor;
-    char*           freq_scaling_available_governors;
-
-    uint32_t        affected_cpus;
+    uint32_t freq_max;
+    uint32_t freq_base;
+    uint32_t freq_cur;
+    uint32_t freq_min;
+    int      transition_latency;
+    char*    freq_scaling_driver;
+    char*    freq_scaling_governor;
+    char*    freq_scaling_available_governors;
+    uint32_t affected_cpus;
 } cpufreq_t;
 
 typedef struct cpu_cache_info 
 {
-    uint32_t        levels_num;
-
-    uint32_t        l1_data_size;
-    uint32_t        l1_inst_size;
-    uint32_t        l2_size;
-    uint32_t        l3_size;
-    uint32_t        l4_size;
-
-    uint32_t        l1_data_line_size;
-    uint32_t        l1_inst_line_size;
-    uint32_t        l2_line_size;
-    uint32_t        l3_line_size;
-    uint32_t        l4_line_size;
-
-    uint32_t        l1_data_sets;
-    uint32_t        l1_inst_sets;
-    uint32_t        l2_sets;
-    uint32_t        l3_sets;
-    uint32_t        l4_sets;
-
-    uint32_t        l1_data_ways;
-    uint32_t        l1_inst_ways;
-    uint32_t        l2_ways;
-    uint32_t        l3_ways;
-    uint32_t        l4_ways;
+    uint32_t levels_num;
+    uint32_t l1_data_size;
+    uint32_t l1_inst_size;
+    uint32_t l2_size;
+    uint32_t l3_size;
+    uint32_t l4_size;
+    uint32_t l1_data_line_size;
+    uint32_t l1_inst_line_size;
+    uint32_t l2_line_size;
+    uint32_t l3_line_size;
+    uint32_t l4_line_size;
+    uint32_t l1_data_sets;
+    uint32_t l1_inst_sets;
+    uint32_t l2_sets;
+    uint32_t l3_sets;
+    uint32_t l4_sets;
+    uint32_t l1_data_ways;
+    uint32_t l1_inst_ways;
+    uint32_t l2_ways;
+    uint32_t l3_ways;
+    uint32_t l4_ways;
 } cpucache_t;
 
 typedef struct cpu_topology_info
 {
-    uint32_t        thread_id; 
-    uint32_t        socket_id;  
-    uint32_t        core_id;    
+    uint32_t thread_id;
+    uint32_t socket_id;
+    uint32_t core_id;
 } cputopology_t;
 
 typedef struct cpu_compound_info
 {
-    char*           model_name;
-    char*           vendor_name;
-
-    uint32_t        cores_num;
-    uint32_t        threads_num;
-    uint32_t        phys_cpus_num;  
-
-    uint32_t        model_number; 
-    uint32_t        family_number;
-    uint32_t        stepping_number;
-
-    uint32_t        cpuid_level;
-    uint32_t        clflush_size;
-    uint32_t        cache_alignment;  
-    char*           microcode_name; 
-    double          bogomips;
-    cpubyteorder_t  byte_oder;
-
-    cpufreq_t       frequency;
-
-    cpucache_t      cache;     
-    
-    cputopology_t   topology; 
-
-    char*           flags;
-
-    char*           bugs;
-
-    char*           energy_performance_preference;
-    char*           ernergy_performance_available_preference; 
-
-    char*           address_sizes;
+    char*          model_name;
+    char*          vendor_name;
+    uint32_t       cores_num;
+    uint32_t       threads_num;
+    uint32_t       phys_cpus_num;
+    uint32_t       model_number;
+    uint32_t       family_number;
+    uint32_t       stepping_number;
+    uint32_t       cpuid_level;
+    uint32_t       clflush_size;
+    uint32_t       cache_alignment;
+    char*          microcode_name;
+    double         bogomips;
+    cpubyteorder_t byte_oder;
+    cpufreq_t      frequency;
+    cpucache_t     cache;
+    cputopology_t  topology;
+    char*          flags;
+    char*          bugs;
+    char*          energy_performance_preference;
+    char*          ernergy_performance_available_preference;
+    char*          address_sizes;
 } cpucompound_t;
 
 typedef struct cpu_load_type
@@ -124,20 +107,19 @@ typedef struct cpu_load_percent
 
 typedef struct cpu_load
 {
-    loadtype_t      total;
-    loadtype_t*     cores;
-    loadpercent_t   load_history[MAX_CPU_LOAD_HISTORY_SIZE];
-    loadpercent_t*  cores_load;
-    double          avg_load;
-    uint32_t        cur_point;
+    loadtype_t     total;
+    loadtype_t*    cores;
+    loadpercent_t  load_history[MAX_CPU_LOAD_HISTORY_SIZE];
+    loadpercent_t* cores_load;
+    double         avg_load;
+    uint32_t       cur_point;
 } cpuload_t;
 
 typedef struct cpu_info 
 {
-    uint32_t        processors_num; 
-    cpucompound_t*  compound;
-
-    cpuload_t       current_load;
+    uint32_t       processors_num; 
+    cpucompound_t* compound;
+    cpuload_t      current_load;
 } cpu_t;
 
 void init_cpu_cores(cpu_t* cpu_info);

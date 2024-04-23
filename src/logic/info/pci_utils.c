@@ -12,8 +12,8 @@
 
 void init_pci_devices(pci_t* pci)
 {
-    pci->pci_dev_num = get_count_of_files(PATH_PCI_DEVICES_DIR);
-    pci->devices     = (pcidev_t*)calloc(pci->pci_dev_num, sizeof(pcidev_t));
+    pci->devices_num = get_count_of_files(PATH_PCI_DEVICES_DIR);
+    pci->devices     = (pcidev_t*)calloc(pci->devices_num, sizeof(pcidev_t));
 }
 
 // To check if current string of pci.ids file is vendor id
@@ -202,7 +202,7 @@ void scan_pci_devices_info(pci_t* pci)
     char cur_file_name[MAX_FILE_PATH_LEN];
     uint32_t count = 0;
     struct dirent* entry;
-    while ((entry = readdir(dir)) != NULL && count != pci->pci_dev_num)
+    while ((entry = readdir(dir)) != NULL && count != pci->devices_num)
     {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
             continue;

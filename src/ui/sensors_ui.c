@@ -4,7 +4,7 @@
 #define SENSORS_GRAPH_OFFSET  38
 #define INITIAL_GRAPH_OFFSET  37
 
-void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int current_cols)
+void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int refresh_time, int current_cols)
 {
     PAGE("Sensors");
 
@@ -12,6 +12,8 @@ void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int current_cols)
 
     wattrset(main_page, COLOR_PAIR(25));
     mvwprintw(main_page, 0, 0, "Sensor name       |Cur°C|Max°C|Min°C|");
+	wattrset(main_page, COLOR_PAIR(14));
+	mvwprintw(main_page, 0, 42, "time: %0.1f sec", (double)refresh_time / SEC);
 
     for (uint32_t i = 0, l = 1; i < sensor->sensors_num; i++, l += 2)
 	{

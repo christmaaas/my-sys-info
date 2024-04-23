@@ -21,8 +21,8 @@ typedef struct pci_device_info
 
 typedef struct pci_info
 {
-    uint32_t    pci_dev_num;
-    pcidev_t*   devices;
+    uint32_t  devices_num;
+    pcidev_t* devices;
 } pci_t;
 
 void init_pci_devices(pci_t* pci);

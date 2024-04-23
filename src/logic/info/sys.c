@@ -11,8 +11,6 @@ void init_system_data(system_t** data)
     init_network(&((*data)->network));
     init_pci(&((*data)->pci));
     init_sensors(&((*data)->sensor));
-
-    // ...
 }
 
 void free_system_data(system_t* data)
@@ -25,8 +23,6 @@ void free_system_data(system_t* data)
     free_network(data->network);
     free_pci(data->pci);
     free_sensors(data->sensor);
-
-    // ...
 
     free(data);
 }

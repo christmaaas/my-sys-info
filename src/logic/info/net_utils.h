@@ -20,31 +20,31 @@ typedef struct network_bandwidth
 
 typedef struct network_stats
 {
-	char        	interface_name[MAX_INTERFACE_NAME_LEN];
-	uint64_t    	r_bytes;
-	uint64_t    	t_bytes;
-	uint64_t    	r_packets;
-	uint64_t    	t_packets;
-	uint64_t    	r_errs;
-	uint64_t    	t_errs;
-	uint64_t    	r_drop;
-    uint64_t    	t_drop;
-	netbandwidth_t 	r_bandwith;
-	netbandwidth_t 	t_bandwith;      
+	char           interface_name[MAX_INTERFACE_NAME_LEN];
+	uint64_t       r_bytes;
+	uint64_t       t_bytes;
+	uint64_t       r_packets;
+	uint64_t       t_packets;
+	uint64_t       r_errs;
+	uint64_t       t_errs;
+	uint64_t       r_drop;
+    uint64_t       t_drop;
+	netbandwidth_t r_bandwith;
+	netbandwidth_t t_bandwith;      
 } netstat_t;
 
 typedef struct net_load
 {
-    double 		r_load_history[MAX_NET_LOAD_HISTORY_SIZE];
-	double 		t_load_history[MAX_NET_LOAD_HISTORY_SIZE];
-    uint32_t 	cur_point;
+    double   r_load_history[MAX_NET_LOAD_HISTORY_SIZE];
+	double   t_load_history[MAX_NET_LOAD_HISTORY_SIZE];
+    uint32_t cur_point;
 } netload_t;
 
 typedef struct network_info
 {
-    uint32_t    interfaces_num;
-    netstat_t* 	stat;
-	netload_t*	current_load;
+    uint32_t   interfaces_num;
+    netstat_t* stat;
+	netload_t* current_load;
 } net_t;
 
 void init_network_interfaces(net_t* network);

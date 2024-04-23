@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define CELTIUS 1000
+
 void init_sensors_stats(sensor_t* sensor)
 {
     sensor->sensors_num = get_count_of_files_name(PATH_SENSORS_DIR, "thermal_zone");
@@ -19,7 +21,7 @@ void scan_sys_sensors_temp(sensor_t* sensor)
     for (uint32_t i = 0; i < sensor->sensors_num; i++)
     {
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/class/thermal/thermal_zone%d/temp", i);
-        sensor->sensors[i].cur_temp = get_file_int(cur_file_name) / 1000; // devision by 1000 to convert to Celtius
+        sensor->sensors[i].cur_temp = get_file_int(cur_file_name) / CELTIUS; // to convert into Celtius
     }
 }
 

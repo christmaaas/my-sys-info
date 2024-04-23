@@ -14,6 +14,23 @@
 #include <time.h>
 #include <stdbool.h>
 #include <sys/ioctl.h>
+#include <sys/utsname.h>
+
+typedef enum active_page
+{
+    P_DEFAULT        = 0,
+    P_HELP           = 1,
+    P_CPU_INFO       = 2,
+    P_CPU_LOAD       = 3,
+    P_INPUT_TIME     = 4,
+    P_CPU_CORES_LOAD = 5,
+    P_MEMORY         = 6,
+    P_MEMORY_LOAD    = 7,
+    P_NETWORK_STATS  = 8,
+    P_REPORT         = 9,
+    P_PCI_INFO       = 10,
+    P_SENSORS        = 11
+} page_t;
 
 int current_lines;
 int current_cols;
@@ -25,7 +42,7 @@ uint32_t selected_pci_dev = 0;
 int active_page = P_DEFAULT;
 int prev_page;
 
-int refresh_time = 10; // in milliseconds
+int refresh_time = SEC; // default value in milliseconds
 
 WINDOW* main_page;
 system_t* data;
@@ -35,16 +52,11 @@ void init_pairs(int color)
 	if (color)
 	{
 		init_pair((short)0, (short)COLOR_WHITE, (short)COLOR_BLACK);
-		init_pair((short)1, (short)COLOR_RED, (short)COLOR_BLACK);
 		init_pair((short)2, (short)COLOR_GREEN, (short)COLOR_BLACK);
-		init_pair((short)3, (short)COLOR_YELLOW, (short)COLOR_BLACK);
 		init_pair((short)4, (short)COLOR_BLUE, (short)COLOR_BLACK);
 		init_pair((short)5, (short)COLOR_MAGENTA, (short)COLOR_BLACK);
-		init_pair((short)6, (short)COLOR_CYAN, (short)COLOR_BLACK);
-		init_pair((short)7, (short)COLOR_WHITE, (short)COLOR_BLACK);
 		init_pair((short)8, (short)COLOR_BLACK, (short)COLOR_RED);
 		init_pair((short)9, (short)COLOR_BLACK, (short)COLOR_GREEN);
-		init_pair((short)10, (short)COLOR_BLACK, (short)COLOR_BLUE);
 		init_pair((short)11, (short)COLOR_BLACK, (short)COLOR_YELLOW);
 		init_pair((short)12, (short)COLOR_BLACK, (short)COLOR_CYAN);
 		init_pair((short)13, (short)COLOR_BLACK, (short)COLOR_WHITE);
@@ -58,7 +70,6 @@ void init_pairs(int color)
 		init_pair((short)21, (short)COLOR_YELLOW, (short)COLOR_YELLOW);
 		init_pair((short)22, (short)COLOR_GREEN, (short)COLOR_GREEN);
 		init_pair((short)23, (short)COLOR_BLUE, (short)COLOR_BLUE);
-		init_pair((short)24, (short)COLOR_WHITE, (short)COLOR_CYAN);
 		init_pair((short)25, (short)COLOR_WHITE, (short)COLOR_BLUE);
 		init_pair((short)26, (short)COLOR_CYAN, (short)COLOR_BLUE);
 		init_pair((short)27, (short)COLOR_GREEN, (short)COLOR_BLUE);
@@ -137,7 +148,7 @@ int input_check()
 						selected_intf++;
 						break;
 					}
-					else if (active_page == P_PCI_INFO && selected_pci_dev < data->pci->pci_dev_num - 1)
+					else if (active_page == P_PCI_INFO && selected_pci_dev < data->pci->devices_num - 1)
 					{
 						selected_pci_dev++;
 						break;
@@ -215,12 +226,6 @@ int input_check()
 					wclear(main_page);
 					break;
 				}
-				case 'g':
-				{
-					active_page = P_GENERAL_INFO;
-					wclear(main_page);
-					break;
-				}
 				case 's':
 				{
 					active_page = P_SENSORS;
@@ -251,11 +256,19 @@ void print_start_page()
 	mvwprintw(main_page, 3, 0, "It operates in the terminal, providing detailed information about the system.");
 	mvwprintw(main_page, 4, 0, "Dynamic graphs and visualization tools are used to present the information.");
 	mvwprintw(main_page, 8, 0, "Here are the options:");
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 9, 0, " 'c' - CPU Info        	'l' - CPU Cores Load      't' - Set Refresh Time");
-	mvwprintw(main_page, 10, 0, " 'C' - CPU Total Load   'U' - Utilisation");
-	mvwprintw(main_page, 11, 0, " 'm' - Memory Usage     'V' - Virtual memory");
+	mvwprintw(main_page, 9, 0,
+			  "'h' - Help             | 'r' - Generate report");
+	mvwprintw(main_page, 10, 0,
+			  "'l' - CPU cores load   | 'n' - Network load ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 11, 0,
+			  "'m' - Memory info      | 'M' - Memory & Swap load");
+	mvwprintw(main_page, 12, 0,
+			  "'s' - Sensors info     | 'p' - PCI devices info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 13, 0,
+			  "'C' - CPU load         | 'c' - CPU info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 14, 0, "'t' - Set refresh time");
+	mvwprintw(main_page, 15, 0, "'q' - Quit");
+	mvwprintw(main_page, 21, 0, "@Made by Artem Slinko. 2024");
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 	wnoutrefresh(stdscr);
 }
@@ -268,7 +281,7 @@ void print_report_page()
 
 	wattrset(main_page, COLOR_PAIR(27));
 	mvwprintw(main_page, 1, 0, "*********************************");
-	mvwprintw(main_page, 2, 0, "******* REPORT CREATED **********");
+	mvwprintw(main_page, 2, 0, "********* REPORT CREATED ********");
 	mvwprintw(main_page, 3, 0, "*********************************");
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 	wnoutrefresh(stdscr);
@@ -278,43 +291,36 @@ void print_help_page()
 {
 	PAGE("Help");
 
+	struct utsname uts;
+	struct tm*	   tim;
+	time_t  	   timer;
+
+	uname(&uts);
+	timer = time(NULL);	
+	tim = localtime(&timer);	
+
 	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 0, 1, "Available options:");
+	mvwprintw(main_page, 1, 0, "Hostname: %s", uts.nodename);
+	mvwprintw(main_page, 2, 0, "Linux: %s", uts.version);
+	mvwprintw(main_page, 3, 0, "Release: %s", uts.release);
+	mvwprintw(main_page, 4, 0, "Machine: %s", uts.machine);
+	mvwprintw(main_page, 5, 0, "Local time: %02d:%02d:%02d", tim->tm_hour, tim->tm_min, tim->tm_sec);
+	wattrset(main_page, COLOR_PAIR(19));
+	mvwprintw_clr(main_page, 6, 0, "Refresh time: %0.1f sec", (double)refresh_time / SEC);
 	wattrset(main_page, COLOR_PAIR(13));
-	mvwprintw(main_page, 1, 1,
-			  "'h' - Help                       	 | r = Resources OS & Proc");
-	mvwprintw(main_page, 2, 1,
-			  "'c' - CPU info ('<' - prev | '>' - next) | l = CPU cores load");
-	mvwprintw(main_page, 3, 1,
-			  "'m' - Memory & Swap                   	| V = Virtual Memory");
-	mvwprintw(main_page, 4, 1,
-			  "n = Network                           	| N = NFS");
-	mvwprintw(main_page, 5, 1,
-			  "d = Disk I/O Graphs  D=Stats          	| o = Disks %%Busy Map");
-	mvwprintw(main_page, 6, 1,
-			  "k = Kernel stats & loadavg            	| j = Filesystem Usage J=reduced");
-	mvwprintw(main_page, 7, 1, "M = MHz by thread & CPU");
-
-	mvwprintw(main_page, 8, 1,
-			  "t = TopProcess 1=Priority/Nice/State  	| u = TopProc with command line");
-	mvwprintw(main_page, 9, 1,
-			  "    ReOrder by: 3=CPU 4=RAM 5=I/O    	|     Hit u twice to update");
-	mvwprintw(main_page, 10, 1,
-			  "g = User Defined Disk Groups          	| G = with -g switches Disk graphs");
-	mvwprintw(main_page, 11, 1,
-			  "    [start nmon with -g <filename>]   	|     to disk groups only");
-	mvwprintw(main_page, 12, 39, "| b = black & white mode");
-	mvwprintw(main_page, 13, 1,
-			  "Other Controls:                       	|");
-	mvwprintw(main_page, 14, 1,
-			  "t = Set refresh time    	| 0 = reset peak marks (\">\") to zero");
-	mvwprintw(main_page, 15, 1,
-			  "- = half   the screen refresh time    	| space refresh screen now");
-	mvwprintw(main_page, 16, 1,
-			  ". = Display only busy disks & CPU     	| 'q' - Quit");
-
-	wattrset(main_page, COLOR_PAIR(29));
-	mvwprintw_clr(main_page, 17, 1, "Refresh interval: %0.1f sec", (double)refresh_time / 10);
+	mvwprintw(main_page, 8, 0, "Available options:");
+	mvwprintw(main_page, 9, 0,
+			  "'h' - Help             | 'r'- Generate report");
+	mvwprintw(main_page, 10, 0,
+			  "'l' - CPU cores load   | 'n' - Network load ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 11, 0,
+			  "'m' - Memory info      | 'M' - Memory & Swap load");
+	mvwprintw(main_page, 12, 0,
+			  "'s' - Sensors info     | 'p' - PCI devices info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 13, 0,
+			  "'C' - CPU load         | 'c' - CPU info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 14, 0, "'t' - Set refresh time");
+	mvwprintw(main_page, 15, 0, "'q' - Quit");
 	wattrset(main_page, COLOR_PAIR(0));
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
@@ -340,10 +346,10 @@ int start_main_ui()
 
 	main_page = newpad(MAX_ROWS_COUNT, MAX_COLS_COUNT);
 
-	wbkgd(stdscr, COLOR_PAIR(14));
+	wbkgd(stdscr, COLOR_PAIR(14)); // background color
 	wbkgd(main_page, COLOR_PAIR(14));
 
-	fflush(NULL); // think about it
+	fflush(NULL); 
 
 	current_lines = LINES;
 	current_cols = COLS;
@@ -375,7 +381,10 @@ int start_main_ui()
 		}
 		case P_CPU_LOAD:
 		{
-			print_cpu_load_graph(main_page, data->cpu, refresh_time, current_cols - GRAPH_RIGHT_BOUNDARY);
+			print_cpu_load_graph(main_page, 
+								data->cpu, 
+								refresh_time, 
+								current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_CPU_CORES_LOAD:
@@ -390,12 +399,19 @@ int start_main_ui()
 		}
 		case P_MEMORY_LOAD:
 		{
-			print_memory_load_graph(main_page, data->memory, refresh_time, current_cols - GRAPH_RIGHT_BOUNDARY);
+			print_memory_load_graph(main_page, 
+								data->memory, 
+								refresh_time, 
+								current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_NETWORK_STATS:
 		{
-			print_network_bandwitdh_graph(main_page, data->network, refresh_time, selected_intf, current_cols - GRAPH_RIGHT_BOUNDARY);
+			print_network_bandwitdh_graph(main_page, 
+										data->network, 
+										refresh_time, 
+										selected_intf, 
+										current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_PCI_INFO:
@@ -403,14 +419,9 @@ int start_main_ui()
 			print_pci_devices_page(main_page, data->pci, selected_pci_dev);
 			break;
 		}
-		case P_GENERAL_INFO:
-		{
-			// TODO
-			break;
-		}
 		case P_SENSORS:
 		{
-			print_sensors_page(main_page, data->sensor, current_cols);
+			print_sensors_page(main_page, data->sensor, refresh_time, current_cols);
 			break;
 		}
 		case P_REPORT:
@@ -430,6 +441,7 @@ int start_main_ui()
 		default:
 			break;
 		}
+
 		wmove(stdscr, 0, 0);
 		wrefresh(stdscr);
 		doupdate();
@@ -441,7 +453,6 @@ int start_main_ui()
 			input_value = input_check();
 			if (input_value == -1)
 			{
-				//TODO: free main_page
 				free_system_data(data);
 				nocbreak();
 				endwin();

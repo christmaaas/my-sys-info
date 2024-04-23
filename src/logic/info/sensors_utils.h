@@ -7,16 +7,16 @@
 
 typedef struct sensor_stat
 {
-    char*     name;
-    uint16_t  max_temp;
-    uint16_t  min_temp;
-    uint16_t  cur_temp;
+    char*    name;
+    uint16_t max_temp;
+    uint16_t min_temp;
+    uint16_t cur_temp;
 } senstat_t;
 
 typedef struct sensors_info
 {
-    uint32_t    sensors_num;
-    senstat_t*  sensors; 
+    uint32_t   sensors_num;
+    senstat_t* sensors; 
 } sensor_t;
 
 void init_sensors_stats(sensor_t* sensor);

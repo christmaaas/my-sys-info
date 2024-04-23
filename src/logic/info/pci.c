@@ -15,7 +15,7 @@ void free_pci(pci_t* pci)
     if (!pci)
         return;
         
-    for (uint32_t dev = 0; dev < pci->pci_dev_num; dev++)
+    for (uint32_t dev = 0; dev < pci->devices_num; dev++)
     {
         free(pci->devices[dev].class_name);
         free(pci->devices[dev].device_id);

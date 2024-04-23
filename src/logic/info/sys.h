@@ -7,16 +7,13 @@
 #include "pci.h"
 #include "sensors.h"
 
-typedef struct system
+typedef struct system_info
 {
     cpu_t*    cpu;
     mem_t*    memory;
     net_t*    network;
     pci_t*    pci;
-    sensor_t* sensor;
-
-    // ...
-    
+    sensor_t* sensor;   
 } system_t;
 
 void init_system_data(system_t** data);
