@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #define MAIN_UI_FINISHED 0
 #define UI_EXEC_ERROR   -2

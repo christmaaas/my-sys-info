@@ -2,6 +2,7 @@
 
 #include <ncurses.h>
 #include <panel.h>
+#include <stdlib.h>
 
 #define MAX_INPUT_LENGTH 3
 

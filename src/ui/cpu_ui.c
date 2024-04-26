@@ -12,12 +12,11 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_i
 
 	cpucompound_t processor = cpu->compound[selected_processor_id];
 
-	wattrset(main_page, COLOR_PAIR(29));
+	wattrset(main_page, COLOR_PAIR(17));
 	mvwprintw(main_page, 0, 1, "Processor ID:");
-	wattrset(main_page, COLOR_PAIR(30));
+	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw_clr(main_page, 0, 14, "%d", selected_processor_id)
 
-	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw_clr(main_page, 1, 1, "Name: %s", processor.model_name);
 	mvwprintw_clr(main_page, 2, 1, "Cores: %u", processor.cores_num);
 	mvwprintw_clr(main_page, 3, 1, "Threads: %u", processor.threads_num);
@@ -34,7 +33,7 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_i
 	mvwprintw_clr(main_page, 13, 1, "Bogomips: %0.2f", processor.bogomips);
 	mvwprintw_clr(main_page, 14, 1, "Core ID: %d", processor.topology.core_id);
 
-	wattrset(main_page, COLOR_PAIR(27));
+	wattrset(main_page, COLOR_PAIR(16));
 	mvwprintw_clr(main_page, 16, 1, "Frequency:");
 
 	wattrset(main_page, COLOR_PAIR(14));
@@ -46,7 +45,7 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_i
 	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / MHZ);
 	mvwprintw_clr(main_page, 21, 1, "Scaling governor: %s", processor.frequency.freq_scaling_governor);
 
-	wattrset(main_page, COLOR_PAIR(28));
+	wattrset(main_page, COLOR_PAIR(15));
 	mvwprintw_clr(main_page, 0, 50, "Cache:");
 
 	wattrset(main_page, COLOR_PAIR(14));

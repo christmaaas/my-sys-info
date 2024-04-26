@@ -205,7 +205,6 @@ void scan_cpu_basic_info(cpu_t* cpu)
             free(all_tokens[FPU_EXCEPTION]);
             free(all_tokens[WP]);
             free(all_tokens[VMX_FLAGS]);
-            //free(all_tokens[POWER_MANAGMENT]);
             free(byte_order_str);
         }
     }
