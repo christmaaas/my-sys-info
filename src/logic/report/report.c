@@ -171,10 +171,9 @@ void make_system_report(system_t* data)
     for (uint32_t i = 0 ; i < data->sensor->sensors_num; i++)
     {
         fprintf(file_ptr, " - Sensor (%d/%d)\n", i + 1, data->sensor->sensors_num);
-        fprintf(file_ptr, "   - Sensor name: %s\n", data->sensor->sensors[i].name);
         fprintf(file_ptr, "   - Current temperature: %d\n", data->sensor->sensors[i].cur_temp);
-        fprintf(file_ptr, "   - Min temperature: %d\n", data->sensor->sensors[i].min_temp);
-        fprintf(file_ptr, "   - Max temperature: %d\n", data->sensor->sensors[i].max_temp);
+        fprintf(file_ptr, "   - Min temperature:     %d\n", data->sensor->sensors[i].min_temp);
+        fprintf(file_ptr, "   - Max temperature:     %d\n", data->sensor->sensors[i].max_temp);
     }                                                                               
                             
     fclose(file_ptr);
