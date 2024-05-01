@@ -256,19 +256,19 @@ void print_start_page()
 	mvwprintw(main_page, 2, 0, "Users can monitor and analyze processor workload, memory, and network load.");
 	mvwprintw(main_page, 3, 0, "It operates in the terminal, providing detailed information about the system.");
 	mvwprintw(main_page, 4, 0, "Dynamic graphs and visualization tools are used to present the information.");
-	mvwprintw(main_page, 8, 0, "Here are the options:");
-	mvwprintw(main_page, 9, 0,
-			  "'h' - Help             | 'r' - Generate report");
-	mvwprintw(main_page, 10, 0,
-			  "'l' - CPU cores load   | 'n' - Network load ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 11, 0,
-			  "'m' - Memory info      | 'M' - Memory & Swap load");
-	mvwprintw(main_page, 12, 0,
-			  "'s' - Sensors info     | 'p' - PCI devices info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 13, 0,
-			  "'C' - CPU load         | 'c' - CPU info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 14, 0, "'t' - Set refresh time");
-	mvwprintw(main_page, 15, 0, "'q' - Quit");
+	mvwprintw(main_page, 6, 0, "Here are the options:");
+	mvwprintw(main_page, 7, 0, "'h' - Help");
+	mvwprintw(main_page, 8, 0, "'r' - Generate report");
+	mvwprintw(main_page, 9, 0, "'l' - CPU cores load");
+	mvwprintw(main_page, 10, 0, "'n' - Network load ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 11, 0, "'m' - Memory info");
+	mvwprintw(main_page, 12, 0, "'M' - Memory & Swap load");
+	mvwprintw(main_page, 13, 0, "'s' - Sensors info");
+	mvwprintw(main_page, 14, 0, "'p' - PCI devices info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 15, 0, "'C' - CPU load");
+	mvwprintw(main_page, 16, 0, "'c' - CPU info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 17, 0, "'t' - Set refresh time");
+	mvwprintw(main_page, 18, 0, "'q' - Quit");
 	mvwprintw(main_page, 21, 0, "@Made by Artem Slinko. 2024");
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 	wnoutrefresh(stdscr);
@@ -310,18 +310,18 @@ void print_help_page()
 	mvwprintw_clr(main_page, 6, 0, "Refresh time: %0.1f sec", (double)refresh_time / SEC);
 	wattrset(main_page, COLOR_PAIR(13));
 	mvwprintw(main_page, 8, 0, "Available options:");
-	mvwprintw(main_page, 9, 0,
-			  "'h' - Help             | 'r'- Generate report");
-	mvwprintw(main_page, 10, 0,
-			  "'l' - CPU cores load   | 'n' - Network load ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 11, 0,
-			  "'m' - Memory info      | 'M' - Memory & Swap load");
-	mvwprintw(main_page, 12, 0,
-			  "'s' - Sensors info     | 'p' - PCI devices info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 13, 0,
-			  "'C' - CPU load         | 'c' - CPU info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 14, 0, "'t' - Set refresh time");
-	mvwprintw(main_page, 15, 0, "'q' - Quit");
+	mvwprintw(main_page, 9, 0, "'h' - Help");
+	mvwprintw(main_page, 10, 0, "'r' - Generate report");
+	mvwprintw(main_page, 11, 0, "'l' - CPU cores load");
+	mvwprintw(main_page, 12, 0, "'n' - Network load ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 13, 0, "'m' - Memory info");
+	mvwprintw(main_page, 14, 0, "'M' - Memory & Swap load");
+	mvwprintw(main_page, 15, 0, "'s' - Sensors info");
+	mvwprintw(main_page, 16, 0, "'p' - PCI devices info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 17, 0, "'C' - CPU load");
+	mvwprintw(main_page, 18, 0, "'c' - CPU info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 19, 0, "'t' - Set refresh time");
+	mvwprintw(main_page, 20, 0, "'q' - Quit");
 	wattrset(main_page, COLOR_PAIR(0));
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);

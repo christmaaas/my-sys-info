@@ -17,20 +17,20 @@ void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, int refres
 	wattrset(main_page, COLOR_PAIR(34));
     mvwprintw(main_page, 2, 0, "Received:");
 	wattrset(main_page, COLOR_PAIR(14));
-    mvwprintw_clr(main_page, 3, 0, "Curr: %0.2f kBit/s", network->stat[selected_intf].r_bandwith.cur / KB);
-    mvwprintw_clr(main_page, 4, 0, "Avg:  %0.2f kBit/s", network->stat[selected_intf].r_bandwith.avg / KB);
-    mvwprintw_clr(main_page, 5, 0, "Min:  %0.2f kBit/s", network->stat[selected_intf].r_bandwith.min / KB);
-    mvwprintw_clr(main_page, 6, 0, "Max:  %0.2f kBit/s", network->stat[selected_intf].r_bandwith.max / KB);
-    mvwprintw_clr(main_page, 7, 0, "Ttl:  %0.2f MByte", network->stat[selected_intf].r_bytes / MB);
+    mvwprintw_clr(main_page, 3, 0, "Curr: %0.2f KB/time", network->stat[selected_intf].r_bandwith.cur / KB);
+    mvwprintw_clr(main_page, 4, 0, "Avg:  %0.2f KB/time", network->stat[selected_intf].r_bandwith.avg / KB);
+    mvwprintw_clr(main_page, 5, 0, "Min:  %0.2f KB/time", network->stat[selected_intf].r_bandwith.min / KB);
+    mvwprintw_clr(main_page, 6, 0, "Max:  %0.2f KB/time", network->stat[selected_intf].r_bandwith.max / KB);
+    mvwprintw_clr(main_page, 7, 0, "Ttl:  %0.2f MB", network->stat[selected_intf].r_bytes / MB);
 
 	wattrset(main_page, COLOR_PAIR(33));
     mvwprintw(main_page, 2, 25, "Transmitted:");
 	wattrset(main_page, COLOR_PAIR(14));
-    mvwprintw_clr(main_page, 3, 25, "Curr: %0.2f kBit/s", network->stat[selected_intf].t_bandwith.cur / KB);
-    mvwprintw_clr(main_page, 4, 25, "Avg:  %0.2f kBit/s", network->stat[selected_intf].t_bandwith.avg / KB);
-    mvwprintw_clr(main_page, 5, 25, "Min:  %0.2f kBit/s", network->stat[selected_intf].t_bandwith.min / KB);
-    mvwprintw_clr(main_page, 6, 25, "Max:  %0.2f kBit/s", network->stat[selected_intf].t_bandwith.max / KB);
-    mvwprintw_clr(main_page, 7, 25, "Ttl:  %0.2f MByte", network->stat[selected_intf].t_bytes / MB);
+    mvwprintw_clr(main_page, 3, 25, "Curr: %0.2f KB/time", network->stat[selected_intf].t_bandwith.cur / KB);
+    mvwprintw_clr(main_page, 4, 25, "Avg:  %0.2f KB/time", network->stat[selected_intf].t_bandwith.avg / KB);
+    mvwprintw_clr(main_page, 5, 25, "Min:  %0.2f KB/time", network->stat[selected_intf].t_bandwith.min / KB);
+    mvwprintw_clr(main_page, 6, 25, "Max:  %0.2f KB/time", network->stat[selected_intf].t_bandwith.max / KB);
+    mvwprintw_clr(main_page, 7, 25, "Ttl:  %0.2f MB", network->stat[selected_intf].t_bytes / MB);
 
 	mvwprintw_clr(main_page, 2, 50, "Received pkg:  %lu", network->stat[selected_intf].r_packets);
     mvwprintw_clr(main_page, 3, 50, "Received errs: %lu", network->stat[selected_intf].r_errs);
@@ -51,7 +51,7 @@ void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, int refres
 
 	wattrset(main_page, COLOR_PAIR(14));
 	mvwprintw(main_page, 9, 1, "Max");
-	mvwprintw(main_page, 21, 0, "0B/s");
+	mvwprintw(main_page, 21, 0, "0 KB");
 
 	for (int x = 0; x < MAX_COLS_COUNT; x++) 
 	{

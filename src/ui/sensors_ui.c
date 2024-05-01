@@ -12,8 +12,8 @@ void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int refresh_time, i
 
     wattrset(main_page, COLOR_PAIR(25));
     mvwprintw(main_page, 0, 0, "Sensor name       |Cur°C|Max°C|Min°C|");
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 0, 42, "time: %0.1f sec", (double)refresh_time / SEC);
+	wattrset(main_page, COLOR_PAIR(13));
+	mvwprintw(main_page, 0, 41, "time: %0.1f sec", (double)refresh_time / SEC);
 
     for (uint32_t i = 0, l = 1; i < sensor->sensors_num; i++, l += 2)
 	{
@@ -28,12 +28,12 @@ void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int refresh_time, i
 		{
 			if ((double)sensor->sensors[i].cur_temp / 100.0 * (current_cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET) > j + GRAPH_CORRECTION)
 			{
-				wattrset(main_page, COLOR_PAIR(31));
-				mvwaddch(main_page, l, j + SENSORS_GRAPH_OFFSET, ' ');
+				wattrset(main_page, COLOR_PAIR(8));
+				mvwaddch(main_page, l, j + SENSORS_GRAPH_OFFSET, '|');
 			}
 			else
 			{
-				wattrset(main_page, COLOR_PAIR(0));
+				wattrset(main_page, COLOR_PAIR(22));
 				mvwaddch(main_page, l, j + SENSORS_GRAPH_OFFSET, ' ');
 			}
 		}
