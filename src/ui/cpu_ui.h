@@ -4,8 +4,14 @@
 #include "common_ui.h"
 #include "../logic/info/sys.h"
 
-void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, int selected_processor_id);
-void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, int refresh_time, int graph_points_num);
-void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, int refresh_time, int current_cols);
+void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id);
+void print_cpu_load_graph(WINDOW* main_page, 
+                        cpu_t* cpu, 
+                        const int time, 
+                        const int graph_width);
+void print_cpu_cores_load(WINDOW* main_page, 
+                        cpu_t* cpu, 
+                        const int time, 
+                        const int cols);
 
 #endif /* _CPU_UI_H */

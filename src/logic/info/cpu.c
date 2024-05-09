@@ -13,72 +13,73 @@ void init_cpu(cpu_t** cpu)
     scan_cpu_clocks(*cpu);
 }
 
-void calculate_total_cpu_load(cpu_t* cpu, int graph_points_num)
+void calculate_total_cpu_load(cpu_t* cpu, const uint32_t graph_width)
 {
-    uint64_t user   = cpu->current_load.total.user; 
-    uint64_t sys    = cpu->current_load.total.sys;
-    uint64_t wait   = cpu->current_load.total.wait;
-    uint64_t idle   = cpu->current_load.total.idle;
-    uint64_t sum    = 0;
+    uint64_t user     = cpu->current_load.total.user; 
+    uint64_t sys      = cpu->current_load.total.sys;
+    uint64_t wait     = cpu->current_load.total.wait;
+    uint64_t idle     = cpu->current_load.total.idle;
+    uint64_t load_sum = 0;
 
-    scan_cpu_load_stat(cpu);
+    scan_cpu_load_stat(cpu); // refreshing data
 
-    user    = cpu->current_load.total.user - user;
-    sys     = cpu->current_load.total.sys - sys;   
-    wait    = cpu->current_load.total.wait - wait;
-    idle    = cpu->current_load.total.idle - idle;
-    sum     = user + sys + wait + idle;
+    user     = cpu->current_load.total.user - user;
+    sys      = cpu->current_load.total.sys - sys;   
+    wait     = cpu->current_load.total.wait - wait;
+    idle     = cpu->current_load.total.idle - idle;
+    load_sum = user + sys + wait + idle;
 
-    cpu->current_load.load_history[cpu->current_load.cur_point].user  = ((double)user / (double)sum) * 100.0;
-    cpu->current_load.load_history[cpu->current_load.cur_point].sys   = ((double)sys / (double)sum) * 100.0;
-    cpu->current_load.load_history[cpu->current_load.cur_point].wait  = ((double)wait / (double)sum) * 100.0;
-    cpu->current_load.load_history[cpu->current_load.cur_point].idle  = ((double)idle / (double)sum) * 100.0;
+    cpu->current_load.load_history[cpu->current_load.cur_point].user = ((double)user / (double)load_sum) * 100.0;
+    cpu->current_load.load_history[cpu->current_load.cur_point].sys  = ((double)sys / (double)load_sum) * 100.0;
+    cpu->current_load.load_history[cpu->current_load.cur_point].wait = ((double)wait / (double)load_sum) * 100.0;
+    cpu->current_load.load_history[cpu->current_load.cur_point].idle = ((double)idle / (double)load_sum) * 100.0;
 
     cpu->current_load.cur_point++;
 
-    if (cpu->current_load.cur_point >= graph_points_num || cpu->current_load.cur_point >= MAX_CPU_LOAD_HISTORY_SIZE)
+    if (cpu->current_load.cur_point >= graph_width || cpu->current_load.cur_point >= MAX_CPU_LOAD_HISTORY_SIZE)
     {
-        for (int i = 0; i < graph_points_num - 1 && i < MAX_CPU_LOAD_HISTORY_SIZE - 1; ++i)
+        for (uint32_t i = 0; i < graph_width - 1 && i < MAX_CPU_LOAD_HISTORY_SIZE - 1; ++i)
             cpu->current_load.load_history[i] = cpu->current_load.load_history[i + 1];
 
-        cpu->current_load.cur_point = graph_points_num - 1;
+        cpu->current_load.cur_point = graph_width - 1;
     }
 }
 
 void calculate_cpu_cores_load(cpu_t* cpu)
 {
-    loadtype_t* cur_cores    = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
-    uint64_t    sum_of_loads = 0;
+    loadtype_t* cur_cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
+    uint64_t    load_sum  = 0;
 
     for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
-        cur_cores[i].user  = cpu->current_load.cores[i].user;
-        cur_cores[i].sys   = cpu->current_load.cores[i].sys;
-        cur_cores[i].wait  = cpu->current_load.cores[i].wait;
-        cur_cores[i].idle  = cpu->current_load.cores[i].idle;
+        cur_cores[i].user = cpu->current_load.cores[i].user;
+        cur_cores[i].sys  = cpu->current_load.cores[i].sys;
+        cur_cores[i].wait = cpu->current_load.cores[i].wait;
+        cur_cores[i].idle = cpu->current_load.cores[i].idle;
     }
 
     scan_cpu_load_stat(cpu);
 
     for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
-        cur_cores[i].user  = cpu->current_load.cores[i].user - cur_cores[i].user;
-        cur_cores[i].sys   = cpu->current_load.cores[i].sys - cur_cores[i].sys;
-        cur_cores[i].wait  = cpu->current_load.cores[i].wait - cur_cores[i].wait;
-        cur_cores[i].idle  = cpu->current_load.cores[i].idle - cur_cores[i].idle;
-        sum_of_loads       = cur_cores[i].user + cur_cores[i].sys 
-                                + cur_cores[i].wait + cur_cores[i].idle;
+        cur_cores[i].user = cpu->current_load.cores[i].user - cur_cores[i].user;
+        cur_cores[i].sys  = cpu->current_load.cores[i].sys - cur_cores[i].sys;
+        cur_cores[i].wait = cpu->current_load.cores[i].wait - cur_cores[i].wait;
+        cur_cores[i].idle = cpu->current_load.cores[i].idle - cur_cores[i].idle;
+        load_sum          = cur_cores[i].user + cur_cores[i].sys 
+                            + cur_cores[i].wait + cur_cores[i].idle;
 
-        cpu->current_load.cores_load[i].user  = ((double)cur_cores[i].user / (double)sum_of_loads) * 100.0;
-        cpu->current_load.cores_load[i].sys   = ((double)cur_cores[i].sys / (double)sum_of_loads) * 100.0;
-        cpu->current_load.cores_load[i].wait  = ((double)cur_cores[i].wait / (double)sum_of_loads) * 100.0;
-        cpu->current_load.cores_load[i].idle  = ((double)cur_cores[i].idle / (double)sum_of_loads) * 100.0;
+        cpu->current_load.cores_load[i].user = ((double)cur_cores[i].user / (double)load_sum) * 100.0;
+        cpu->current_load.cores_load[i].sys  = ((double)cur_cores[i].sys / (double)load_sum) * 100.0;
+        cpu->current_load.cores_load[i].wait = ((double)cur_cores[i].wait / (double)load_sum) * 100.0;
+        cpu->current_load.cores_load[i].idle = ((double)cur_cores[i].idle / (double)load_sum) * 100.0;
     }
-    cpu->current_load.avg_load = 0;
+
+    cpu->current_load.avg_load = 0; // resets at every iteration to calc avg load 
     for (uint32_t i = 0; i < cpu->processors_num; i++)
         cpu->current_load.avg_load += cpu->current_load.cores_load[i].user 
-                                        + cpu->current_load.cores_load[i].sys 
-                                        + cpu->current_load.cores_load[i].wait;
+                                    + cpu->current_load.cores_load[i].sys 
+                                    + cpu->current_load.cores_load[i].wait;
 
     cpu->current_load.avg_load /= cpu->processors_num;
 

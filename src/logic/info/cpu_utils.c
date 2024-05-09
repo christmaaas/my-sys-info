@@ -29,10 +29,13 @@ void init_cpu_cores(cpu_t* cpu)
     char** readed_tokens = NULL;
     int tokens_num = 0;
 
-    readed_tokens = strsplit(file_buffer, "-", &tokens_num); // "-" is a delim str for num of processors in "online" file
+    // "-" is a delim str for num of processors in "online" file
+    readed_tokens = strsplit(file_buffer, "-", &tokens_num);
 
-    cpu->processors_num = atoi(readed_tokens[1]) + 1; // number of processors is at index [1] in tokens
-                                                      // and +1 cause of indexes              
+    /* number of processors is at index [1] in tokens
+       and +1 cause of indexes  */
+    cpu->processors_num = atoi(readed_tokens[1]) + 1;   
+
     cpu->compound                = (cpucompound_t*)calloc(cpu->processors_num, sizeof(cpucompound_t));
     cpu->current_load.cores      = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
     cpu->current_load.cores_load = (loadpercent_t*)calloc(cpu->processors_num, sizeof(loadpercent_t));
@@ -62,7 +65,8 @@ void scan_cpu_basic_info(cpu_t* cpu)
 
     while (fgets(file_buffer, CPU_FILE_BUFFER_SIZE, file_ptr))
     {
-        if (file_buffer[0] == '\n') // info in "cpuinfo.txt" mapped by blocks separated by new line
+        // info in "cpuinfo.txt" mapped by blocks separated by new line
+        if (file_buffer[0] == '\n') 
         {
             tokens_count = 0;
             continue;
@@ -223,61 +227,62 @@ void scan_cpu_cache(cpu_t* cpu)
 
         int count_of_cache_files = get_count_of_files_name(cache_path, "index");
 
-        cpu->compound[cpu_id].cache.levels_num = count_of_cache_files - 1; // -1 cause of l1 cache has 2 files except one
+        // -1 cause of l1 cache has 2 files except one
+        cpu->compound[cpu_id].cache.levels_num = count_of_cache_files - 1;
 
         for (int level = 0; level < count_of_cache_files; ++level)
         {
             snprintf(cache_index_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpu%u/cache/index%d", cpu_id, level);
 
-            size_path                       = strconcat(cache_index_path, "/size");
-            line_size_path                  = strconcat(cache_index_path, "/coherency_line_size");
-            sets_count                      = strconcat(cache_index_path, "/number_of_sets");
-            ways_of_associativity_path      = strconcat(cache_index_path, "/ways_of_associativity");
+            size_path                  = strconcat(cache_index_path, "/size");
+            line_size_path             = strconcat(cache_index_path, "/coherency_line_size");
+            sets_count                 = strconcat(cache_index_path, "/number_of_sets");
+            ways_of_associativity_path = strconcat(cache_index_path, "/ways_of_associativity");
 
             switch (level)
             {
                 case L1_DATA_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l1_data_size        = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l1_data_line_size   = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l1_data_sets        = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l1_data_ways        = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l1_data_size      = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l1_data_line_size = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l1_data_sets      = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l1_data_ways      = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L1_INSTRUCTION_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l1_inst_size        = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l1_inst_line_size   = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l1_inst_sets        = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l1_inst_ways        = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l1_inst_size      = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l1_inst_line_size = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l1_inst_sets      = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l1_inst_ways      = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L2_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l2_size             = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l2_line_size        = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l2_sets             = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l2_ways             = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l2_size      = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l2_line_size = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l2_sets      = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l2_ways      = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L3_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l3_size             = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l3_line_size        = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l3_sets             = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l3_ways             = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l3_size      = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l3_line_size = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l3_sets      = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l3_ways      = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
                 case L4_LEVEL: 
                 {
-                    cpu->compound[cpu_id].cache.l4_size             = get_file_int(size_path);
-                    cpu->compound[cpu_id].cache.l4_line_size        = get_file_int(line_size_path);
-                    cpu->compound[cpu_id].cache.l4_sets             = get_file_int(sets_count);
-                    cpu->compound[cpu_id].cache.l4_ways             = get_file_int(ways_of_associativity_path);
+                    cpu->compound[cpu_id].cache.l4_size      = get_file_int(size_path);
+                    cpu->compound[cpu_id].cache.l4_line_size = get_file_int(line_size_path);
+                    cpu->compound[cpu_id].cache.l4_sets      = get_file_int(sets_count);
+                    cpu->compound[cpu_id].cache.l4_ways      = get_file_int(ways_of_associativity_path);
 
                     break;
                 }
@@ -349,15 +354,31 @@ void scan_cpu_clocks(cpu_t* cpu)
     }
 }
 
-void refresh_cpu_clocks(cpu_t* cpu, int processor_id)
+void refresh_cpu_clocks(cpu_t* cpu, const int proc_id)
 {
     char policy_path[MAX_FILE_PATH_LEN];
-    snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%d", processor_id);
+    snprintf(policy_path, MAX_FILE_PATH_LEN, "/sys/devices/system/cpu/cpufreq/policy%d", proc_id);
 
     char* policy_content_path = strconcat(policy_path, "/scaling_cur_freq");
-    cpu->compound[processor_id].frequency.freq_cur = get_file_int(policy_content_path);
+    cpu->compound[proc_id].frequency.freq_cur = get_file_int(policy_content_path);
     free(policy_content_path);
 }
+
+/* /proc/stat explanation:
+   All of the numbers reported in this file are aggregates since the system booted.
+   These numbers identify the amount of time the CPU has spent performing different kinds of work. 
+   Time units are in USER_HZ or Jiffies (typically hundredths of a second).
+   The first "cpu" line is an aggregate of all following "cpuN" lines
+   The "cpu" lines description: */
+/* Column	Name	Description	Kernel
+    1	    user	 Time spent with normal processing in user mode.
+    2	    nice	 Time spent with niced processes in user mode.
+    3	    system	 Time spent running in kernel mode.
+    4	    idle	 Time spent in vacations twiddling thumbs.
+    5	    iowait	 Time spent waiting for I/O to completed. 
+    ...     ...      ... */
+ /* There may be more columns, depends on the kernel version
+    For fairly accurate calcs, the given 5 are enough */
 
 void scan_cpu_load_stat(cpu_t* cpu)
 {
@@ -383,7 +404,8 @@ void scan_cpu_load_stat(cpu_t* cpu)
                                             &sys,
                                             &idle,
                                             &wait);
-		
+
+    // niced processes are also in user mode so we can add it to user processes	
 	cpu->current_load.total.user = user + nice;
 	cpu->current_load.total.sys  = sys;
 	cpu->current_load.total.idle = idle;
@@ -403,6 +425,7 @@ void scan_cpu_load_stat(cpu_t* cpu)
 		                                        &idle,
                                                 &wait);
 
+        // niced processes are also in user mode so we can add it to user processes
         cpu->current_load.cores[core].user = user + nice;
         cpu->current_load.cores[core].sys  = sys;
 	    cpu->current_load.cores[core].idle = idle;

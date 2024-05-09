@@ -17,72 +17,54 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 
+#define WAIT_TIME_VALUE   100000 // 0.1 of second (usleep arg is a microseconds)
+#define INPUT_BUFFER_SIZE 128
+
 typedef enum active_page
 {
-    P_DEFAULT        = 0,
-    P_HELP           = 1,
-    P_CPU_INFO       = 2,
-    P_CPU_LOAD       = 3,
-    P_INPUT_TIME     = 4,
-    P_CPU_CORES_LOAD = 5,
-    P_MEMORY         = 6,
-    P_MEMORY_LOAD    = 7,
-    P_NETWORK_STATS  = 8,
-    P_REPORT         = 9,
-    P_PCI_INFO       = 10,
-    P_SENSORS        = 11
+    P_HELP           = 0,
+    P_CPU_INFO       = 1,
+    P_CPU_LOAD       = 2,
+    P_INPUT_TIME     = 3,
+    P_CPU_CORES_LOAD = 4,
+    P_MEMORY         = 5,
+    P_MEMORY_LOAD    = 6,
+    P_NETWORK_STATS  = 7,
+    P_REPORT         = 8,
+    P_PCI_INFO       = 9,
+    P_SENSORS        = 10
 } page_t;
+
+typedef enum control_keys
+{
+    KEY_P_HELP           = '0',
+    KEY_P_CPU_INFO       = '1',
+    KEY_P_CPU_LOAD       = '2',
+    KEY_P_CPU_CORES_LOAD = '3',
+    KEY_P_MEMORY         = '4',
+    KEY_P_MEMORY_LOAD    = '5',
+    KEY_P_NETWORK_STATS  = '6',
+    KEY_P_REPORT         = '7',
+    KEY_P_PCI_INFO       = '8',
+    KEY_P_SENSORS        = '9',
+	KEY_LEFT_ARROW       = '<',
+	KEY_RIGHT_ARROW      = '>',
+	KEY_P_INPUT_TIME     = 't',
+	KEY_QUIT			 = 'q'
+} key_t;
 
 int current_lines;
 int current_cols;
-
-uint32_t selected_processor_id = 0;
-uint32_t selected_intf = 0;
-uint32_t selected_pci_dev = 0;
-
-int active_page = P_DEFAULT;
+int active_page = P_HELP;
 int prev_page;
-
 int refresh_time = SEC; // default value in milliseconds
+
+uint32_t proc_id    = 0; // selected processor id
+uint32_t intf_id    = 0; // selected network interface id
+uint32_t pci_dev_id = 0; // selected pci-device id
 
 WINDOW* main_page;
 system_t* data;
-
-void init_pairs(int color)
-{
-	if (color)
-	{
-		init_pair((short)0, (short)COLOR_WHITE, (short)COLOR_BLACK);
-		init_pair((short)2, (short)COLOR_GREEN, (short)COLOR_BLACK);
-		init_pair((short)4, (short)COLOR_BLUE, (short)COLOR_BLACK);
-		init_pair((short)5, (short)COLOR_MAGENTA, (short)COLOR_BLACK);
-		init_pair((short)8, (short)COLOR_BLACK, (short)COLOR_RED);
-		init_pair((short)9, (short)COLOR_BLACK, (short)COLOR_GREEN);
-		init_pair((short)11, (short)COLOR_BLACK, (short)COLOR_YELLOW);
-		init_pair((short)12, (short)COLOR_BLACK, (short)COLOR_CYAN);
-		init_pair((short)13, (short)COLOR_BLACK, (short)COLOR_WHITE);
-		init_pair((short)14, (short)COLOR_BLUE, (short)COLOR_WHITE);
-		init_pair((short)15, (short)COLOR_RED, (short)COLOR_WHITE);
-		init_pair((short)16, (short)COLOR_GREEN, (short)COLOR_WHITE);
-		init_pair((short)17, (short)COLOR_YELLOW, (short)COLOR_WHITE);
-		init_pair((short)18, (short)COLOR_RED, (short)COLOR_GREEN);
-		init_pair((short)19, (short)COLOR_MAGENTA, (short)COLOR_WHITE);
-		init_pair((short)20, (short)COLOR_MAGENTA, (short)COLOR_MAGENTA);
-		init_pair((short)21, (short)COLOR_YELLOW, (short)COLOR_YELLOW);
-		init_pair((short)22, (short)COLOR_GREEN, (short)COLOR_GREEN);
-		init_pair((short)23, (short)COLOR_BLUE, (short)COLOR_BLUE);
-		init_pair((short)25, (short)COLOR_WHITE, (short)COLOR_BLUE);
-		init_pair((short)26, (short)COLOR_CYAN, (short)COLOR_BLUE);
-		init_pair((short)27, (short)COLOR_GREEN, (short)COLOR_BLUE);
-		init_pair((short)28, (short)COLOR_RED, (short)COLOR_BLUE);
-		init_pair((short)29, (short)COLOR_YELLOW, (short)COLOR_BLUE);
-		init_pair((short)30, (short)COLOR_BLUE, (short)COLOR_YELLOW);
-		init_pair((short)31, (short)COLOR_RED, (short)COLOR_RED);
-		init_pair((short)32, (short)COLOR_CYAN, (short)COLOR_CYAN);
-		init_pair((short)33, (short)COLOR_WHITE, (short)COLOR_RED);
-		init_pair((short)34, (short)COLOR_WHITE, (short)COLOR_CYAN);
-	}
-}
 
 int check_window_resize(int* prev_lines, int* prev_cols)
 {
@@ -106,11 +88,9 @@ int check_time_changed(int* current_time)
 	return 1;
 }
 
-#define MAX_INPUT_BUFFER_SIZE 128
-
-int input_check()
+int control_handle()
 {
-	char buf[MAX_INPUT_BUFFER_SIZE];
+	char buf[INPUT_BUFFER_SIZE];
 	int bytes_of_stream = 0, readed_chars = 0;
 
 	ioctl(fileno(stdin), FIONREAD, &bytes_of_stream);
@@ -125,115 +105,104 @@ int input_check()
 			{
 				switch (buf[i])
 				{
-				case 'h':
+				case KEY_RIGHT_ARROW:
+				{
+					if (active_page == P_CPU_INFO && proc_id < data->cpu->processors_num - 1)
+					{
+						proc_id++;
+						break;
+					}
+					else if (active_page == P_NETWORK_STATS && intf_id < data->network->interfaces_num - 1)
+					{
+						intf_id++;
+						break;
+					}
+					else if (active_page == P_PCI_INFO && pci_dev_id < data->pci->devices_num - 1)
+					{
+						pci_dev_id++;
+						break;
+					}
+					else
+						return 0;
+				}
+				case KEY_LEFT_ARROW:
+				{
+					if (active_page == P_CPU_INFO && proc_id > 0)
+					{
+						proc_id--;
+						break;
+					}
+					else if (active_page == P_NETWORK_STATS && intf_id > 0)
+					{
+						intf_id--;
+						break;
+					}
+					else if (active_page == P_PCI_INFO && pci_dev_id > 0)
+					{
+						pci_dev_id--;
+						break;
+					}
+					else
+						return 0;
+				}
+				case KEY_P_HELP:
 				{
 					active_page = P_HELP;
-					wclear(main_page);
 					break;
 				}
-				case 'c':
+				case KEY_P_CPU_INFO:
 				{
 					active_page = P_CPU_INFO;
-					wclear(main_page);
 					break;
 				}
-				case '>':
-				{
-					if (active_page == P_CPU_INFO && selected_processor_id < data->cpu->processors_num - 1)
-					{
-						selected_processor_id++;
-						break;
-					}
-					else if (active_page == P_NETWORK_STATS && selected_intf < data->network->interfaces_num - 1)
-					{
-						selected_intf++;
-						break;
-					}
-					else if (active_page == P_PCI_INFO && selected_pci_dev < data->pci->devices_num - 1)
-					{
-						selected_pci_dev++;
-						break;
-					}
-					else
-						return 0;
-				}
-				case '<':
-				{
-					if (active_page == P_CPU_INFO && selected_processor_id > 0)
-					{
-						selected_processor_id--;
-						break;
-					}
-					else if (active_page == P_NETWORK_STATS && selected_intf > 0)
-					{
-						selected_intf--;
-						break;
-					}
-					else if (active_page == P_PCI_INFO && selected_pci_dev > 0)
-					{
-						selected_pci_dev--;
-						break;
-					}
-					else
-						return 0;
-				}
-				case 'C':
+				case KEY_P_CPU_LOAD:
 				{
 					active_page = P_CPU_LOAD;
-					wclear(main_page);
 					break;
 				}
-				case 't':
+				case KEY_P_INPUT_TIME:
 				{
 					prev_page = active_page;
 					active_page = P_INPUT_TIME;
-					wclear(main_page);
 					break;
 				}
-				case 'l':
+				case KEY_P_CPU_CORES_LOAD:
 				{
 					active_page = P_CPU_CORES_LOAD;
-					wclear(main_page);
 					break;
 				}
-				case 'm':
+				case KEY_P_MEMORY:
 				{
 					active_page = P_MEMORY;
-					wclear(main_page);
 					break;
 				}
-				case 'M':
+				case KEY_P_MEMORY_LOAD:
 				{
 					active_page = P_MEMORY_LOAD;
-					wclear(main_page);
 					break;
 				}
-				case 'n':
+				case KEY_P_NETWORK_STATS:
 				{
 					active_page = P_NETWORK_STATS;
-					wclear(main_page);
 					break;
 				}
-				case 'r':
+				case KEY_P_REPORT:
 				{
 					prev_page = active_page;
 					active_page = P_REPORT;
-					wclear(main_page);
 					break;
 				}
-				case 'p':
+				case KEY_P_PCI_INFO:
 				{
 					active_page = P_PCI_INFO;
-					wclear(main_page);
 					break;
 				}
-				case 's':
+				case KEY_P_SENSORS:
 				{
 					active_page = P_SENSORS;
-					wclear(main_page);
 					break;
 				}
-				case 'q':
+				case KEY_QUIT:
 				{
 					return -1;
 				}
@@ -247,40 +216,15 @@ int input_check()
 	return 0;
 }
 
-void print_start_page()
-{
-	PAGE("Menu");
-
-	wattrset(main_page, COLOR_PAIR(14));
-	mvwprintw(main_page, 1, 0, "MySysInfo is a program that collects and displays system data and resources.");
-	mvwprintw(main_page, 2, 0, "Users can monitor and analyze processor workload, memory, and network load.");
-	mvwprintw(main_page, 3, 0, "It operates in the terminal, providing detailed information about the system.");
-	mvwprintw(main_page, 4, 0, "Dynamic graphs and visualization tools are used to present the information.");
-	mvwprintw(main_page, 6, 0, "Here are the options:");
-	mvwprintw(main_page, 7, 0, "'h' - Help");
-	mvwprintw(main_page, 8, 0, "'r' - Generate report");
-	mvwprintw(main_page, 9, 0, "'l' - CPU cores load");
-	mvwprintw(main_page, 10, 0, "'n' - Network load ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 11, 0, "'m' - Memory info");
-	mvwprintw(main_page, 12, 0, "'M' - Memory & Swap load");
-	mvwprintw(main_page, 13, 0, "'s' - Sensors info");
-	mvwprintw(main_page, 14, 0, "'p' - PCI devices info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 15, 0, "'C' - CPU load");
-	mvwprintw(main_page, 16, 0, "'c' - CPU info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 17, 0, "'t' - Set refresh time");
-	mvwprintw(main_page, 18, 0, "'q' - Quit");
-	mvwprintw(main_page, 21, 0, "@Made by Artem Slinko. 2024");
-	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
-	wnoutrefresh(stdscr);
-}
-
 void print_report_page()
 {
-	PAGE("System Report");
+	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
+	mvprintw(0, PAGE_TITLE_OFFSET, "System Report");
+	wnoutrefresh(stdscr);
 
-	make_system_report(data);
+	make_system_report(data, refresh_time);
 
-	wattrset(main_page, COLOR_PAIR(27));
+	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_BLUE));
 	mvwprintw(main_page, 1, 0, "*********************************");
 	mvwprintw(main_page, 2, 0, "********* REPORT CREATED ********");
 	mvwprintw(main_page, 3, 0, "*********************************");
@@ -290,7 +234,9 @@ void print_report_page()
 
 void print_help_page()
 {
-	PAGE("Help");
+	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
+	mvprintw(0, PAGE_TITLE_OFFSET, "Help");
+	wnoutrefresh(stdscr);
 
 	struct utsname uts;
 	struct tm*	   tim;
@@ -300,76 +246,100 @@ void print_help_page()
 	timer = time(NULL);	
 	tim = localtime(&timer);	
 
-	wattrset(main_page, COLOR_PAIR(14));
+	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw(main_page, 1, 0, "Hostname: %s", uts.nodename);
 	mvwprintw(main_page, 2, 0, "Linux: %s", uts.version);
 	mvwprintw(main_page, 3, 0, "Release: %s", uts.release);
 	mvwprintw(main_page, 4, 0, "Machine: %s", uts.machine);
 	mvwprintw(main_page, 5, 0, "Local time: %02d:%02d:%02d", tim->tm_hour, tim->tm_min, tim->tm_sec);
-	wattrset(main_page, COLOR_PAIR(19));
+
+	wattrset(main_page, COLOR_PAIR(PAIR_MAGENDA_WHITE));
 	mvwprintw_clr(main_page, 6, 0, "Refresh time: %0.1f sec", (double)refresh_time / SEC);
-	wattrset(main_page, COLOR_PAIR(13));
+	
+	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 8, 0, "Available options:");
-	mvwprintw(main_page, 9, 0, "'h' - Help");
-	mvwprintw(main_page, 10, 0, "'r' - Generate report");
-	mvwprintw(main_page, 11, 0, "'l' - CPU cores load");
-	mvwprintw(main_page, 12, 0, "'n' - Network load ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 13, 0, "'m' - Memory info");
-	mvwprintw(main_page, 14, 0, "'M' - Memory & Swap load");
-	mvwprintw(main_page, 15, 0, "'s' - Sensors info");
-	mvwprintw(main_page, 16, 0, "'p' - PCI devices info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 17, 0, "'C' - CPU load");
-	mvwprintw(main_page, 18, 0, "'c' - CPU info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 19, 0, "'t' - Set refresh time");
+	mvwprintw(main_page, 9, 0, "'0' - Help");
+	mvwprintw(main_page, 10, 0, "'1' - CPU Info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 11, 0, "'2' - CPU Load");
+	mvwprintw(main_page, 12, 0, "'3' - CPU Each Load");
+	mvwprintw(main_page, 13, 0, "'4' - Memory Info");
+	mvwprintw(main_page, 14, 0, "'5' - Memory & Swap load");
+	mvwprintw(main_page, 15, 0, "'6' - Network Stats ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 16, 0, "'7' - Generate Report");
+	mvwprintw(main_page, 17, 0, "'8' - PCI Devices Info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 18, 0, "'9' - Sensors Info");
+	mvwprintw(main_page, 19, 0, "'t' - Set Refresh Time");
 	mvwprintw(main_page, 20, 0, "'q' - Quit");
-	wattrset(main_page, COLOR_PAIR(0));
+	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
 
 int start_main_ui()
 {
-	bool is_time_changed = false;
+	// time changing flag
+	bool is_time_changed = false; 
 
 	initscr();
 	cbreak();
 	move(0, 0);
 	refresh();
 
-	int color = has_colors();
-	if (color)
-	{
-		start_color();
-		init_pairs(color);
-	}
+	start_color();
+	
+	init_pair((short)PAIR_DEFAULT, (short)COLOR_WHITE, (short)COLOR_BLACK);
+	init_pair((short)PAIR_GREEN_BLACK, (short)COLOR_GREEN, (short)COLOR_BLACK);
+	init_pair((short)PAIR_BLUE_BLACK, (short)COLOR_BLUE, (short)COLOR_BLACK);
+	init_pair((short)PAIR_MAGENDA_BLACK, (short)COLOR_MAGENTA, (short)COLOR_BLACK);
+	init_pair((short)PAIR_BLACK_RED, (short)COLOR_BLACK, (short)COLOR_RED);
+	init_pair((short)PAIR_BLACK_GREEN, (short)COLOR_BLACK, (short)COLOR_GREEN);
+	init_pair((short)PAIR_BLACK_YELLOW, (short)COLOR_BLACK, (short)COLOR_YELLOW);
+	init_pair((short)PAIR_BLACK_CYAN, (short)COLOR_BLACK, (short)COLOR_CYAN);
+	init_pair((short)PAIR_BLACK_WHITE, (short)COLOR_BLACK, (short)COLOR_WHITE);
+	init_pair((short)PAIR_BLUE_WHITE, (short)COLOR_BLUE, (short)COLOR_WHITE);
+	init_pair((short)PAIR_RED_WHITE, (short)COLOR_RED, (short)COLOR_WHITE);
+	init_pair((short)PAIR_GREEN_WHITE, (short)COLOR_GREEN, (short)COLOR_WHITE);
+	init_pair((short)PAIR_YELLOW_WHITE, (short)COLOR_YELLOW, (short)COLOR_WHITE);
+	init_pair((short)PAIR_RED_GREEN, (short)COLOR_RED, (short)COLOR_GREEN);
+	init_pair((short)PAIR_MAGENDA_WHITE, (short)COLOR_MAGENTA, (short)COLOR_WHITE);
+	init_pair((short)PAIR_MAGENDA_MAGENDA, (short)COLOR_MAGENTA, (short)COLOR_MAGENTA);
+	init_pair((short)PAIR_YELLOW_YELLOW, (short)COLOR_YELLOW, (short)COLOR_YELLOW);
+	init_pair((short)PAIR_GREEN_GREEN, (short)COLOR_GREEN, (short)COLOR_GREEN);
+	init_pair((short)PAIR_BLUE_BLUE, (short)COLOR_BLUE, (short)COLOR_BLUE);
+	init_pair((short)PAIR_WHITE_BLUE, (short)COLOR_WHITE, (short)COLOR_BLUE);
+	init_pair((short)PAIR_CYAN_BLUE, (short)COLOR_CYAN, (short)COLOR_BLUE);
+	init_pair((short)PAIR_GREEN_BLUE, (short)COLOR_GREEN, (short)COLOR_BLUE);
+	init_pair((short)PAIR_RED_BLUE, (short)COLOR_RED, (short)COLOR_BLUE);
+	init_pair((short)PAIR_YELLOW_BLUE, (short)COLOR_YELLOW, (short)COLOR_BLUE);
+	init_pair((short)PAIR_BLUE_YELLOW, (short)COLOR_BLUE, (short)COLOR_YELLOW);
+	init_pair((short)PAIR_RED_RED, (short)COLOR_RED, (short)COLOR_RED);
+	init_pair((short)PAIR_CYAN_CYAN, (short)COLOR_CYAN, (short)COLOR_CYAN);
+	init_pair((short)PAIR_WHITE_RED, (short)COLOR_WHITE, (short)COLOR_RED);
+	init_pair((short)PAIR_WHITE_CYAN, (short)COLOR_WHITE, (short)COLOR_CYAN);
 
 	clear();
 
 	main_page = newpad(MAX_ROWS_COUNT, MAX_COLS_COUNT);
 
-	wbkgd(stdscr, COLOR_PAIR(14)); // background color
-	wbkgd(main_page, COLOR_PAIR(14));
+	// background color
+	wbkgd(stdscr, COLOR_PAIR(PAIR_BLUE_WHITE));
+	wbkgd(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 
 	fflush(NULL); 
 
 	current_lines = LINES;
 	current_cols = COLS;
 
+	// initialize system processed data
 	init_system_data(&data);
 
 	while (true)
 	{
 		box(stdscr, 0, 0);
-		mvprintw(0, current_cols / 2 - 5, "MySysInfo");
 		wnoutrefresh(stdscr);
 
 		switch (active_page)
 		{
-		case P_DEFAULT:
-		{
-			print_start_page();
-			break;
-		}
 		case P_HELP:
 		{
 			print_help_page();
@@ -377,7 +347,7 @@ int start_main_ui()
 		}
 		case P_CPU_INFO:
 		{
-			print_cpu_info_page(main_page, data->cpu, selected_processor_id);
+			print_cpu_info_page(main_page, data->cpu, proc_id);
 			break;
 		}
 		case P_CPU_LOAD:
@@ -411,13 +381,13 @@ int start_main_ui()
 			print_network_bandwitdh_graph(main_page, 
 										data->network, 
 										refresh_time, 
-										selected_intf, 
+										intf_id, 
 										current_cols - GRAPH_RIGHT_BOUNDARY);
 			break;
 		}
 		case P_PCI_INFO:
 		{
-			print_pci_devices_page(main_page, data->pci, selected_pci_dev);
+			print_pci_devices_page(main_page, data->pci, pci_dev_id);
 			break;
 		}
 		case P_SENSORS:
@@ -443,25 +413,36 @@ int start_main_ui()
 			break;
 		}
 
-		wmove(stdscr, 0, 0);
+		// move course to the beginning each time
+		wmove(stdscr, 0, 0); 
+
 		wrefresh(stdscr);
+
 		doupdate();
 
-		int input_value = 0;
+		int contol_key_value = 0;
 		for (int i = 0; i < refresh_time; i++)
 		{
-			usleep(100000);
-			input_value = input_check();
-			if (input_value == -1)
+			// wait for user input
+			usleep(WAIT_TIME_VALUE);
+
+			contol_key_value = control_handle();
+			
+			if (contol_key_value == -1)
 			{
 				free_system_data(data);
+
 				nocbreak();
+
 				endwin();
 				return 0;
 			}
-			else if (input_value == 1 || !check_window_resize(&current_lines, &current_cols)
+			else if (contol_key_value || !check_window_resize(&current_lines, &current_cols)
 									  || is_time_changed)
+			{
+				wclear(main_page);
 				break;
+			}
 		}
 
 		is_time_changed = false;

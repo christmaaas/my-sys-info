@@ -3,18 +3,18 @@
 
 #include <stdint.h>
 
-#define PATH_CPUINFO_FILE          "/proc/cpuinfo"
-#define PATH_CPUS_PRESENT_FILE     "/sys/devices/system/cpu/present"
-#define PATH_CPU_BYTE_ORDER_FILE   "/sys/kernel/cpu_byteorder"
-#define PATH_STAT_FILE             "/proc/stat"
-#define PATH_CPUFREQ_FILE          "/sys/devices/system/cpu/cpufreq"
+#define PATH_CPUINFO_FILE        "/proc/cpuinfo"
+#define PATH_CPUS_PRESENT_FILE   "/sys/devices/system/cpu/present"
+#define PATH_CPU_BYTE_ORDER_FILE "/sys/kernel/cpu_byteorder"
+#define PATH_STAT_FILE           "/proc/stat"
+#define PATH_CPUFREQ_FILE        "/sys/devices/system/cpu/cpufreq"
 
 #define MAX_CPU_LOAD_HISTORY_SIZE  200
 
 typedef enum cpu_byte_order_name
 {
     LITTLE_ENDIAN_ORDER = 0,
-    BIG_ENDIAN_ORDER = 1
+    BIG_ENDIAN_ORDER    = 1
 } cpubyteorder_t;
 
 typedef struct cpu_frequency_info 
@@ -126,47 +126,47 @@ void init_cpu_cores(cpu_t* cpu_info);
 
 typedef enum cpu_info_tokens
 {
-    PROCESSOR_NUM       = 0,
-    VENDOR_ID           = 1,
-    CPU_FAMILY          = 2,
-    MODEL               = 3,
-    MODEL_NAME          = 4,
-    STEPPING            = 5,
-    MICROCODE           = 6,
-    FREQUENCY_MHZ       = 7,
-    CACHE_SIZE          = 8,
-    PHYSICAL_ID         = 9,
-    SIBLINGS            = 10,
-    CORE_ID             = 11,
-    CPU_CORES           = 12,
-    APICID              = 13,
-    INITIAL_APICID      = 14,
-    FPU                 = 15,
-    FPU_EXCEPTION       = 16,
-    CPUID_LEVEL         = 17,
-    WP                  = 18,
-    FLAGS               = 19,
-    VMX_FLAGS           = 20,
-    BUGS                = 21,
-    BOGOMIPS            = 22,
-    CLFLUSH_SIZE        = 23,
-    CACHE_ALIGNMENT     = 24,
-    ADDRESS_SIZES       = 25,
-    POWER_MANAGMENT     = 26
+    PROCESSOR_NUM   = 0,
+    VENDOR_ID       = 1,
+    CPU_FAMILY      = 2,
+    MODEL           = 3,
+    MODEL_NAME      = 4,
+    STEPPING        = 5,
+    MICROCODE       = 6,
+    FREQUENCY_MHZ   = 7,
+    CACHE_SIZE      = 8,
+    PHYSICAL_ID     = 9,
+    SIBLINGS        = 10,
+    CORE_ID         = 11,
+    CPU_CORES       = 12,
+    APICID          = 13,
+    INITIAL_APICID  = 14,
+    FPU             = 15,
+    FPU_EXCEPTION   = 16,
+    CPUID_LEVEL     = 17,
+    WP              = 18,
+    FLAGS           = 19,
+    VMX_FLAGS       = 20,
+    BUGS            = 21,
+    BOGOMIPS        = 22,
+    CLFLUSH_SIZE    = 23,
+    CACHE_ALIGNMENT = 24,
+    ADDRESS_SIZES   = 25,
+    POWER_MANAGMENT = 26
 } cpu_info_tokens_t;
 
 void scan_cpu_basic_info(cpu_t* cpu);
 void scan_cpu_clocks(cpu_t* cpu);
-void refresh_cpu_clocks(cpu_t* cpu, int processor_id);
+void refresh_cpu_clocks(cpu_t* cpu, const int proc_id);
 void scan_cpu_load_stat(cpu_t* cpu);
 
 typedef enum cpu_cache_levels
 {
-    L1_DATA_LEVEL           = 0,
-    L1_INSTRUCTION_LEVEL    = 1,
-    L2_LEVEL                = 2,
-    L3_LEVEL                = 3,
-    L4_LEVEL                = 4
+    L1_DATA_LEVEL        = 0,
+    L1_INSTRUCTION_LEVEL = 1,
+    L2_LEVEL             = 2,
+    L3_LEVEL             = 3,
+    L4_LEVEL             = 4
 } cache_level_t;
 
 void scan_cpu_cache(cpu_t* cpu);

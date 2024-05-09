@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MEMORY_TOKENS_COUNT 12
+
 void scan_memory(mem_t* memory)
 {
     FILE* file_ptr = NULL;
@@ -19,75 +21,75 @@ void scan_memory(mem_t* memory)
 
     int count = 0, tokens_num = 0;
     char** tokens = NULL;
-    while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr) && count < 12)
+    while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr) && count < MEMORY_TOKENS_COUNT)
     {
         tokens = strsplit(file_buffer, ":", &tokens_num);
 
-        if(!strcmp(tokens[0], "MemTotal"))
+        if (!strcmp(tokens[0], "MemTotal"))
 		{
-			memory->memory_usage.total = atol(tokens[1]);
+			memory->usage_stats.total = atol(tokens[1]);
             count++;
 		}
-		else if(!strcmp(tokens[0], "MemFree"))
+		else if (!strcmp(tokens[0], "MemFree"))
 		{
-			memory->memory_usage.free = atol(tokens[1]);
+			memory->usage_stats.free = atol(tokens[1]);
             count++;
 		}
-		else if(!strcmp(tokens[0], "Buffers"))
+		else if (!strcmp(tokens[0], "Buffers"))
 		{
-			memory->memory_usage.buffers = atol(tokens[1]);
+			memory->usage_stats.buffers = atol(tokens[1]);
             count++;
 		}
-		else if(!strcmp(tokens[0], "Cached"))
+		else if (!strcmp(tokens[0], "Cached"))
 		{
-			memory->memory_usage.cached = atol(tokens[1]);
+			memory->usage_stats.cached = atol(tokens[1]);
             count++;
 		}
-		else if(!strcmp(tokens[0], "SwapTotal"))
+		else if (!strcmp(tokens[0], "SwapTotal"))
 		{
-			memory->memory_usage.swap_total = atol(tokens[1]);
+			memory->usage_stats.swap_total = atol(tokens[1]);
             count++;
 		}
-		else if(!strcmp(tokens[0], "SwapFree"))
+		else if (!strcmp(tokens[0], "SwapFree"))
 		{
-			memory->memory_usage.swap_free = atol(tokens[1]);
+			memory->usage_stats.swap_free = atol(tokens[1]);
             count++;
 		}
-        else if(!strcmp(tokens[0], "Active"))
+        else if (!strcmp(tokens[0], "Active"))
 		{
-			memory->memory_usage.active = atol(tokens[1]);
+			memory->usage_stats.active = atol(tokens[1]);
             count++;
 		}
-        else if(!strcmp(tokens[0], "Inactive"))
+        else if (!strcmp(tokens[0], "Inactive"))
 		{
-			memory->memory_usage.inactive = atol(tokens[1]);
+			memory->usage_stats.inactive = atol(tokens[1]);
             count++;
 		}
-        else if(!strcmp(tokens[0], "AnonPages"))
+        else if (!strcmp(tokens[0], "AnonPages"))
 		{
-			memory->memory_usage.anon_pages = atol(tokens[1]);
+			memory->usage_stats.anon_pages = atol(tokens[1]);
             count++;
 		}
-        else if(!strcmp(tokens[0], "Mapped"))
+        else if (!strcmp(tokens[0], "Mapped"))
 		{
-			memory->memory_usage.mapped = atol(tokens[1]);
+			memory->usage_stats.mapped = atol(tokens[1]);
+            count++;
+		} 
+        else if (!strcmp(tokens[0], "Shmem"))
+		{
+			memory->usage_stats.shmem = atol(tokens[1]);
             count++;
 		}
-        else if(!strcmp(tokens[0], "Shmem"))
+        else if (!strcmp(tokens[0], "PageTables"))
 		{
-			memory->memory_usage.shmem = atol(tokens[1]);
-            count++;
-		}
-        else if(!strcmp(tokens[0], "PageTables"))
-		{
-			memory->memory_usage.page_tables = atol(tokens[1]);
+			memory->usage_stats.page_tables = atol(tokens[1]);
             count++;
 		}
 
         for (int i = 0; i < tokens_num; ++i)
             free(tokens[i]);
-
         free(tokens);
     }
+	
     fclose(file_ptr);
 }

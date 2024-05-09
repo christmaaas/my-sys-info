@@ -6,22 +6,28 @@
 
 #define MAX_INPUT_LENGTH 3
 
-#define MAX_REFRESH_TIME 100
+#define MAX_REFRESH_TIME     100
 #define DEFAULT_REFRESH_TIME 1
-#define MIN_REFRESH_TIME 0
+#define MIN_REFRESH_TIME     0
+#define CENTERING_DIVIDER    3.3
 
-#define FRAME() \
+#define PAIR_BLUE_GREEN 29
+
+#define DRAW_WIN_FRAME() \
 	{ \
 		box(win, 0, 0); \
-		mvwprintw(win, 0, getmaxx(win) / 3.3, "Refresh Time"); \
+		mvwprintw(win, 0, getmaxx(win) / CENTERING_DIVIDER, "Refresh Time"); \
 	}
 
-WINDOW* create_input_window(int starty, int startx, int height, int width) 
+WINDOW* create_input_window(const int start_y, const int start_x, const int height, const int width) 
 {
     WINDOW* win;
-    win = newwin(height, width, starty, startx);
-    wbkgd(win, COLOR_PAIR(1));
-    FRAME(); 
+    win = newwin(height, width, start_y, start_x);
+
+    wbkgd(win, COLOR_PAIR(PAIR_BLUE_GREEN));
+
+    DRAW_WIN_FRAME(); 
+
     wrefresh(win);
     return win;
 }
@@ -29,13 +35,14 @@ WINDOW* create_input_window(int starty, int startx, int height, int width)
 void init_color_pairs() 
 {
     start_color();
-    init_pair((short)1, (short)COLOR_BLUE, (short)COLOR_GREEN);
+    init_pair((short)PAIR_BLUE_GREEN, (short)COLOR_BLUE, (short)COLOR_GREEN);
 }
 
 PANEL* create_input_panel(WINDOW* win) 
 {
     PANEL* pan;
     pan = new_panel(win);
+    
     update_panels();
     return pan;
 }
@@ -56,11 +63,11 @@ void draw_input_prompt(WINDOW* win)
     wrefresh(win);
 }
 
-void draw_input_field(WINDOW* win, int input_length, char* input_buffer) 
+void draw_input_field(WINDOW* win, const int input_length, char* input_buffer) 
 {
     mvwprintw(win, 3, 1, "Enter ms: %s", input_buffer);
     wclrtoeol(win);
-    FRAME();
+    DRAW_WIN_FRAME();
     wmove(win, 3, 11 + input_length);
     wrefresh(win);
 }

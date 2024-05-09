@@ -20,8 +20,10 @@ void free_pci(pci_t* pci)
         free(pci->devices[dev].class_name);
         free(pci->devices[dev].device_id);
         free(pci->devices[dev].device_name);
+        free(pci->devices[dev].driver_name);
         free(pci->devices[dev].interface_name);
         free(pci->devices[dev].modalias);
+        free(pci->devices[dev].revision);
         free(pci->devices[dev].slot_name);
         free(pci->devices[dev].subclass_name);
         free(pci->devices[dev].vendor_id);

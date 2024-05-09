@@ -3,6 +3,6 @@
 
 #include "../info/sys.h"
 
-void make_system_report(system_t* data);
+void make_system_report(system_t* data, const int ref_time);
 
 #endif /* _REPORT_H */

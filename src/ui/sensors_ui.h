@@ -4,6 +4,9 @@
 #include "common_ui.h"
 #include "../logic/info/sys.h"
 
-void print_sensors_page(WINDOW* main_page, sensor_t* sensor, int refresh_time, int current_cols);
+void print_sensors_page(WINDOW* main_page, 
+                        sensor_t* sensor, 
+                        const int time, 
+                        const int cols);
 
 #endif /* _SENSORS_UI_H */

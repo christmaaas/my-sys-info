@@ -16,7 +16,7 @@ typedef struct sensor_stat
 typedef struct sensors_info
 {
     uint32_t   sensors_num;
-    senstat_t* sensors; 
+    senstat_t* stats; 
 } sensor_t;
 
 void init_sensors_stats(sensor_t* sensor);

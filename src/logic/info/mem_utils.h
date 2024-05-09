@@ -44,8 +44,8 @@ typedef struct mem_load
 
 typedef struct memory_info
 {
-    memusage_t 	 memory_usage;
-	mempercent_t memory_percentage;
+    memusage_t 	 usage_stats;
+	mempercent_t usage_percentage;
 	memload_t	 current_load;
 } mem_t;
 

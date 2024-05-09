@@ -17,18 +17,18 @@ void calculate_sensors_stats(sensor_t* sensor)
 
     for (uint32_t i = 0; i < sensor->sensors_num; i++)
     {
-        sensors_min_temp[i] = sensor->sensors[i].min_temp;
-        sensors_max_temp[i] = sensor->sensors[i].max_temp;
+        sensors_min_temp[i] = sensor->stats[i].min_temp;
+        sensors_max_temp[i] = sensor->stats[i].max_temp;
     }
 
-    scan_sys_sensors_temp(sensor);
+    scan_sys_sensors_temp(sensor); // refreshing data
 
     for (uint32_t i = 0; i < sensor->sensors_num; i++)
     {
-        if (sensor->sensors[i].cur_temp < sensors_min_temp[i])
-            sensor->sensors[i].min_temp = sensor->sensors[i].cur_temp;
-        if (sensor->sensors[i].cur_temp > sensors_max_temp[i])
-            sensor->sensors[i].max_temp = sensor->sensors[i].cur_temp;
+        if (sensor->stats[i].cur_temp < sensors_min_temp[i])
+            sensor->stats[i].min_temp = sensor->stats[i].cur_temp;
+        if (sensor->stats[i].cur_temp > sensors_max_temp[i])
+            sensor->stats[i].max_temp = sensor->stats[i].cur_temp;
     }
 
     free(sensors_min_temp);
@@ -41,8 +41,8 @@ void free_sensors(sensor_t* sensor)
         return;
         
     for (uint32_t sen = 0; sen < sensor->sensors_num; sen++)
-        free(sensor->sensors[sen].name);
+        free(sensor->stats[sen].name);
 
-    free(sensor->sensors);
+    free(sensor->stats);
     free(sensor);
 }

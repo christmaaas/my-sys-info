@@ -4,6 +4,6 @@
 #include "common_ui.h"
 #include "../logic/info/sys.h"
 
-void print_pci_devices_page(WINDOW* main_page, pci_t* pci, int selected_pci_dev);
+void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id);
 
 #endif /* _PCI_UI_H */
