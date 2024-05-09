@@ -215,6 +215,7 @@ void get_pci_device_driver(pcidev_t* pci_dev, const char* path)
     char** tokens = strsplit(file_buffer, "=", &tokens_num);
 
     pci_dev->driver_name = strduplicate(tokens[1]);
+    CUT_STRING_BY_LENGTH(pci_dev->driver_name);
 
     for (int i = 0; i < tokens_num; i++)
         free(tokens[i]);

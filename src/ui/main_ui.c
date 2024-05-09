@@ -7,15 +7,19 @@
 #include "pci_ui.h"
 #include "sensors_ui.h"
 #include "time_ui.h"
+#include "menu_ui.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+#define __USE_MISC
 #include <unistd.h>
+#include <stdio.h>
+
+extern int fileno(FILE *stream);
 
 #define WAIT_TIME_VALUE   100000 // 0.1 of second (usleep arg is a microseconds)
 #define INPUT_BUFFER_SIZE 128
@@ -32,25 +36,16 @@ typedef enum active_page
     P_NETWORK_STATS  = 7,
     P_REPORT         = 8,
     P_PCI_INFO       = 9,
-    P_SENSORS        = 10
+    P_SENSORS        = 10,
+	P_MENU           = 11
 } page_t;
 
 typedef enum control_keys
 {
-    KEY_P_HELP           = '0',
-    KEY_P_CPU_INFO       = '1',
-    KEY_P_CPU_LOAD       = '2',
-    KEY_P_CPU_CORES_LOAD = '3',
-    KEY_P_MEMORY         = '4',
-    KEY_P_MEMORY_LOAD    = '5',
-    KEY_P_NETWORK_STATS  = '6',
-    KEY_P_REPORT         = '7',
-    KEY_P_PCI_INFO       = '8',
-    KEY_P_SENSORS        = '9',
-	KEY_LEFT_ARROW       = '<',
-	KEY_RIGHT_ARROW      = '>',
-	KEY_P_INPUT_TIME     = 't',
-	KEY_QUIT			 = 'q'
+    KEY_P_MENU		= 'm',
+	KEY_LEFT_ARROW  = '<',
+	KEY_RIGHT_ARROW = '>',
+	KEY_QUIT		= 'q'
 } key_t;
 
 int current_lines;
@@ -90,20 +85,20 @@ int check_time_changed(int* current_time)
 
 int control_handle()
 {
-	char buf[INPUT_BUFFER_SIZE];
+	char input_buf[INPUT_BUFFER_SIZE];
 	int bytes_of_stream = 0, readed_chars = 0;
 
 	ioctl(fileno(stdin), FIONREAD, &bytes_of_stream);
 
 	if (bytes_of_stream > 0)
 	{
-		readed_chars = read(fileno(stdin), buf, bytes_of_stream);
+		readed_chars = read(fileno(stdin), input_buf, bytes_of_stream);
 
 		if (readed_chars > 0)
 		{
 			for (int i = 0; i < readed_chars; ++i)
 			{
-				switch (buf[i])
+				switch (input_buf[i])
 				{
 				case KEY_RIGHT_ARROW:
 				{
@@ -145,61 +140,10 @@ int control_handle()
 					else
 						return 0;
 				}
-				case KEY_P_HELP:
-				{
-					active_page = P_HELP;
-					break;
-				}
-				case KEY_P_CPU_INFO:
-				{
-					active_page = P_CPU_INFO;
-					break;
-				}
-				case KEY_P_CPU_LOAD:
-				{
-					active_page = P_CPU_LOAD;
-					break;
-				}
-				case KEY_P_INPUT_TIME:
+				case KEY_P_MENU:
 				{
 					prev_page = active_page;
-					active_page = P_INPUT_TIME;
-					break;
-				}
-				case KEY_P_CPU_CORES_LOAD:
-				{
-					active_page = P_CPU_CORES_LOAD;
-					break;
-				}
-				case KEY_P_MEMORY:
-				{
-					active_page = P_MEMORY;
-					break;
-				}
-				case KEY_P_MEMORY_LOAD:
-				{
-					active_page = P_MEMORY_LOAD;
-					break;
-				}
-				case KEY_P_NETWORK_STATS:
-				{
-					active_page = P_NETWORK_STATS;
-					break;
-				}
-				case KEY_P_REPORT:
-				{
-					prev_page = active_page;
-					active_page = P_REPORT;
-					break;
-				}
-				case KEY_P_PCI_INFO:
-				{
-					active_page = P_PCI_INFO;
-					break;
-				}
-				case KEY_P_SENSORS:
-				{
-					active_page = P_SENSORS;
+					active_page = P_MENU;
 					break;
 				}
 				case KEY_QUIT:
@@ -258,18 +202,19 @@ void print_help_page()
 	
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 8, 0, "Available options:");
-	mvwprintw(main_page, 9, 0, "'0' - Help");
-	mvwprintw(main_page, 10, 0, "'1' - CPU Info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 11, 0, "'2' - CPU Load");
-	mvwprintw(main_page, 12, 0, "'3' - CPU Each Load");
-	mvwprintw(main_page, 13, 0, "'4' - Memory Info");
-	mvwprintw(main_page, 14, 0, "'5' - Memory & Swap load");
-	mvwprintw(main_page, 15, 0, "'6' - Network Stats ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 16, 0, "'7' - Generate Report");
-	mvwprintw(main_page, 17, 0, "'8' - PCI Devices Info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 18, 0, "'9' - Sensors Info");
-	mvwprintw(main_page, 19, 0, "'t' - Set Refresh Time");
-	mvwprintw(main_page, 20, 0, "'q' - Quit");
+	mvwprintw(main_page, 9, 0, "'m' - Selection Menu");
+	mvwprintw(main_page, 10, 0, " - 1. Help");
+	mvwprintw(main_page, 11, 0, " - 2. CPU Info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 12, 0, " - 3. CPU Load");
+	mvwprintw(main_page, 13, 0, " - 4. Set Refresh Time");
+	mvwprintw(main_page, 14, 0, " - 5. CPU Each Load");
+	mvwprintw(main_page, 15, 0, " - 6. Memory Info");
+	mvwprintw(main_page, 16, 0, " - 7. Memory & Swap Load");
+	mvwprintw(main_page, 17, 0, " - 8. Network Stats ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 18, 0, " - 9. Generate Report");
+	mvwprintw(main_page, 19, 0, " - 10.PCI Devices Info ('<' - prev | '>' - next)");
+	mvwprintw(main_page, 20, 0, " - 11.Sensors Info");
+	mvwprintw(main_page, 21, 0, "'q' - Quit");
 	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
@@ -277,8 +222,8 @@ void print_help_page()
 
 int start_main_ui()
 {
-	// time changing flag
-	bool is_time_changed = false; 
+	bool is_time_changed = false; // time changing flag 
+	bool is_menu_called  = false; // menu calling flag
 
 	initscr();
 	cbreak();
@@ -409,6 +354,12 @@ int start_main_ui()
 			is_time_changed = true;
 			break;
 		}
+		case P_MENU:
+		{
+			active_page = select_page_menu();
+			is_menu_called = true;
+			break;
+		}
 		default:
 			break;
 		}
@@ -438,14 +389,17 @@ int start_main_ui()
 				return 0;
 			}
 			else if (contol_key_value || !check_window_resize(&current_lines, &current_cols)
-									  || is_time_changed)
+									  || is_time_changed
+									  || is_menu_called)
 			{
 				wclear(main_page);
 				break;
 			}
 		}
 
+		// reset flags
 		is_time_changed = false;
+		is_menu_called  = false;
 	}
 	return 1;
 }

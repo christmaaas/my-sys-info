@@ -13,7 +13,7 @@
 
 #define PAIR_BLUE_GREEN 29
 
-#define DRAW_WIN_FRAME() \
+#define DRAW_TIME_WIN_FRAME() \
 	{ \
 		box(win, 0, 0); \
 		mvwprintw(win, 0, getmaxx(win) / CENTERING_DIVIDER, "Refresh Time"); \
@@ -21,29 +21,23 @@
 
 WINDOW* create_input_window(const int start_y, const int start_x, const int height, const int width) 
 {
-    WINDOW* win;
-    win = newwin(height, width, start_y, start_x);
+    WINDOW* win = newwin(height, width, start_y, start_x);
 
     wbkgd(win, COLOR_PAIR(PAIR_BLUE_GREEN));
 
-    DRAW_WIN_FRAME(); 
+    DRAW_TIME_WIN_FRAME(); 
 
     wrefresh(win);
-    return win;
-}
 
-void init_color_pairs() 
-{
-    start_color();
-    init_pair((short)PAIR_BLUE_GREEN, (short)COLOR_BLUE, (short)COLOR_GREEN);
+    return win;
 }
 
 PANEL* create_input_panel(WINDOW* win) 
 {
-    PANEL* pan;
-    pan = new_panel(win);
+    PANEL* pan = new_panel(win);
     
     update_panels();
+
     return pan;
 }
 
@@ -67,7 +61,7 @@ void draw_input_field(WINDOW* win, const int input_length, char* input_buffer)
 {
     mvwprintw(win, 3, 1, "Enter ms: %s", input_buffer);
     wclrtoeol(win);
-    DRAW_WIN_FRAME();
+    DRAW_TIME_WIN_FRAME();
     wmove(win, 3, 11 + input_length);
     wrefresh(win);
 }
@@ -78,7 +72,7 @@ int input_refresh_time()
     keypad(stdscr, TRUE);
     wclear(stdscr);
 
-    init_color_pairs();
+    init_pair((short)PAIR_BLUE_GREEN, (short)COLOR_BLUE, (short)COLOR_GREEN);
 
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);

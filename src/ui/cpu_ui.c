@@ -104,7 +104,7 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	mvwprintw(main_page, 21, 1, "<5%%");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw_clr(main_page, 0, 0, "CPU AVGload/time graph | time: %0.1f sec", (double)time / SEC);
+	mvwprintw_clr(main_page, 0, 0, "CPU total load/time graph | time: %0.1f sec", (double)time / SEC);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_GREEN));
 	mvwprintw(main_page, 0, 45, " ");
@@ -155,7 +155,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	calculate_cpu_cores_load(cpu);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw(main_page, 0, 0, "CPUs load/time diagram | time: %0.1f sec", (double)time / SEC);
+	mvwprintw(main_page, 0, 0, "CPU each load/time diagram | time: %0.1f sec", (double)time / SEC);
 
 	for (uint32_t i = 0; i < cpu->processors_num; i++)
 	{

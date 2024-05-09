@@ -158,8 +158,8 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, c
 	mvwprintw(main_page, 21, 1, "<5%%");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw_clr(main_page, 0, 0, "RAM/time graph | time: %0.1f sec", (double)time / SEC);
-	mvwprintw_clr(main_page, 11, 0, "Swap/time graph | time: %0.1f sec", (double)time / SEC);
+	mvwprintw_clr(main_page, 0, 0, "RAM load/time graph | time: %0.1f sec", (double)time / SEC);
+	mvwprintw_clr(main_page, 11, 0, "Swap load/time graph | time: %0.1f sec", (double)time / SEC);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_YELLOW));
 	mvwprintw(main_page, 0, 45, " ");

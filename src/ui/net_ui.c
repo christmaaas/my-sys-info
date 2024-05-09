@@ -45,7 +45,7 @@ void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, const int 
     mvwprintw_clr(main_page, 7, 50, "Transmitted drop: %lu", network->stat[intf_id].t_drop);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw_clr(main_page, 8, 0, "Network Bandwitdh/time graph | time: %0.1f sec", (double)time / SEC);
+	mvwprintw_clr(main_page, 8, 0, "Network bandwitdh/time graph | time: %0.1f sec", (double)time / SEC);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_CYAN_CYAN));
 	mvwprintw(main_page, 8, 47, " ");

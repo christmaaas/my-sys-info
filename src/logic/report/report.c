@@ -99,7 +99,7 @@ void make_system_report(system_t* data, const int ref_time)
     fprintf(file_ptr, "\n - Current CPU Average Load: %0.1f%%\n\n", data->cpu->current_load.avg_load);
     fprintf(file_ptr, " - Current CPU Each Load:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
-        fprintf(file_ptr, "   - PROC#%d: %0.2f%%\n", i, data->cpu->current_load.cores_load[i].user 
+        fprintf(file_ptr, "   - PROC#%d: %0.2f%%\n", i + 1, data->cpu->current_load.cores_load[i].user 
                                                     + data->cpu->current_load.cores_load[i].wait 
                                                     + data->cpu->current_load.cores_load[i].sys);
     fprintf(file_ptr, "\nMemory Information:\n");
@@ -157,17 +157,19 @@ void make_system_report(system_t* data, const int ref_time)
     {
         fprintf(file_ptr, " - Device (%d/%d)\n", i + 1, data->pci->devices_num);
         fprintf(file_ptr, "   - Slot: %s\n", data->pci->devices[i].slot_name);
+        fprintf(file_ptr, "   - Modalias: %s\n", data->pci->devices[i].modalias);
         fprintf(file_ptr, "   - Class: %s\n", data->pci->devices[i].class_name);
         fprintf(file_ptr, "   - Subclass: %s\n", 
                             data->pci->devices[i].subclass_name ? data->pci->devices[i].subclass_name : "Not Found");
         fprintf(file_ptr, "   - Interface: %s\n", 
                             data->pci->devices[i].interface_name ? data->pci->devices[i].interface_name : "Not Found");
+        fprintf(file_ptr, "   - Driver: %s\n", data->pci->devices[i].driver_name);
         fprintf(file_ptr, "   - Vendor Name: %s\n", data->pci->devices[i].vendor_name);
         fprintf(file_ptr, "   - Vendor ID: %s\n", data->pci->devices[i].vendor_id);
         fprintf(file_ptr, "   - Device Name: %s\n",
                             data->pci->devices[i].device_name ? data->pci->devices[i].device_name : "Not Found");
         fprintf(file_ptr, "   - Device ID: %s\n", data->pci->devices[i].device_id);
-        fprintf(file_ptr, "   - Modalias: %s\n", data->pci->devices[i].modalias);
+        fprintf(file_ptr, "   - Revision: %s\n", data->pci->devices[i].revision);
     }
 
     fprintf(file_ptr, "\nSystem Sensors Statistics (Temperature in Celtius):\n");
