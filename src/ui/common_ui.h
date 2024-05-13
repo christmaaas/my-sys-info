@@ -14,8 +14,10 @@
 #define GRAPH_RIGHT_BOUNDARY 	8
 #define GRAPH_THRESHOLD_VALUE	0.5 // needs to fit accurate data to the graph conditions
 
-#define KB 	1024.0
+#define KB 	1000.0
 #define MB 	(KB * KB)
+#define KiB 1024.0
+#define MiB (KiB * KiB)
 #define SEC 10
 
 typedef enum color_pairs

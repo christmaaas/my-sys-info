@@ -16,7 +16,9 @@ PANEL* create_options_panel(const int start_y, const int start_x, const int heig
     wbkgd(win, COLOR_PAIR(PAIR_WHITE_BLUE));
 
     box(win, 0, 0);
+    wattron(win, A_BOLD);
     mvwprintw(win, 0, getmaxx(win) / CENTERING_DIVIDER, "Menu");
+    wattroff(win, A_BOLD);
 
     PANEL* pan = new_panel(win);
     update_panels();
@@ -93,11 +95,11 @@ int select_page_menu()
     {
         "1. Help",
         "2. CPU Info",
-        "3. CPU Load",
+        "3. CPU Total Usage",
         "4. Set Refresh time",
-        "5. CPU Each Load",
+        "5. CPU Each Usage",
         "6. Memory Info",
-        "7. Memory & Swap Load",
+        "7. Memory & Swap Usage",
         "8. Network Stats",
         "9. Generate Report",
         "10.PCI Devices Info",

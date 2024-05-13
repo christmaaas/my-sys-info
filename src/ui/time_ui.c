@@ -7,7 +7,7 @@
 #define MAX_INPUT_LENGTH 3
 
 #define MAX_REFRESH_TIME     100
-#define DEFAULT_REFRESH_TIME 1
+#define DEFAULT_REFRESH_TIME 10
 #define MIN_REFRESH_TIME     0
 #define CENTERING_DIVIDER    3.3
 
@@ -16,7 +16,9 @@
 #define DRAW_TIME_WIN_FRAME() \
 	{ \
 		box(win, 0, 0); \
+        wattron(win, A_BOLD); \
 		mvwprintw(win, 0, getmaxx(win) / CENTERING_DIVIDER, "Refresh Time"); \
+        wattroff(win, A_BOLD); \
 	}
 
 WINDOW* create_input_window(const int start_y, const int start_x, const int height, const int width) 
@@ -52,17 +54,17 @@ void destroy_input_panel(WINDOW* win, PANEL* pan)
 void draw_input_prompt(WINDOW* win) 
 {
     wattron(win, A_BOLD);
-    mvwprintw(win, 1, 1, "Min - 1ms | Max - 100ms");
+    mvwprintw(win, 1, 1, "Min - 10 | Max - 100");
     wattroff(win, A_BOLD);
     wrefresh(win);
 }
 
 void draw_input_field(WINDOW* win, const int input_length, char* input_buffer) 
 {
-    mvwprintw(win, 3, 1, "Enter ms: %s", input_buffer);
+    mvwprintw(win, 3, 1, "Enter time: %s", input_buffer);
     wclrtoeol(win);
     DRAW_TIME_WIN_FRAME();
-    wmove(win, 3, 11 + input_length);
+    wmove(win, 3, 13 + input_length);
     wrefresh(win);
 }
 
@@ -114,7 +116,7 @@ int input_refresh_time()
 
     int refresh_time = atoi(input_buffer);
 
-    if (refresh_time == MIN_REFRESH_TIME)
+    if (refresh_time < DEFAULT_REFRESH_TIME)
         refresh_time = DEFAULT_REFRESH_TIME; 
     else if (refresh_time > MAX_REFRESH_TIME)
         refresh_time = MAX_REFRESH_TIME;

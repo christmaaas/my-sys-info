@@ -16,7 +16,9 @@ void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id)
 		mvwaddch(main_page, 1, i, '=');
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 3, 1, "Slot: %s", pci_dev.slot_name);
+	wattroff(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 4, 1, "Modalias: %s", pci_dev.modalias);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));

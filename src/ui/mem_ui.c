@@ -40,8 +40,10 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 	mvwprintw_clr(main_page, 2,  55, "%.1fMB", memory->usage_stats.mapped / KB);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total):", memory->usage_stats.total / KB);
 	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total):", memory->usage_stats.swap_total / KB);
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 4, 0, "Utilization:");
@@ -146,7 +148,7 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, const int graph_width)
 {
 	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Memory Load");
+	mvprintw(0, PAGE_TITLE_OFFSET, "Memory Usage");
 	wnoutrefresh(stdscr);
 
 	calculate_total_memory_load(memory, graph_width);
@@ -154,12 +156,14 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, c
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw(main_page, 1, 0, "100%%");
     mvwprintw(main_page, 12, 0, "100%%");
-	mvwprintw(main_page, 10, 1, "<5%%");
-	mvwprintw(main_page, 21, 1, "<5%%");
+	mvwprintw(main_page, 10, 2, "0%%");
+	mvwprintw(main_page, 21, 2, "0%%");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw_clr(main_page, 0, 0, "RAM load/time graph | time: %0.1f sec", (double)time / SEC);
-	mvwprintw_clr(main_page, 11, 0, "Swap load/time graph | time: %0.1f sec", (double)time / SEC);
+	wattron(main_page, A_BOLD);
+	mvwprintw_clr(main_page, 0, 0, "RAM usage/time graph | time: %0.1f sec", (double)time / SEC);
+	mvwprintw_clr(main_page, 11, 0, "Swap usage/time graph | time: %0.1f sec", (double)time / SEC);
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_YELLOW));
 	mvwprintw(main_page, 0, 45, " ");
@@ -168,8 +172,10 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, c
 	mvwprintw(main_page, 11, 45, " ");
 	
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw(main_page, 0, 46, " - current RAM load");
-	mvwprintw(main_page, 11, 46, " - current Swap load");
+	wattron(main_page, A_BOLD);
+	mvwprintw(main_page, 0, 46, " - current RAM usage");
+	mvwprintw(main_page, 11, 46, " - current Swap usage");
+	wattroff(main_page, A_BOLD);
 
 	for (int x = 0; x < MAX_COLS_COUNT; x++) 
 	{
@@ -180,7 +186,7 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, c
 				wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 				mvwaddch(main_page, y, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 			}
-			if ((memory->current_load.ram_load_history[x]) / 100 * MAX_RAM_GRAPH_HEIGHT > y + GRAPH_THRESHOLD_VALUE)
+			if ((memory->current_load.ram_load_history[x]) / 100.0 * MAX_RAM_GRAPH_HEIGHT > y + GRAPH_THRESHOLD_VALUE)
 			{
 				wattrset(main_page, COLOR_PAIR(PAIR_BLACK_YELLOW));
 				mvwaddch(main_page, MAX_RAM_GRAPH_HEIGHT - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);
@@ -204,7 +210,7 @@ void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, c
 				wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 				mvwaddch(main_page, GRAPH_BOTTOM_BOUND - 8, x + GRAPH_DELIM_LINE_OFFSET, ACS_HLINE);
 			}
-			if ((memory->current_load.swap_load_history[x]) / 100 * MAX_SWAP_GRAPH_HEIGHT > y + GRAPH_THRESHOLD_VALUE)
+			if ((memory->current_load.swap_load_history[x]) / 100.0 * MAX_SWAP_GRAPH_HEIGHT > y + GRAPH_THRESHOLD_VALUE)
 			{
 				wattrset(main_page, COLOR_PAIR(PAIR_BLACK_GREEN));
 				mvwaddch(main_page, GRAPH_BOTTOM_BOUND - y, x + GRAPH_POINT_OFFSET, ACS_PLUS);

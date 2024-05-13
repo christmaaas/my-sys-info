@@ -7,9 +7,11 @@
 
 #define MAX_REPORT_NAME_SIZE 100
 
-#define MHZ 1000
-#define KB  1024.0
-#define MB 	(KB * KB)
+#define MHz 1000.0
+#define KiB 1024.0
+#define MiB (KiB * KiB)
+#define KB  1000.0
+#define MB  (KB * KB)
 #define SEC 10
 
 void make_system_report(system_t* data, const int ref_time)
@@ -63,10 +65,10 @@ void make_system_report(system_t* data, const int ref_time)
         fprintf(file_ptr, "   - Bogomips: %0.2f\n", data->cpu->compound[i].bogomips);
         fprintf(file_ptr, "   - Core ID: %d\n", data->cpu->compound[i].topology.core_id);
         fprintf(file_ptr, "   - Frequency:\n");
-        fprintf(file_ptr, "     - Max:     %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_max / MHZ);
-        fprintf(file_ptr, "     - Current: %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_cur / MHZ);
-        fprintf(file_ptr, "     - Base:    %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_base / MHZ);
-        fprintf(file_ptr, "     - Min:     %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_min / MHZ);
+        fprintf(file_ptr, "     - Max:     %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_max / MHz);
+        fprintf(file_ptr, "     - Current: %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_cur / MHz);
+        fprintf(file_ptr, "     - Base:    %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_base / MHz);
+        fprintf(file_ptr, "     - Min:     %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_min / MHz);
         fprintf(file_ptr, "     - Scaling governor: %s\n", data->cpu->compound[i].frequency.freq_scaling_governor);
         fprintf(file_ptr, "     - Latency: %d\n", data->cpu->compound[i].frequency.transition_latency);
         fprintf(file_ptr, "     - Affected processors: %d\n", data->cpu->compound[i].frequency.affected_cpus);
@@ -79,25 +81,25 @@ void make_system_report(system_t* data, const int ref_time)
         fprintf(file_ptr, "     - Lvl1 (I) line size: %uKB\n", data->cpu->compound[i].cache.l1_inst_line_size);
         fprintf(file_ptr, "     - Lvl2 line size:     %uKB\n", data->cpu->compound[i].cache.l2_line_size);
         fprintf(file_ptr, "     - Lvl3 line size:     %uKB\n\n", data->cpu->compound[i].cache.l3_line_size);
-        fprintf(file_ptr, "     - Lvl1 (D) sets:      %uKB\n", data->cpu->compound[i].cache.l1_data_sets);
-        fprintf(file_ptr, "     - Lvl1 (I) sets:      %uKB\n", data->cpu->compound[i].cache.l1_inst_sets);
-        fprintf(file_ptr, "     - Lvl2 sets:          %uKB\n", data->cpu->compound[i].cache.l2_sets);
-        fprintf(file_ptr, "     - Lvl3 sets:          %uKB\n\n", data->cpu->compound[i].cache.l3_sets);
-        fprintf(file_ptr, "     - Lvl1 (D) ways:      %uKB\n", data->cpu->compound[i].cache.l1_data_ways);
-        fprintf(file_ptr, "     - Lvl1 (I) ways:      %uKB\n", data->cpu->compound[i].cache.l1_inst_ways);
-        fprintf(file_ptr, "     - Lvl2 ways:          %uKB\n", data->cpu->compound[i].cache.l2_ways);
-        fprintf(file_ptr, "     - Lvl3 ways:          %uKB\n", data->cpu->compound[i].cache.l3_ways);
+        fprintf(file_ptr, "     - Lvl1 (D) sets:      %u\n", data->cpu->compound[i].cache.l1_data_sets);
+        fprintf(file_ptr, "     - Lvl1 (I) sets:      %u\n", data->cpu->compound[i].cache.l1_inst_sets);
+        fprintf(file_ptr, "     - Lvl2 sets:          %u\n", data->cpu->compound[i].cache.l2_sets);
+        fprintf(file_ptr, "     - Lvl3 sets:          %u\n\n", data->cpu->compound[i].cache.l3_sets);
+        fprintf(file_ptr, "     - Lvl1 (D) ways:      %u\n", data->cpu->compound[i].cache.l1_data_ways);
+        fprintf(file_ptr, "     - Lvl1 (I) ways:      %u\n", data->cpu->compound[i].cache.l1_inst_ways);
+        fprintf(file_ptr, "     - Lvl2 ways:          %u\n", data->cpu->compound[i].cache.l2_ways);
+        fprintf(file_ptr, "     - Lvl3 ways:          %u\n", data->cpu->compound[i].cache.l3_ways);
 
         if (data->cpu->compound[i].cache.levels_num > 3)
 	    {
 		    fprintf(file_ptr, "     - Lvl4 size: %uKB\n", data->cpu->compound[i].cache.l4_size);
 		    fprintf(file_ptr, "     - Lvl4 line size: %uKB\n", data->cpu->compound[i].cache.l4_line_size);
-		    fprintf(file_ptr, "     - Lvl4 sets: %uKB\n", data->cpu->compound[i].cache.l4_sets);
-		    fprintf(file_ptr, "     - Lvl4 ways: %uKB\n", data->cpu->compound[i].cache.l4_ways);
+		    fprintf(file_ptr, "     - Lvl4 sets: %u\n", data->cpu->compound[i].cache.l4_sets);
+		    fprintf(file_ptr, "     - Lvl4 ways: %u\n", data->cpu->compound[i].cache.l4_ways);
 	    }
     }
-    fprintf(file_ptr, "\n - Current CPU Average Load: %0.1f%%\n\n", data->cpu->current_load.avg_load);
-    fprintf(file_ptr, " - Current CPU Each Load:\n");
+    fprintf(file_ptr, "\n - Current CPU Average Usage: %0.1f%%\n\n", data->cpu->current_load.avg_load);
+    fprintf(file_ptr, " - Current CPU Each Usage:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
         fprintf(file_ptr, "   - PROC#%d: %0.2f%%\n", i + 1, data->cpu->current_load.cores_load[i].user 
                                                     + data->cpu->current_load.cores_load[i].wait 
@@ -133,17 +135,17 @@ void make_system_report(system_t* data, const int ref_time)
                                                         i + 1, 
                                                         data->network->interfaces_num);
         fprintf(file_ptr, "   - Received:\n");
-        fprintf(file_ptr, "     - Current Bandwidth: %0.2f KB/time\n", data->network->stat[i].r_bandwith.cur / KB);
-        fprintf(file_ptr, "     - Avg Bandwidth:     %0.2f KB/time\n", data->network->stat[i].r_bandwith.avg / KB);
-        fprintf(file_ptr, "     - Min Bandwidth:     %0.2f KB/time\n", data->network->stat[i].r_bandwith.min / KB);
-        fprintf(file_ptr, "     - Max Bandwidth:     %0.2f KB/time\n", data->network->stat[i].r_bandwith.max / KB);
-        fprintf(file_ptr, "     - Total Received:    %0.2f MByte\n", data->network->stat[i].r_bytes / MB);
+        fprintf(file_ptr, "     - Current Bandwidth: %0.2f KiB/s\n", data->network->stat[i].r_bandwith.cur / KiB);
+        fprintf(file_ptr, "     - Avg Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].r_bandwith.avg / KiB);
+        fprintf(file_ptr, "     - Min Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].r_bandwith.min / KiB);
+        fprintf(file_ptr, "     - Max Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].r_bandwith.max / KiB);
+        fprintf(file_ptr, "     - Total Received:    %0.2f MiB\n", data->network->stat[i].r_bytes / MiB);
         fprintf(file_ptr, "   - Transmitted:\n");
-        fprintf(file_ptr, "     - Current Bandwidth: %0.2f KB/time\n", data->network->stat[i].t_bandwith.cur / KB);
-        fprintf(file_ptr, "     - Avg Bandwidth:     %0.2f KB/time\n", data->network->stat[i].t_bandwith.avg / KB);
-        fprintf(file_ptr, "     - Min Bandwidth:     %0.2f KB/time\n", data->network->stat[i].t_bandwith.min / KB);
-        fprintf(file_ptr, "     - Max Bandwidth:     %0.2f KB/time\n", data->network->stat[i].t_bandwith.max / KB);
-        fprintf(file_ptr, "     - Total Transmitted: %0.2f MByte\n", data->network->stat[i].t_bytes / MB);
+        fprintf(file_ptr, "     - Current Bandwidth: %0.2f KiB/s\n", data->network->stat[i].t_bandwith.cur / KiB);
+        fprintf(file_ptr, "     - Avg Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].t_bandwith.avg / KiB);
+        fprintf(file_ptr, "     - Min Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].t_bandwith.min / KiB);
+        fprintf(file_ptr, "     - Max Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].t_bandwith.max / KiB);
+        fprintf(file_ptr, "     - Total Transmitted: %0.2f MiB\n", data->network->stat[i].t_bytes / MiB);
         fprintf(file_ptr, "   - Received packets:    %lu\n", data->network->stat[i].r_packets);
         fprintf(file_ptr, "   - Received errors:     %lu\n", data->network->stat[i].r_errs);
         fprintf(file_ptr, "   - Received drop:       %lu\n", data->network->stat[i].r_drop);

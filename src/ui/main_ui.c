@@ -73,16 +73,6 @@ int check_window_resize(int* prev_lines, int* prev_cols)
 	return 1;
 }
 
-int check_time_changed(int* current_time)
-{
-	if (*current_time != refresh_time)
-	{
-		*current_time = refresh_time;
-		return 0;
-	}
-	return 1;
-}
-
 int control_handle()
 {
 	char input_buf[INPUT_BUFFER_SIZE];
@@ -198,14 +188,16 @@ void print_help_page()
 	mvwprintw(main_page, 5, 0, "Local time: %02d:%02d:%02d", tim->tm_hour, tim->tm_min, tim->tm_sec);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_MAGENDA_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 6, 0, "Refresh time: %0.1f sec", (double)refresh_time / SEC);
+	wattroff(main_page, A_BOLD);
 	
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 8, 0, "Available options:");
 	mvwprintw(main_page, 9, 0, "'m' - Selection Menu");
 	mvwprintw(main_page, 10, 0, " - 1. Help");
 	mvwprintw(main_page, 11, 0, " - 2. CPU Info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 12, 0, " - 3. CPU Load");
+	mvwprintw(main_page, 12, 0, " - 3. CPU Total Load");
 	mvwprintw(main_page, 13, 0, " - 4. Set Refresh Time");
 	mvwprintw(main_page, 14, 0, " - 5. CPU Each Load");
 	mvwprintw(main_page, 15, 0, " - 6. Memory Info");

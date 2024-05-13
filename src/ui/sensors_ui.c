@@ -14,10 +14,14 @@ void print_sensors_page(WINDOW* main_page, sensor_t* sensor, const int time, con
     calculate_sensors_stats(sensor);
 
     wattrset(main_page, COLOR_PAIR(PAIR_WHITE_BLUE));
+	wattron(main_page, A_BOLD);
     mvwprintw(main_page, 0, 0, "Sensor name       |Cur°C|Max°C|Min°C|");
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw(main_page, 0, 41, "time: %0.1f sec", (double)time / SEC);
+	wattroff(main_page, A_BOLD);
 
     for (uint32_t i = 0, l = 1; i < sensor->sensors_num; i++, l += 2)
 	{

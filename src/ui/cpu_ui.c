@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#define MHZ 1000
+#define MHz 1000.0
 
 void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 {
@@ -15,7 +15,9 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 	cpucompound_t processor = cpu->compound[proc_id];
 
 	wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw(main_page, 0, 1, "Processor ID:");
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw_clr(main_page, 0, 14, "%d", proc_id + 1);
@@ -40,19 +42,23 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 	mvwprintw_clr(main_page, 14, 1, "Core ID: %d", processor.topology.core_id);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 16, 1, "Frequency:");
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw_clr(main_page, 17, 1, "Max: %0.2fMHz", (double)processor.frequency.freq_max / MHZ);
-	mvwprintw_clr(main_page, 18, 1, "Current: %0.2fMHz", (double)processor.frequency.freq_cur / MHZ);
+	mvwprintw_clr(main_page, 17, 1, "Max: %0.2fMHz", (double)processor.frequency.freq_max / MHz);
+	mvwprintw_clr(main_page, 18, 1, "Current: %0.2fMHz", (double)processor.frequency.freq_cur / MHz);
 	mvwprintw_clr(main_page, 17, 20, " | Latency: %d", processor.frequency.transition_latency);
 	mvwprintw_clr(main_page, 18, 20, " | Affected processors: %d", processor.frequency.affected_cpus);
-	mvwprintw_clr(main_page, 19, 1, "Base: %0.2fMHz", (double)processor.frequency.freq_base / MHZ);
-	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / MHZ);
+	mvwprintw_clr(main_page, 19, 1, "Base: %0.2fMHz", (double)processor.frequency.freq_base / MHz);
+	mvwprintw_clr(main_page, 20, 1, "Min: %0.2fMHz", (double)processor.frequency.freq_min / MHz);
 	mvwprintw_clr(main_page, 21, 1, "Scaling governor: %s", processor.frequency.freq_scaling_governor);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_RED_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw_clr(main_page, 0, 50, "Cache:");
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw_clr(main_page, 1, 50, "Lvl1 (D) size: %uKB", processor.cache.l1_data_size);
@@ -65,20 +71,20 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 	mvwprintw_clr(main_page, 8, 50, "Lvl2 line size: %uKB", processor.cache.l2_line_size);
 	mvwprintw_clr(main_page, 9, 50, "Lvl3 line size: %uKB", processor.cache.l3_line_size);
 
-	mvwprintw_clr(main_page, 11, 50, "Lvl1 (D) sets: %uKB", processor.cache.l1_data_sets);
-	mvwprintw_clr(main_page, 12, 50, "Lvl1 (I) sets: %uKB", processor.cache.l1_inst_sets);
-	mvwprintw_clr(main_page, 13, 50, "Lvl2 sets: %uKB", processor.cache.l2_sets);
-	mvwprintw_clr(main_page, 14, 50, "Lvl3 sets: %uKB", processor.cache.l3_sets);
+	mvwprintw_clr(main_page, 11, 50, "Lvl1 (D) sets: %u", processor.cache.l1_data_sets);
+	mvwprintw_clr(main_page, 12, 50, "Lvl1 (I) sets: %u", processor.cache.l1_inst_sets);
+	mvwprintw_clr(main_page, 13, 50, "Lvl2 sets: %u", processor.cache.l2_sets);
+	mvwprintw_clr(main_page, 14, 50, "Lvl3 sets: %u", processor.cache.l3_sets);
 
-	mvwprintw_clr(main_page, 16, 50, "Lvl1 (D) ways: %uKB", processor.cache.l1_data_ways);
-	mvwprintw_clr(main_page, 17, 50, "Lvl1 (I) ways: %uKB", processor.cache.l1_inst_ways);
-	mvwprintw_clr(main_page, 18, 50, "Lvl2 ways: %uKB", processor.cache.l2_ways);
-	mvwprintw_clr(main_page, 19, 50, "Lvl3 ways: %uKB", processor.cache.l3_ways);
+	mvwprintw_clr(main_page, 16, 50, "Lvl1 (D) ways: %u", processor.cache.l1_data_ways);
+	mvwprintw_clr(main_page, 17, 50, "Lvl1 (I) ways: %u", processor.cache.l1_inst_ways);
+	mvwprintw_clr(main_page, 18, 50, "Lvl2 ways: %u", processor.cache.l2_ways);
+	mvwprintw_clr(main_page, 19, 50, "Lvl3 ways: %u", processor.cache.l3_ways);
 
 	if (processor.cache.levels_num > 3)
 	{
-		mvwprintw_clr(main_page, 21, 50, "Lvl4 size: %u", processor.cache.l4_size);
-		mvwprintw_clr(main_page, 22, 50, "Lvl4 line size: %u", processor.cache.l4_line_size);
+		mvwprintw_clr(main_page, 21, 50, "Lvl4 size: %uKB", processor.cache.l4_size);
+		mvwprintw_clr(main_page, 22, 50, "Lvl4 line size: %uKB", processor.cache.l4_line_size);
 		mvwprintw_clr(main_page, 23, 50, "Lvl4 sets: %u", processor.cache.l4_sets);
 		mvwprintw_clr(main_page, 24, 50, "Lvl4 ways: %u", processor.cache.l4_ways);
 	}
@@ -91,7 +97,7 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const int graph_width)
 {
 	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Total Load");
+	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Total Usage");
 	wnoutrefresh(stdscr);
 
 	calculate_total_cpu_load(cpu, graph_width);
@@ -101,16 +107,20 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	mvwprintw(main_page, 6, 1, "75%%");
 	mvwprintw(main_page, 11, 1, "50%%");
 	mvwprintw(main_page, 16, 1, "25%%");
-	mvwprintw(main_page, 21, 1, "<5%%");
+	mvwprintw(main_page, 21, 2, "0%%");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw_clr(main_page, 0, 0, "CPU total load/time graph | time: %0.1f sec", (double)time / SEC);
+	wattron(main_page, A_BOLD);
+	mvwprintw_clr(main_page, 0, 0, "CPU total usage/time graph | time: %0.1f sec", (double)time / SEC);
+	wattron(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_GREEN));
 	mvwprintw(main_page, 0, 45, " ");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw(main_page, 0, 46, " - current load");
+	wattron(main_page, A_BOLD);
+	mvwprintw(main_page, 0, 46, " - current usage");
+	wattroff(main_page, A_BOLD);
 
 	for (int x = 0; x < MAX_COLS_COUNT; x++) 
 	{
@@ -123,7 +133,7 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const i
 			}
 			if ((cpu->current_load.load_history[x].user 
 				+ cpu->current_load.load_history[x].sys 
-				+ cpu->current_load.load_history[x].wait) / 100 
+				+ cpu->current_load.load_history[x].wait) / 100.0 
 				* MAX_CPU_GRAPH_HEIGHT > y + GRAPH_THRESHOLD_VALUE)
 			{
 				wattrset(main_page, COLOR_PAIR(PAIR_BLACK_GREEN));
@@ -149,13 +159,15 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const i
 void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const int cols)
 {
 	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Each Load");
+	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Each Usage");
 	wnoutrefresh(stdscr);
 
 	calculate_cpu_cores_load(cpu);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-	mvwprintw(main_page, 0, 0, "CPU each load/time diagram | time: %0.1f sec", (double)time / SEC);
+	wattron(main_page, A_BOLD);
+	mvwprintw(main_page, 0, 0, "CPU each usage/time diagram | time: %0.1f sec", (double)time / SEC);
+	wattroff(main_page, A_BOLD);
 
 	for (uint32_t i = 0; i < cpu->processors_num; i++)
 	{
@@ -170,7 +182,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 
 		for (int j = 0; j < cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; j++)
 		{
-			if (core_load / 100 
+			if (core_load / 100.0 
 				* (cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET) > j + GRAPH_THRESHOLD_VALUE)
 			{
 				wattrset(main_page, COLOR_PAIR(PAIR_RED_GREEN));
@@ -187,7 +199,9 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	}
 	
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
+	wattron(main_page, A_BOLD);
 	mvwprintw(main_page, cpu->processors_num + 3, 0, "AVERAGE");
+	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw(main_page, cpu->processors_num + 3, INITIAL_GRAPH_OFFSET, "[");
@@ -195,7 +209,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 
 	for (int i = 0; i < cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET; i++)
 	{
-		if (cpu->current_load.avg_load / 100 
+		if (cpu->current_load.avg_load / 100.0 
 			* (cols - GRAPH_BOUNDARY_OFFSET - INITIAL_GRAPH_OFFSET) > i + GRAPH_THRESHOLD_VALUE)
 		{
 			wattrset(main_page, COLOR_PAIR(PAIR_RED_GREEN));
