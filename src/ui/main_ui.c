@@ -52,7 +52,7 @@ int current_lines;
 int current_cols;
 int active_page = P_HELP;
 int prev_page;
-int refresh_time = SEC; // default value in milliseconds
+int refresh_time = SEC; // default value (1 second)
 
 uint32_t proc_id    = 0; // selected processor id
 uint32_t intf_id    = 0; // selected network interface id
@@ -197,11 +197,11 @@ void print_help_page()
 	mvwprintw(main_page, 9, 0, "'m' - Selection Menu");
 	mvwprintw(main_page, 10, 0, " - 1. Help");
 	mvwprintw(main_page, 11, 0, " - 2. CPU Info ('<' - prev | '>' - next)");
-	mvwprintw(main_page, 12, 0, " - 3. CPU Total Load");
+	mvwprintw(main_page, 12, 0, " - 3. CPU Total Usage");
 	mvwprintw(main_page, 13, 0, " - 4. Set Refresh Time");
-	mvwprintw(main_page, 14, 0, " - 5. CPU Each Load");
+	mvwprintw(main_page, 14, 0, " - 5. CPU Each Usage");
 	mvwprintw(main_page, 15, 0, " - 6. Memory Info");
-	mvwprintw(main_page, 16, 0, " - 7. Memory & Swap Load");
+	mvwprintw(main_page, 16, 0, " - 7. Memory Usage");
 	mvwprintw(main_page, 17, 0, " - 8. Network Stats ('<' - prev | '>' - next)");
 	mvwprintw(main_page, 18, 0, " - 9. Generate Report");
 	mvwprintw(main_page, 19, 0, " - 10.PCI Devices Info ('<' - prev | '>' - next)");
@@ -219,6 +219,7 @@ int start_main_ui()
 
 	initscr();
 	cbreak();
+	curs_set(0);
 	move(0, 0);
 	refresh();
 

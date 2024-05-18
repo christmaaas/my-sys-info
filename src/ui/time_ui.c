@@ -71,6 +71,7 @@ void draw_input_field(WINDOW* win, const int input_length, char* input_buffer)
 int input_refresh_time() 
 {
     noecho();
+    curs_set(1);
     keypad(stdscr, TRUE);
     wclear(stdscr);
 
@@ -122,6 +123,8 @@ int input_refresh_time()
         refresh_time = MAX_REFRESH_TIME;
     
     destroy_input_panel(input_win, input_pan);
+
+    curs_set(0);
 
     return refresh_time;
 }

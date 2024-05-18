@@ -87,7 +87,6 @@ int select_page_menu()
     noecho();
     keypad(stdscr, TRUE);
     wclear(stdscr);
-    curs_set(0);
 
     init_pair((short)PAIR_WHITE_BLUE, (short)COLOR_WHITE, (short)COLOR_BLUE);
 
@@ -99,7 +98,7 @@ int select_page_menu()
         "4. Set Refresh time",
         "5. CPU Each Usage",
         "6. Memory Info",
-        "7. Memory & Swap Usage",
+        "7. Memory Usage",
         "8. Network Stats",
         "9. Generate Report",
         "10.PCI Devices Info",
@@ -119,8 +118,6 @@ int select_page_menu()
     int selected_option = select_option(options_pan, options, MAX_OPTIONS);
 
     destroy_options_panel(options_pan);
-
-    curs_set(2);
 
     return selected_option;
 }

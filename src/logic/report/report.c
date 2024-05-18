@@ -10,8 +10,6 @@
 #define MHz 1000.0
 #define KiB 1024.0
 #define MiB (KiB * KiB)
-#define KB  1000.0
-#define MB  (KB * KB)
 #define SEC 10
 
 void make_system_report(system_t* data, const int ref_time)
@@ -106,26 +104,26 @@ void make_system_report(system_t* data, const int ref_time)
                                                     + data->cpu->current_load.cores_load[i].sys);
     fprintf(file_ptr, "\nMemory Information:\n");
     fprintf(file_ptr, " - Pages:\n");
-    fprintf(file_ptr, "   - Anon Pages:  %0.1fMB\n", data->memory->usage_stats.anon_pages / KB);
-    fprintf(file_ptr, "   - Page Tables: %0.1fMB\n", data->memory->usage_stats.page_tables / KB);
+    fprintf(file_ptr, "   - Anon Pages:  %0.1fMiB\n", data->memory->usage_stats.anon_pages / KiB);
+    fprintf(file_ptr, "   - Page Tables: %0.1fMiB\n", data->memory->usage_stats.page_tables / KiB);
     fprintf(file_ptr, " - Activity:\n");
-    fprintf(file_ptr, "   - Active:   %0.1fMB\n", data->memory->usage_stats.active / KB);
-    fprintf(file_ptr, "   - Inactive: %0.1fMB\n\n", data->memory->usage_stats.inactive / KB);
-    fprintf(file_ptr, " - Shared: %0.1fMB\n", data->memory->usage_stats.shmem / KB);
-    fprintf(file_ptr, " - Mapped: %0.1fMB\n\n", data->memory->usage_stats.mapped / KB);
-    fprintf(file_ptr, " - RAM Total:  %0.1fMB\n", data->memory->usage_stats.total / KB);
-    fprintf(file_ptr, " - Swap Total: %0.1fMB\n\n", data->memory->usage_stats.swap_total / KB);
-    fprintf(file_ptr, " - RAM Usage:   %0.1fMB(%3.1lf%%)\n", data->memory->usage_stats.usage / KB, 
+    fprintf(file_ptr, "   - Active:   %0.1fMiB\n", data->memory->usage_stats.active / KiB);
+    fprintf(file_ptr, "   - Inactive: %0.1fMiB\n\n", data->memory->usage_stats.inactive / KiB);
+    fprintf(file_ptr, " - Shared: %0.1fMiB\n", data->memory->usage_stats.shmem / KiB);
+    fprintf(file_ptr, " - Mapped: %0.1fMiB\n\n", data->memory->usage_stats.mapped / KiB);
+    fprintf(file_ptr, " - RAM Total:  %0.1fMiB\n", data->memory->usage_stats.total / KiB);
+    fprintf(file_ptr, " - Swap Total: %0.1fMiB\n\n", data->memory->usage_stats.swap_total / KiB);
+    fprintf(file_ptr, " - RAM Usage:   %0.1fMiB(%3.1lf%%)\n", data->memory->usage_stats.usage / KiB, 
 														data->memory->usage_percentage.usage);
-    fprintf(file_ptr, " - RAM Buffers: %0.1fMB(%3.1lf%%)\n", data->memory->usage_stats.buffers / KB,
+    fprintf(file_ptr, " - RAM Buffers: %0.1fMiB(%3.1lf%%)\n", data->memory->usage_stats.buffers / KiB,
 														data->memory->usage_percentage.buffers);                                                    
-    fprintf(file_ptr, " - RAM Cached:  %0.1fMB(%3.1lf%%)\n", data->memory->usage_stats.cached / KB,
+    fprintf(file_ptr, " - RAM Cached:  %0.1fMiB(%3.1lf%%)\n", data->memory->usage_stats.cached / KiB,
 														 data->memory->usage_percentage.cached);
-    fprintf(file_ptr, " - RAM Free:    %0.1fMB(%3.1lf%%)\n\n", data->memory->usage_stats.free / KB,
+    fprintf(file_ptr, " - RAM Free:    %0.1fMiB(%3.1lf%%)\n\n", data->memory->usage_stats.free / KiB,
 														 data->memory->usage_percentage.free);
-    fprintf(file_ptr, " - Swap Usage:  %0.1fMB(%3.1lf%%)\n", data->memory->usage_stats.swap_usage / KB,
+    fprintf(file_ptr, " - Swap Usage:  %0.1fMiB(%3.1lf%%)\n", data->memory->usage_stats.swap_usage / KiB,
 														 data->memory->usage_percentage.swap_usage);
-    fprintf(file_ptr, " - Swap Free:   %0.1fMB(%3.1lf%%)\n\n", data->memory->usage_stats.swap_free / KB,
+    fprintf(file_ptr, " - Swap Free:   %0.1fMiB(%3.1lf%%)\n\n", data->memory->usage_stats.swap_free / KiB,
 														 data->memory->usage_percentage.swap_free);
 
     fprintf(file_ptr, "Network Information:\n");

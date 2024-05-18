@@ -14,72 +14,72 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 	calculate_memory_usage_percentage(memory);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw(main_page, 0,  0, "Pages:");
-	mvwprintw(main_page, 1,  0, "Anon pages: ");
-	mvwprintw(main_page, 2,  0, "Page tables: ");
+	mvwprintw(main_page, 0, 0, "Pages:");
+	mvwprintw(main_page, 1, 0, "Anon pages: ");
+	mvwprintw(main_page, 2, 0, "Page tables: ");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_CYAN_BLUE));
-	mvwprintw_clr(main_page, 1,  13, "%.1fMB", memory->usage_stats.anon_pages / KB);
-	mvwprintw_clr(main_page, 2,  13, "%.1fMB", memory->usage_stats.page_tables / KB);
+	mvwprintw_clr(main_page, 1, 13, "%.1fMiB", memory->usage_stats.anon_pages / KiB);
+	mvwprintw_clr(main_page, 2, 13, "%.1fMiB", memory->usage_stats.page_tables / KiB);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw(main_page, 0,  25, "Activity:");
-	mvwprintw(main_page, 1,  25, "Active: ");
-	mvwprintw(main_page, 2,  25, "Inactive: ");
+	mvwprintw(main_page, 0, 25, "Activity:");
+	mvwprintw(main_page, 1, 25, "Active: ");
+	mvwprintw(main_page, 2, 25, "Inactive: ");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_CYAN_BLUE));
-	mvwprintw_clr(main_page, 1,  35, "%.1fMB", memory->usage_stats.active / KB);
-	mvwprintw_clr(main_page, 2,  35, "%.1fMB", memory->usage_stats.inactive / KB);
+	mvwprintw_clr(main_page, 1, 35, "%.1fMiB", memory->usage_stats.active / KiB);
+	mvwprintw_clr(main_page, 2, 35, "%.1fMiB", memory->usage_stats.inactive / KiB);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw(main_page, 1,  47, "Shared: ");
-	mvwprintw(main_page, 2,  47, "Mapped: ");
+	mvwprintw(main_page, 1, 47, "Shared: ");
+	mvwprintw(main_page, 2, 47, "Mapped: ");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_CYAN_BLUE));
-	mvwprintw_clr(main_page, 1,  55, "%.1fMB", memory->usage_stats.shmem / KB);
-	mvwprintw_clr(main_page, 2,  55, "%.1fMB", memory->usage_stats.mapped / KB);
+	mvwprintw_clr(main_page, 1, 55, "%.1fMiB", memory->usage_stats.shmem / KiB);
+	mvwprintw_clr(main_page, 2, 55, "%.1fMiB", memory->usage_stats.mapped / KiB);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	wattron(main_page, A_BOLD);
-	mvwprintw_clr(main_page, 3,  0, "RAM (%.1fMB Total):", memory->usage_stats.total / KB);
-	mvwprintw_clr(main_page, 15,  0, "Swap (%.1fMB Total):", memory->usage_stats.swap_total / KB);
+	mvwprintw_clr(main_page, 3, 0, "RAM (%.1fMiB Total):", memory->usage_stats.total / KiB);
+	mvwprintw_clr(main_page, 15, 0, "Swap (%.1fMiB Total):", memory->usage_stats.swap_total / KiB);
 	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 4, 0, "Utilization:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_WHITE));
-	mvwprintw_clr(main_page, 5, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.usage / KB, 
+	mvwprintw_clr(main_page, 5, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.usage / KiB, 
 														memory->usage_percentage.usage);
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 7, 0, "Buffers:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_MAGENDA_WHITE));
-	mvwprintw_clr(main_page, 8, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.buffers / KB,
+	mvwprintw_clr(main_page, 8, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.buffers / KiB,
 														memory->usage_percentage.buffers);
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 10, 0, "Cached:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw_clr(main_page, 11, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.cached / KB,
+	mvwprintw_clr(main_page, 11, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.cached / KiB,
 														memory->usage_percentage.cached);
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 13, 0, "Free:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_WHITE));
-	mvwprintw_clr(main_page, 14, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.free / KB,
+	mvwprintw_clr(main_page, 14, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.free / KiB,
 														memory->usage_percentage.free);
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 16, 0, "Utilization:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_WHITE));
-	mvwprintw_clr(main_page, 17, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.swap_usage / KB,
+	mvwprintw_clr(main_page, 17, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.swap_usage / KiB,
 														memory->usage_percentage.swap_usage);
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw(main_page, 19, 0, "Free:");
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_WHITE));
-	mvwprintw_clr(main_page, 20, 0, "%.1fMB(%3.1lf%%)", memory->usage_stats.swap_free / KB,
+	mvwprintw_clr(main_page, 20, 0, "%.1fMiB(%3.1lf%%)", memory->usage_stats.swap_free / KiB,
 														memory->usage_percentage.swap_free);
 	wmove(main_page, LOAD_LINE_START_POINT + 5, DIAGRAM_START_POINT + 1);
 	for (int i = 0; i < (int)((memory->usage_percentage.usage / 2)); i++)
@@ -108,7 +108,7 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 	wmove(main_page, LOAD_LINE_START_POINT + 17, DIAGRAM_START_POINT + 1);
 	for (int i = 0; i < (int)((memory->usage_percentage.swap_usage) / 2); i++)
 	{
-		wattrset(main_page, COLOR_PAIR(PAIR_MAGENDA_MAGENDA));
+		wattrset(main_page, COLOR_PAIR(PAIR_YELLOW_YELLOW));
 		wprintw(main_page, " ");
 	}
 	wmove(main_page, LOAD_LINE_START_POINT + 20, DIAGRAM_START_POINT + 1);
