@@ -8,17 +8,20 @@
 
 typedef struct pci_device_info
 {
-    char* class_name;
-    char* subclass_name;
-    char* interface_name;
-    char* driver_name;
-    char* vendor_id;
-    char* vendor_name;
-    char* device_id;
-    char* device_name;
-    char* revision;
-    char* slot_name;
-    char* modalias;
+    char*    class_name;
+    char*    subclass_name;
+    char*    interface_name;
+    char*    driver_name;
+    uint32_t vendor_id;
+    char*    vendor_name;
+    uint32_t device_id;
+    char*    device_name;
+    uint32_t revision;
+    char*    slot_name;
+    uint32_t domain; 
+    uint32_t bus;
+    uint32_t device;
+    uint32_t function;
 } pcidev_t;
 
 typedef struct pci_info

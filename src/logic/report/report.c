@@ -1,6 +1,7 @@
 #include "report.h"
 
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <time.h>
 #include <sys/utsname.h>
@@ -18,7 +19,7 @@ void make_system_report(system_t* data, const int ref_time)
     struct tm* current_date = localtime(&current_time);
 
     char report_name[MAX_REPORT_NAME_SIZE];
-    sprintf(report_name, "../resources/MySysInfo Report [%02d-%02d-%04d %02d:%02d:%02d].txt",
+    sprintf(report_name, "../reports/MySysInfo Report [%02d-%02d-%04d %02d:%02d:%02d].txt",
             current_date->tm_mday, current_date->tm_mon + 1, current_date->tm_year + 1900,
             current_date->tm_hour, current_date->tm_min, current_date->tm_sec);
 
@@ -37,6 +38,7 @@ void make_system_report(system_t* data, const int ref_time)
     struct utsname uts;
     uname(&uts);
 
+    fprintf(file_ptr, "User: %s\n", getlogin());
     fprintf(file_ptr, "Hostname: %s\n", uts.nodename);
 	fprintf(file_ptr, "Linux: %s\n", uts.version);
 	fprintf(file_ptr, "Release: %s\n", uts.release);
@@ -46,22 +48,24 @@ void make_system_report(system_t* data, const int ref_time)
     fprintf(file_ptr, "CPU Information:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
     {
-        fprintf(file_ptr, " - Processor ID: %d\n", i);
+        refresh_cpu_clocks(data->cpu, i);
+
+        fprintf(file_ptr, " - Processor ID: %hu\n", data->cpu->compound[i].topology.thread_id + 1);
+        fprintf(file_ptr, "   - Physical number: %hu\n", data->cpu->compound[i].topology.socket_id);
         fprintf(file_ptr, "   - Name: %s\n", data->cpu->compound[i].model_name);
-        fprintf(file_ptr, "   - Cores: %u\n", data->cpu->compound[i].cores_num);
-        fprintf(file_ptr, "   - Threads: %u\n", data->cpu->compound[i].threads_num);
+        fprintf(file_ptr, "   - Vendor: %s\n", data->cpu->compound[i].vendor_name);
+        fprintf(file_ptr, "   - Cores: %hu\n", data->cpu->compound[i].cores_num);
+        fprintf(file_ptr, "   - Threads: %hu\n", data->cpu->compound[i].threads_num);
         fprintf(file_ptr, "   - Model number: %u\n", data->cpu->compound[i].model_number);
         fprintf(file_ptr, "   - Family number: %u\n", data->cpu->compound[i].family_number);
         fprintf(file_ptr, "   - Stepping number: %u\n", data->cpu->compound[i].stepping_number);
         fprintf(file_ptr, "   - Cpuid level: %u\n", data->cpu->compound[i].cpuid_level);
-        fprintf(file_ptr, "   - Clflush size: %u\n", data->cpu->compound[i].clflush_size);
         fprintf(file_ptr, "   - Cache allignment: %u\n", data->cpu->compound[i].cache_alignment);
-        fprintf(file_ptr, "   - Physical number: %u\n", data->cpu->compound[i].phys_cpus_num);
         fprintf(file_ptr, "   - Microcode name: %s\n", data->cpu->compound[i].microcode_name);
         fprintf(file_ptr, "   - Byte order: %s\n",
 				            data->cpu->compound[i].byte_oder == LITTLE_ENDIAN_ORDER ? "little endian" : "big endian");
         fprintf(file_ptr, "   - Bogomips: %0.2f\n", data->cpu->compound[i].bogomips);
-        fprintf(file_ptr, "   - Core ID: %d\n", data->cpu->compound[i].topology.core_id);
+        fprintf(file_ptr, "   - Core ID: %hu\n", data->cpu->compound[i].topology.core_id);
         fprintf(file_ptr, "   - Frequency:\n");
         fprintf(file_ptr, "     - Max:     %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_max / MHz);
         fprintf(file_ptr, "     - Current: %0.2fMHz\n", (double)data->cpu->compound[i].frequency.freq_cur / MHz);
@@ -96,12 +100,19 @@ void make_system_report(system_t* data, const int ref_time)
 		    fprintf(file_ptr, "     - Lvl4 ways: %u\n", data->cpu->compound[i].cache.l4_ways);
 	    }
     }
+
+    calculate_cpu_cores_load(data->cpu);
+
     fprintf(file_ptr, "\n - Current CPU Average Usage: %0.1f%%\n\n", data->cpu->current_load.avg_load);
     fprintf(file_ptr, " - Current CPU Each Usage:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
-        fprintf(file_ptr, "   - PROC#%d: %0.2f%%\n", i + 1, data->cpu->current_load.cores_load[i].user 
+        fprintf(file_ptr, "   - PROC#%hu: %0.1f%%\n", data->cpu->compound[i].topology.thread_id + 1, 
+                                                    data->cpu->current_load.cores_load[i].user 
                                                     + data->cpu->current_load.cores_load[i].wait 
                                                     + data->cpu->current_load.cores_load[i].sys);
+
+    calculate_memory_usage_percentage(data->memory);
+
     fprintf(file_ptr, "\nMemory Information:\n");
     fprintf(file_ptr, " - Pages:\n");
     fprintf(file_ptr, "   - Anon Pages:  %0.1fMiB\n", data->memory->usage_stats.anon_pages / KiB);
@@ -130,8 +141,8 @@ void make_system_report(system_t* data, const int ref_time)
     for (uint32_t i = 0 ; i < data->network->interfaces_num; i++)
     {
         fprintf(file_ptr, " - Interface %s (%d/%d)\n", data->network->stat[i].interface_name, 
-                                                        i + 1, 
-                                                        data->network->interfaces_num);
+                                                    i + 1, 
+                                                    data->network->interfaces_num);
         fprintf(file_ptr, "   - Received:\n");
         fprintf(file_ptr, "     - Current Bandwidth: %0.2f KiB/s\n", data->network->stat[i].r_bandwith.cur / KiB);
         fprintf(file_ptr, "     - Avg Bandwidth:     %0.2f KiB/s\n", data->network->stat[i].r_bandwith.avg / KiB);
@@ -155,22 +166,26 @@ void make_system_report(system_t* data, const int ref_time)
     fprintf(file_ptr, "\nPCI Devices Information:\n");
     for (uint32_t i = 0 ; i < data->pci->devices_num; i++)
     {
-        fprintf(file_ptr, " - Device (%d/%d)\n", i + 1, data->pci->devices_num);
-        fprintf(file_ptr, "   - Slot: %s\n", data->pci->devices[i].slot_name);
-        fprintf(file_ptr, "   - Modalias: %s\n", data->pci->devices[i].modalias);
-        fprintf(file_ptr, "   - Class: %s\n", data->pci->devices[i].class_name);
-        fprintf(file_ptr, "   - Subclass: %s\n", 
+        fprintf(file_ptr, " - Device %s (%d/%d)\n", data->pci->devices[i].slot_name, i + 1, data->pci->devices_num);
+        fprintf(file_ptr, "   - Domain:   %04x\n", data->pci->devices[i].domain);
+	    fprintf(file_ptr, "   - Bus:      %02x\n", data->pci->devices[i].bus);
+	    fprintf(file_ptr, "   - Device:   %02x\n", data->pci->devices[i].device);
+	    fprintf(file_ptr, "   - Function: %x\n\n", data->pci->devices[i].function);
+        fprintf(file_ptr, "   - Class:     %s\n", data->pci->devices[i].class_name);
+        fprintf(file_ptr, "   - Subclass:  %s\n", 
                             data->pci->devices[i].subclass_name ? data->pci->devices[i].subclass_name : "Not Found");
-        fprintf(file_ptr, "   - Interface: %s\n", 
+        fprintf(file_ptr, "   - Interface: %s\n\n", 
                             data->pci->devices[i].interface_name ? data->pci->devices[i].interface_name : "Not Found");
-        fprintf(file_ptr, "   - Driver: %s\n", data->pci->devices[i].driver_name);
         fprintf(file_ptr, "   - Vendor Name: %s\n", data->pci->devices[i].vendor_name);
-        fprintf(file_ptr, "   - Vendor ID: %s\n", data->pci->devices[i].vendor_id);
+        fprintf(file_ptr, "   - Vendor ID:   %04x\n\n", data->pci->devices[i].vendor_id);
         fprintf(file_ptr, "   - Device Name: %s\n",
                             data->pci->devices[i].device_name ? data->pci->devices[i].device_name : "Not Found");
-        fprintf(file_ptr, "   - Device ID: %s\n", data->pci->devices[i].device_id);
-        fprintf(file_ptr, "   - Revision: %s\n", data->pci->devices[i].revision);
+        fprintf(file_ptr, "   - Device ID:   %04x\n\n", data->pci->devices[i].device_id);
+        fprintf(file_ptr, "   - Driver:   %s\n", data->pci->devices[i].driver_name);
+        fprintf(file_ptr, "   - Revision: %02x\n", data->pci->devices[i].revision);
     }
+
+    calculate_sensors_stats(data->sensor);
 
     fprintf(file_ptr, "\nSystem Sensors Statistics (Temperature in Celtius):\n");
     for (uint32_t i = 0 ; i < data->sensor->sensors_num; i++)

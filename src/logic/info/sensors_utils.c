@@ -27,14 +27,15 @@ void scan_sys_sensors_temp(sensor_t* sensor)
 
 void scan_sys_sensors_info(sensor_t* sensor)
 {
+    scan_sys_sensors_temp(sensor);
+    
     char cur_file_name[MAX_FILE_PATH_LEN];
     for (uint32_t i = 0; i < sensor->sensors_num; i++)
     {
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/class/thermal/thermal_zone%d/type", i);
         sensor->stats[i].name = get_file(cur_file_name);
 
-        scan_sys_sensors_temp(sensor);
         sensor->stats[i].min_temp = sensor->stats[i].cur_temp;
-        sensor->stats[i].max_temp = sensor->stats[i].cur_temp;
+        // sensor->stats[i].max_temp is already set
     }
 }

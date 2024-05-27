@@ -48,6 +48,37 @@ void init_cpu_cores(cpu_t* cpu)
 #define CPU_FILE_BUFFER_SIZE 2048 // flags line can be longer than 1024, so 2048 is optimal
 #define COUNT_OF_PROCESSOR_TOKENS 27
 
+typedef enum cpu_info_tokens
+{
+    PROCESSOR_NUM   = 0,
+    VENDOR_ID       = 1,
+    CPU_FAMILY      = 2,
+    MODEL           = 3,
+    MODEL_NAME      = 4,
+    STEPPING        = 5,
+    MICROCODE       = 6,
+    FREQUENCY_MHZ   = 7,
+    CACHE_SIZE      = 8,
+    PHYSICAL_ID     = 9,
+    SIBLINGS        = 10,
+    CORE_ID         = 11,
+    CPU_CORES       = 12,
+    APICID          = 13,
+    INITIAL_APICID  = 14,
+    FPU             = 15,
+    FPU_EXCEPTION   = 16,
+    CPUID_LEVEL     = 17,
+    WP              = 18,
+    FLAGS           = 19,
+    VMX_FLAGS       = 20,
+    BUGS            = 21,
+    BOGOMIPS        = 22,
+    CLFLUSH_SIZE    = 23,
+    CACHE_ALIGNMENT = 24,
+    ADDRESS_SIZES   = 25,
+    POWER_MANAGMENT = 26
+} cpu_info_tokens_t;
+
 void scan_cpu_basic_info(cpu_t* cpu)
 {
     FILE* file_ptr = NULL;
@@ -154,37 +185,16 @@ void scan_cpu_basic_info(cpu_t* cpu)
                         free(all_tokens[CPUID_LEVEL]);          
                         break; 
                     }
-                    case FLAGS:             
-                    { 
-                        cpu->compound[processor_id].flags = all_tokens[FLAGS];                            
-                        break; 
-                    }
-                    case BUGS:              
-                    { 
-                        cpu->compound[processor_id].bugs = all_tokens[BUGS];                              
-                        break; 
-                    }
                     case BOGOMIPS:          
                     { 
                         cpu->compound[processor_id].bogomips = atoi(all_tokens[BOGOMIPS]);
                         free(all_tokens[BOGOMIPS]);                   
                         break; 
                     }
-                    case CLFLUSH_SIZE:      
-                    { 
-                        cpu->compound[processor_id].clflush_size = atoi(all_tokens[CLFLUSH_SIZE]);
-                        free(all_tokens[CLFLUSH_SIZE]);        
-                        break; 
-                    }
                     case CACHE_ALIGNMENT:   
                     { 
                         cpu->compound[processor_id].cache_alignment = atoi(all_tokens[CACHE_ALIGNMENT]);
                         free(all_tokens[CACHE_ALIGNMENT]);   
-                        break; 
-                    }
-                    case ADDRESS_SIZES:     
-                    { 
-                        cpu->compound[processor_id].address_sizes = all_tokens[ADDRESS_SIZES];            
                         break; 
                     }
                     default:
@@ -208,12 +218,25 @@ void scan_cpu_basic_info(cpu_t* cpu)
             free(all_tokens[FPU]);
             free(all_tokens[FPU_EXCEPTION]);
             free(all_tokens[WP]);
+            free(all_tokens[FLAGS]);
             free(all_tokens[VMX_FLAGS]);
+            free(all_tokens[BUGS]);
+            free(all_tokens[CLFLUSH_SIZE]);
+            free(all_tokens[ADDRESS_SIZES]);
             free(byte_order_str);
         }
     }
     fclose(file_ptr);
 }
+
+typedef enum cpu_cache_levels
+{
+    L1_DATA_LEVEL        = 0,
+    L1_INSTRUCTION_LEVEL = 1,
+    L2_LEVEL             = 2,
+    L3_LEVEL             = 3,
+    L4_LEVEL             = 4
+} cache_level_t;
 
 void scan_cpu_cache(cpu_t* cpu)
 {
@@ -299,10 +322,9 @@ void scan_cpu_cache(cpu_t* cpu)
 
 void scan_cpu_clocks(cpu_t* cpu)
 {
-    char policy_path[MAX_FILE_PATH_LEN];
-
     int count_of_freq_files = get_count_of_files_name(PATH_CPUFREQ_FILE, "policy");
 
+    char policy_path[MAX_FILE_PATH_LEN];
     char* policy_content_path = NULL;
     for(int cpu_id = 0; cpu_id < count_of_freq_files; ++cpu_id)
     {
@@ -332,24 +354,8 @@ void scan_cpu_clocks(cpu_t* cpu)
         cpu->compound[cpu_id].frequency.affected_cpus = get_file_int(policy_content_path);
         free(policy_content_path);
 
-        policy_content_path = strconcat(policy_path, "/scaling_driver");
-        cpu->compound[cpu_id].frequency.freq_scaling_driver = get_file(policy_content_path);
-        free(policy_content_path);
-
         policy_content_path = strconcat(policy_path, "/scaling_governor");
         cpu->compound[cpu_id].frequency.freq_scaling_governor = get_file(policy_content_path);
-        free(policy_content_path);
-
-        policy_content_path = strconcat(policy_path, "/scaling_available_governors");
-        cpu->compound[cpu_id].frequency.freq_scaling_available_governors = get_file(policy_content_path);
-        free(policy_content_path);
-
-        policy_content_path = strconcat(policy_path, "/energy_performance_preference");
-        cpu->compound[cpu_id].energy_performance_preference = get_file(policy_content_path);
-        free(policy_content_path);
-
-        policy_content_path = strconcat(policy_path, "/energy_performance_available_preferences");
-        cpu->compound[cpu_id].ernergy_performance_available_preference = get_file(policy_content_path);
         free(policy_content_path);
     }
 }

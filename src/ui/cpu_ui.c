@@ -6,9 +6,7 @@
 
 void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Info");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("CPU Info");
 
 	refresh_cpu_clocks(cpu, proc_id);
 
@@ -20,26 +18,26 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 	wattroff(main_page, A_BOLD);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-	mvwprintw_clr(main_page, 0, 14, "%d", proc_id + 1);
+	mvwprintw_clr(main_page, 0, 14, "%hu", processor.topology.thread_id + 1);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_CYAN_BLUE));
-	mvwprintw_clr(main_page, 1, 1, "Physical number: %u", processor.phys_cpus_num);
+	mvwprintw_clr(main_page, 1, 1, "Physical number: %hu", processor.topology.socket_id);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw_clr(main_page, 2, 1, "Name: %s", processor.model_name);
-	mvwprintw_clr(main_page, 3, 1, "Cores: %u", processor.cores_num);
-	mvwprintw_clr(main_page, 4, 1, "Threads: %u", processor.threads_num);
-	mvwprintw_clr(main_page, 5, 1, "Model number: %u", processor.model_number);
-	mvwprintw_clr(main_page, 6, 1, "Family number: %u", processor.family_number);
-	mvwprintw_clr(main_page, 7, 1, "Stepping number: %u", processor.stepping_number);
-	mvwprintw_clr(main_page, 8, 1, "Cpuid level: %u", processor.cpuid_level);
-	mvwprintw_clr(main_page, 9, 1, "Clflush size: %u", processor.clflush_size);
+	mvwprintw_clr(main_page, 3, 1, "Vendor: %s", processor.vendor_name);
+	mvwprintw_clr(main_page, 4, 1, "Cores: %hu", processor.cores_num);
+	mvwprintw_clr(main_page, 5, 1, "Threads: %hu", processor.threads_num);
+	mvwprintw_clr(main_page, 6, 1, "Model number: %u", processor.model_number);
+	mvwprintw_clr(main_page, 7, 1, "Family number: %u", processor.family_number);
+	mvwprintw_clr(main_page, 8, 1, "Stepping number: %u", processor.stepping_number);
+	mvwprintw_clr(main_page, 9, 1, "Cpuid level: %u", processor.cpuid_level);
 	mvwprintw_clr(main_page, 10, 1, "Cache allignment: %u", processor.cache_alignment);
 	mvwprintw_clr(main_page, 11, 1, "Microcode name: %s", processor.microcode_name);
 	mvwprintw_clr(main_page, 12, 1, "Byte order: %s",
 				  processor.byte_oder == LITTLE_ENDIAN_ORDER ? "little endian" : "big endian");
 	mvwprintw_clr(main_page, 13, 1, "Bogomips: %0.2f", processor.bogomips);
-	mvwprintw_clr(main_page, 14, 1, "Core ID: %d", processor.topology.core_id);
+	mvwprintw_clr(main_page, 14, 1, "Core ID: %hu", processor.topology.core_id);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_WHITE));
 	wattron(main_page, A_BOLD);
@@ -96,9 +94,7 @@ void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id)
 
 void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const int graph_width)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Total Usage");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("CPU Total Usage");
 
 	calculate_total_cpu_load(cpu, graph_width);
 
@@ -158,9 +154,7 @@ void print_cpu_load_graph(WINDOW* main_page, cpu_t* cpu, const int time, const i
 
 void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const int cols)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "CPU Each Usage");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("CPU Each Usage");
 
 	calculate_cpu_cores_load(cpu);
 
@@ -172,7 +166,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	for (uint32_t i = 0; i < cpu->processors_num; i++)
 	{
 		wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
-		mvwprintw(main_page, i + 2, 0, "PROC #%d", i + 1);
+		mvwprintw(main_page, i + 2, 0, "PROC #%hu", cpu->compound[i].topology.thread_id + 1);
 		mvwprintw(main_page, i + 2, INITIAL_GRAPH_OFFSET, "[");
 		mvwprintw(main_page, i + 2, cols - GRAPH_BOUNDARY_OFFSET + 1, "]");
 
@@ -195,7 +189,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 			}
 		}
 		wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
-		mvwprintw_clr(main_page, i + 2, cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", core_load);
+		mvwprintw_clr(main_page, i + 2, cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.1f%%", core_load);
 	}
 	
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
@@ -223,7 +217,7 @@ void print_cpu_cores_load(WINDOW* main_page, cpu_t* cpu, const int time, const i
 	}
 	wattrset(main_page, COLOR_PAIR(PAIR_BLACK_WHITE));
 	mvwprintw_clr(main_page, cpu->processors_num + 3, 
-					cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.2f%%", cpu->current_load.avg_load);
+					cols - GRAPH_BOUNDARY_OFFSET + 2, "%0.1f%%", cpu->current_load.avg_load);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	for (int i = 0; i < cols; i++)

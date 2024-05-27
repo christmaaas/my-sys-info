@@ -152,9 +152,7 @@ int control_handle()
 
 void print_report_page()
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "System Report");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("System Report");
 
 	make_system_report(data, refresh_time);
 
@@ -168,9 +166,7 @@ void print_report_page()
 
 void print_help_page()
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Help");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("Help");
 
 	struct utsname uts;
 	struct tm*	   tim;
@@ -181,6 +177,7 @@ void print_help_page()
 	tim = localtime(&timer);	
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
+	mvwprintw(main_page, 0, 0, "User: %s", getlogin());
 	mvwprintw(main_page, 1, 0, "Hostname: %s", uts.nodename);
 	mvwprintw(main_page, 2, 0, "Linux: %s", uts.version);
 	mvwprintw(main_page, 3, 0, "Release: %s", uts.release);

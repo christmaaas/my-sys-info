@@ -6,10 +6,7 @@
 
 void print_sensors_page(WINDOW* main_page, sensor_t* sensor, const int time, const int cols)
 {
-    wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Sensors Info");
-
-	wnoutrefresh(stdscr);
+    PAGE_TITLE("Sensors Info");
 
     calculate_sensors_stats(sensor);
 

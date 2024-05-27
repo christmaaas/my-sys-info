@@ -22,7 +22,9 @@ bool is_vendor_line(const char* str)
     return isalpha(str[0]) || isdigit(str[0]);
 }
 
-void get_pci_vendor_device(pcidev_t* pci_dev, char* vendor, char* device)
+#define MAX_ID_LEN 6
+
+void get_pci_vendor_device(pcidev_t* pci_dev, const uint32_t vendor_id, const uint32_t device_id)
 {
     FILE* file_ptr = NULL;
     if ((file_ptr = fopen(PATH_PCI_IDS_FILE, "r")) == NULL) 
@@ -34,14 +36,20 @@ void get_pci_vendor_device(pcidev_t* pci_dev, char* vendor, char* device)
     char **device_tokens = NULL, **vendor_tokens = NULL;
     int tokens_num = 0;
     char file_buffer[FILE_BUFFER_SIZE];
+    char vendor_entry[MAX_ID_LEN];
+    char device_entry[MAX_ID_LEN];
+
+    // convert id to strings
+    sprintf(vendor_entry, "%x", vendor_id);
+    sprintf(device_entry, "%x", device_id);
 
     // in pci.ids vendor id starts with tabulation
-    char* file_device = strconcat("\t", device); 
+    char* file_device = strconcat("\t", device_entry); 
 
     while (fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr)) 
     {
         // one tab <-- class name
-        if (strstr(file_buffer, vendor) != NULL && file_buffer[0] != '\t') 
+        if (strstr(file_buffer, vendor_entry) != NULL && file_buffer[0] != '\t') 
         {
             vendor_tokens = strsplit(file_buffer, "  ", &tokens_num);
             pci_dev->vendor_name = strduplicate(vendor_tokens[1]);
@@ -231,7 +239,7 @@ void scan_pci_devices_info(pci_t* pci)
         return;
     }
 
-    char* class = NULL;
+    char *class = NULL, *buf_digit = NULL;
     char cur_file_name[MAX_FILE_PATH_LEN];
     uint32_t count = 0;
     struct dirent* entry;
@@ -242,11 +250,20 @@ void scan_pci_devices_info(pci_t* pci)
 
         pci->devices[count].slot_name = strduplicate(entry->d_name);
 
+        sscanf(pci->devices[count].slot_name, "%x:%02x:%02x.%1x", &pci->devices[count].domain, 
+                                                                &pci->devices[count].bus, 
+                                                                &pci->devices[count].device, 
+                                                                &pci->devices[count].function);
+
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/bus/pci/devices/%s/%s", entry->d_name, "vendor");
-        pci->devices[count].vendor_id = get_file_without_hex_prefix(cur_file_name);
+        buf_digit = get_file(cur_file_name);
+        sscanf(buf_digit, "%x", &pci->devices[count].vendor_id);
+        free(buf_digit);
 
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/bus/pci/devices/%s/%s", entry->d_name, "device");
-        pci->devices[count].device_id = get_file_without_hex_prefix(cur_file_name);
+        buf_digit = get_file(cur_file_name);
+        sscanf(buf_digit, "%x", &pci->devices[count].device_id);
+        free(buf_digit);
 
         get_pci_vendor_device(&(pci->devices[count]), pci->devices[count].vendor_id, pci->devices[count].device_id);
 
@@ -254,11 +271,10 @@ void scan_pci_devices_info(pci_t* pci)
         class = get_file_without_hex_prefix(cur_file_name);
         get_pci_class_attributes(&(pci->devices[count]), class); 
 
-        snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/bus/pci/devices/%s/%s", entry->d_name, "modalias");
-        pci->devices[count].modalias = get_file(cur_file_name);
-
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/bus/pci/devices/%s/%s", entry->d_name, "revision");
-        pci->devices[count].revision = get_file_without_hex_prefix(cur_file_name);
+        buf_digit = get_file(cur_file_name);
+        sscanf(buf_digit, "%x", &pci->devices[count].revision);
+        free(buf_digit);
 
         snprintf(cur_file_name, MAX_FILE_PATH_LEN, "/sys/bus/pci/devices/%s/%s", entry->d_name, "uevent");
         get_pci_device_driver(&(pci->devices[count]), cur_file_name);

@@ -48,7 +48,6 @@ void calculate_total_cpu_load(cpu_t* cpu, const uint32_t graph_width)
 void calculate_cpu_cores_load(cpu_t* cpu)
 {
     loadtype_t* cur_cores = (loadtype_t*)calloc(cpu->processors_num, sizeof(loadtype_t));
-    uint64_t    load_sum  = 0;
 
     for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
@@ -60,6 +59,8 @@ void calculate_cpu_cores_load(cpu_t* cpu)
 
     scan_cpu_load_stat(cpu);
 
+    uint64_t load_sum = 0;
+    
     for (uint32_t i = 0; i < cpu->processors_num; i++)
     {
         cur_cores[i].user = cpu->current_load.cores[i].user - cur_cores[i].user;
@@ -93,17 +94,10 @@ void free_cpu(cpu_t* cpu)
         
     for (uint32_t cpu_id = 0; cpu_id < cpu->processors_num; cpu_id++)
     {
-        free(cpu->compound[cpu_id].frequency.freq_scaling_available_governors);
         free(cpu->compound[cpu_id].frequency.freq_scaling_governor);
-        free(cpu->compound[cpu_id].frequency.freq_scaling_driver);
         free(cpu->compound[cpu_id].vendor_name);
         free(cpu->compound[cpu_id].model_name);
         free(cpu->compound[cpu_id].microcode_name);
-        free(cpu->compound[cpu_id].flags);
-        free(cpu->compound[cpu_id].bugs);
-        free(cpu->compound[cpu_id].address_sizes);
-        free(cpu->compound[cpu_id].energy_performance_preference);
-        free(cpu->compound[cpu_id].ernergy_performance_available_preference);
     }   
     free(cpu->compound);
     free(cpu->current_load.cores);

@@ -24,7 +24,6 @@
 WINDOW* create_input_window(const int start_y, const int start_x, const int height, const int width) 
 {
     WINDOW* win = newwin(height, width, start_y, start_x);
-
     wbkgd(win, COLOR_PAIR(PAIR_BLUE_GREEN));
 
     DRAW_TIME_WIN_FRAME(); 
@@ -63,7 +62,9 @@ void draw_input_field(WINDOW* win, const int input_length, char* input_buffer)
 {
     mvwprintw(win, 3, 1, "Enter time: %s", input_buffer);
     wclrtoeol(win);
+
     DRAW_TIME_WIN_FRAME();
+
     wmove(win, 3, 13 + input_length);
     wrefresh(win);
 }

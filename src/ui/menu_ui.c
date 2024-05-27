@@ -1,3 +1,5 @@
+#include "menu_ui.h"
+
 #include <ncurses.h>
 #include <panel.h>
 #include <stdlib.h>

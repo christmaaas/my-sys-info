@@ -4,14 +4,14 @@
 
 void print_network_bandwitdh_graph(WINDOW* main_page, net_t* network, const int time, const int intf_id, const int graph_width)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Network Bandwidth");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("Network Bandwidth");
 
 	calculate_network_bandwidth(network, time, intf_id, graph_width);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_WHITE_BLUE));
-    mvwprintw_clr(main_page, 0, 0, "Interface %s (%d/%d)", network->stat[intf_id].interface_name, intf_id + 1, network->interfaces_num);
+    mvwprintw_clr(main_page, 0, 0, "Interface %s (%d/%d)", network->stat[intf_id].interface_name, 
+														intf_id + 1, 
+														network->interfaces_num);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	for (int i = 0; i < MAX_COLS_COUNT; i++) 

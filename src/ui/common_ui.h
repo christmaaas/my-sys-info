@@ -48,13 +48,22 @@ typedef enum color_pairs
 	PAIR_RED_RED		 = 25,
 	PAIR_CYAN_CYAN		 = 26,
 	PAIR_WHITE_RED		 = 27,
-	PAIR_WHITE_CYAN		 = 28,
+	PAIR_WHITE_CYAN		 = 28
 } color_t;
 
 #define mvwprintw_clr(win, y, x, ...) \
 	{ \
 		mvwprintw(win, y, x, __VA_ARGS__); \
 		wclrtoeol(win); \
+	}
+
+#define PAGE_TITLE(page_name) \
+	{ \
+		wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT)); \
+		wattron(main_page, A_BOLD); \
+		mvprintw(0, PAGE_TITLE_OFFSET, page_name); \
+		wattroff(main_page, A_BOLD); \
+		wnoutrefresh(stdscr); \
 	}
 
 #endif /* _COMMON_UI_H */

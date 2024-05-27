@@ -7,9 +7,7 @@
 
 void print_memory_page(WINDOW* main_page, mem_t* memory)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Memory Info");
-	wnoutrefresh(stdscr); 
+	PAGE_TITLE("Memory Info");
 
 	calculate_memory_usage_percentage(memory);
 
@@ -147,9 +145,7 @@ void print_memory_page(WINDOW* main_page, mem_t* memory)
 
 void print_memory_load_graph(WINDOW* main_page, mem_t* memory, const int time, const int graph_width)
 {
-	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT));
-	mvprintw(0, PAGE_TITLE_OFFSET, "Memory Usage");
-	wnoutrefresh(stdscr);
+	PAGE_TITLE("Memory Usage");
 
 	calculate_total_memory_load(memory, graph_width);
 
