@@ -166,7 +166,7 @@ void make_system_report(system_t* data, const int ref_time)
     fprintf(file_ptr, "\nPCI Devices Information:\n");
     for (uint32_t i = 0 ; i < data->pci->devices_num; i++)
     {
-        fprintf(file_ptr, " - Device %s (%d/%d)\n", data->pci->devices[i].slot_name, i + 1, data->pci->devices_num);
+        fprintf(file_ptr, " - Device %s (%d/%d)\n", data->pci->devices[i].device_location, i + 1, data->pci->devices_num);
         fprintf(file_ptr, "   - Domain:   %04x\n", data->pci->devices[i].domain);
 	    fprintf(file_ptr, "   - Bus:      %02x\n", data->pci->devices[i].bus);
 	    fprintf(file_ptr, "   - Device:   %02x\n", data->pci->devices[i].device);
@@ -181,7 +181,7 @@ void make_system_report(system_t* data, const int ref_time)
         fprintf(file_ptr, "   - Device Name: %s\n",
                             data->pci->devices[i].device_name ? data->pci->devices[i].device_name : "Not Found");
         fprintf(file_ptr, "   - Device ID:   %04x\n\n", data->pci->devices[i].device_id);
-        fprintf(file_ptr, "   - Driver:   %s\n", data->pci->devices[i].driver_name);
+        fprintf(file_ptr, "   - Driver:   %s\n\n", data->pci->devices[i].driver_name);
         fprintf(file_ptr, "   - Revision: %02x\n", data->pci->devices[i].revision);
     }
 

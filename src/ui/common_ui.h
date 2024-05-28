@@ -60,9 +60,7 @@ typedef enum color_pairs
 #define PAGE_TITLE(page_name) \
 	{ \
 		wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT)); \
-		wattron(main_page, A_BOLD); \
 		mvprintw(0, PAGE_TITLE_OFFSET, page_name); \
-		wattroff(main_page, A_BOLD); \
 		wnoutrefresh(stdscr); \
 	}
 

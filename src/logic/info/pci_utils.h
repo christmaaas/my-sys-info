@@ -17,7 +17,7 @@ typedef struct pci_device_info
     uint32_t device_id;
     char*    device_name;
     uint32_t revision;
-    char*    slot_name;
+    char*    device_location;
     uint32_t domain; 
     uint32_t bus;
     uint32_t device;

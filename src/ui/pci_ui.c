@@ -7,7 +7,7 @@ void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id)
 	pcidev_t pci_dev = pci->devices[pci_dev_id];
 
     wattrset(main_page, COLOR_PAIR(PAIR_WHITE_BLUE));
-    mvwprintw_clr(main_page, 0, 0, "PCI Device %s (%d/%d)", pci_dev.slot_name, pci_dev_id + 1, pci->devices_num);
+    mvwprintw_clr(main_page, 0, 0, "PCI Device %s (%d/%d)", pci_dev.dev_location, pci_dev_id + 1, pci->devices_num);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	for (int i = 0; i < MAX_COLS_COUNT; i++) 
@@ -34,7 +34,7 @@ void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id)
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	mvwprintw_clr(main_page, 18, 1, "Driver:   %s", pci_dev.driver_name);
-	mvwprintw_clr(main_page, 19, 1, "Revision: %02x", pci_dev.revision);
+	mvwprintw_clr(main_page, 20, 1, "Revision: %02x", pci_dev.revision);
 
 	pnoutrefresh(main_page, 0, 0, 1, 1, LINES - 2, COLS - 2);
 }
