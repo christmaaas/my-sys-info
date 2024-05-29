@@ -48,8 +48,6 @@ void make_system_report(system_t* data, const int ref_time)
     fprintf(file_ptr, "CPU Information:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
     {
-        refresh_cpu_clocks(data->cpu, i);
-
         fprintf(file_ptr, " - Processor ID: %hu\n", data->cpu->compound[i].topology.thread_id + 1);
         fprintf(file_ptr, "   - Physical number: %hu\n", data->cpu->compound[i].topology.socket_id);
         fprintf(file_ptr, "   - Name: %s\n", data->cpu->compound[i].model_name);
@@ -101,8 +99,6 @@ void make_system_report(system_t* data, const int ref_time)
 	    }
     }
 
-    calculate_cpu_cores_load(data->cpu);
-
     fprintf(file_ptr, "\n - Current CPU Average Usage: %0.1f%%\n\n", data->cpu->current_load.avg_load);
     fprintf(file_ptr, " - Current CPU Each Usage:\n");
     for (uint32_t i = 0; i < data->cpu->processors_num; i++)
@@ -110,8 +106,6 @@ void make_system_report(system_t* data, const int ref_time)
                                                     data->cpu->current_load.cores_load[i].user 
                                                     + data->cpu->current_load.cores_load[i].wait 
                                                     + data->cpu->current_load.cores_load[i].sys);
-
-    calculate_memory_usage_percentage(data->memory);
 
     fprintf(file_ptr, "\nMemory Information:\n");
     fprintf(file_ptr, " - Pages:\n");
@@ -184,8 +178,6 @@ void make_system_report(system_t* data, const int ref_time)
         fprintf(file_ptr, "   - Driver:   %s\n\n", data->pci->devices[i].driver_name);
         fprintf(file_ptr, "   - Revision: %02x\n", data->pci->devices[i].revision);
     }
-
-    calculate_sensors_stats(data->sensor);
 
     fprintf(file_ptr, "\nSystem Sensors Statistics (Temperature in Celtius):\n");
     for (uint32_t i = 0 ; i < data->sensor->sensors_num; i++)

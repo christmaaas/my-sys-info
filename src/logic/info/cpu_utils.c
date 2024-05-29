@@ -187,7 +187,7 @@ void scan_cpu_basic_info(cpu_t* cpu)
                     }
                     case BOGOMIPS:          
                     { 
-                        cpu->compound[processor_id].bogomips = atoi(all_tokens[BOGOMIPS]);
+                        cpu->compound[processor_id].bogomips = atof(all_tokens[BOGOMIPS]);
                         free(all_tokens[BOGOMIPS]);                   
                         break; 
                     }

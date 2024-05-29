@@ -7,7 +7,7 @@ void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id)
 	pcidev_t pci_dev = pci->devices[pci_dev_id];
 
     wattrset(main_page, COLOR_PAIR(PAIR_WHITE_BLUE));
-    mvwprintw_clr(main_page, 0, 0, "PCI Device %s (%d/%d)", pci_dev.dev_location, pci_dev_id + 1, pci->devices_num);
+    mvwprintw_clr(main_page, 0, 0, "PCI Device %s (%d/%d)", pci_dev.device_location, pci_dev_id + 1, pci->devices_num);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_BLUE_WHITE));
 	for (int i = 0; i < MAX_COLS_COUNT; i++) 

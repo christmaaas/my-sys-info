@@ -45,19 +45,19 @@ void scan_network_stats(net_t* network)
         if(!fgets(file_buffer, FILE_BUFFER_SIZE, file_ptr))
 			break;
 		sscanf(file_buffer, "%s %lu %lu %lu %lu %d %d %d %d %lu %lu %lu %lu",
-		    network->stat[i].interface_name,
-			&network->stat[i].r_bytes,
-			&network->stat[i].r_packets,
-			&network->stat[i].r_errs,
-			&network->stat[i].r_drop,
-			&extra_field,
-			&extra_field,
-			&extra_field,
-			&extra_field,
-			&network->stat[i].t_bytes,
-			&network->stat[i].t_packets,
-			&network->stat[i].t_errs,
-			&network->stat[i].t_drop);
+		                                                                network->stat[i].interface_name,
+			                                                            &network->stat[i].r_bytes,
+			                                                            &network->stat[i].r_packets,
+			                                                            &network->stat[i].r_errs,
+			                                                            &network->stat[i].r_drop,
+			                                                            &extra_field,
+			                                                            &extra_field,
+			                                                            &extra_field,
+			                                                            &extra_field,
+			                                                            &network->stat[i].t_bytes,
+			                                                            &network->stat[i].t_packets,
+			                                                            &network->stat[i].t_errs,
+			                                                            &network->stat[i].t_drop);
 	}
     fclose(file_ptr);
 }
