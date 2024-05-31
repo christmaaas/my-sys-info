@@ -150,11 +150,11 @@ int control_handle()
 	return 0;
 }
 
-void print_report_page()
+void print_report_page(const int page)
 {
 	PAGE_TITLE("System Report");
 
-	make_system_report(data, refresh_time);
+	make_system_report(data, refresh_time, page);
 
 	wattrset(main_page, COLOR_PAIR(PAIR_GREEN_BLUE));
 	mvwprintw(main_page, 1, 0, "*********************************");
@@ -332,7 +332,7 @@ int start_main_ui()
 		}
 		case P_REPORT:
 		{
-			print_report_page();
+			if (prev_page != P_HELP) print_report_page(prev_page);
 			active_page = prev_page;
 			wclear(main_page);
 			break;
