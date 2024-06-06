@@ -29,6 +29,7 @@ make MODE=release
 ```
 
 If compilation was successful, an bin directory will be created in the current directory.
+
 Change to the bin directory:
 
 ```
