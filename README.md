@@ -1,19 +1,62 @@
-# MySysInfo
+## MySysInfo - system monitor for Linux
 
-## Описание
+# Installation
 
-MySysInfo - это утилита для мониторинга системы под управлением Linux. Она предоставляет пользователю информацию о различных аспектах системы, таких как использование центрального процессора, память, диски и сеть.
+## Build
 
-## Особенности
+Download the latest version using git clone command:
 
-- Предоставляет подробную информацию о процессоре, включая частоту, кеш, ядра и потоки.
-- Отображает использование памяти и ее статистику, включая физическую и виртуальную память.
-- Позволяет отслеживать активность дисков, включая чтение, запись и использование пространства.
-- Предоставляет информацию о сетевых интерфейсах и их активности.
-- Визуализация данных в виде графиков для удобного отслеживания изменений во времени.
+```bash
+git clone git://github.com/christmaaas/MySysInfo.git
+```
 
-## Требования
+Change to the MySysInfo source directory:
 
-- Операционная система Linux
-- Компилятор языка C
-- Библиотека ncurses для построения графического интерфейса в терминале
+```
+cd MySysInfo
+```
+
+and launch 'make' utility to compile MySysInfo in debug mode:
+
+```
+make MODE=debug
+```
+
+Or to compile MySysInfo in release mode:
+
+```
+make MODE=release
+```
+
+If compilation was successful, an bin directory will be created in the current directory.
+Change to the bin directory:
+
+```
+cd bin
+```
+
+You can now launch MySysInfo by typing ```./{debug|release}```. 
+
+# Uninstall
+
+Remove MySysInfo source direcotry:
+
+```bash
+rm -rf MySysInfo
+```
+
+# Usage Examples
+
+## Launch MySysInfo Ncurses mode
+
+```
+./{debug|release}
+```
+
+## Show "Help" information
+
+* Add the following row to your cron schedule:
+
+```
+./{debug|release} -h
+```
