@@ -1,13 +1,14 @@
 #include "../logic/info/sys.h"
 #include "../logic/report/report.h"
-#include "main_ui.h"
-#include "cpu_ui.h"
-#include "mem_ui.h"
-#include "net_ui.h"
-#include "pci_ui.h"
-#include "sensors_ui.h"
-#include "time_ui.h"
-#include "menu_ui.h"
+
+#include "main.h"
+#include "cpu.h"
+#include "mem.h"
+#include "net.h"
+#include "pci.h"
+#include "sensors.h"
+#include "time.h"
+#include "menu.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +16,7 @@
 #include <stdbool.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+
 #define __USE_MISC
 #include <unistd.h>
 #include <stdio.h>

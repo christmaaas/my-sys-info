@@ -1,5 +1,6 @@
-#include "utils/opt_utils.h"
-#include "ui/main_ui.h"
+#include "utils/opt.h"
+
+#include "ui/main.h"
 
 #include <unistd.h>
 #include <stdlib.h>

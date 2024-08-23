@@ -1,4 +1,4 @@
-#include "sensors_ui.h"
+#include "sensors.h"
 
 #define GRAPH_BOUNDARY_OFFSET 3
 #define SENSORS_GRAPH_OFFSET  38

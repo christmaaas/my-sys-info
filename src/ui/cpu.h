@@ -1,7 +1,8 @@
 #ifndef _CPU_UI_H
 #define _CPU_UI_H
 
-#include "common_ui.h"
+#include "common.h"
+
 #include "../logic/info/sys.h"
 
 void print_cpu_info_page(WINDOW* main_page, cpu_t* cpu, const int proc_id);

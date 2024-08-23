@@ -52,16 +52,16 @@ typedef enum color_pairs
 } color_t;
 
 #define mvwprintw_clr(win, y, x, ...) \
-	{ \
-		mvwprintw(win, y, x, __VA_ARGS__); \
-		wclrtoeol(win); \
-	}
+{ \
+	mvwprintw(win, y, x, __VA_ARGS__); \
+	wclrtoeol(win); \
+}
 
 #define PAGE_TITLE(page_name) \
-	{ \
-		wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT)); \
-		mvprintw(0, PAGE_TITLE_OFFSET, page_name); \
-		wnoutrefresh(stdscr); \
-	}
+{ \
+	wattrset(main_page, COLOR_PAIR(PAIR_DEFAULT)); \
+	mvprintw(0, PAGE_TITLE_OFFSET, page_name); \
+	wnoutrefresh(stdscr); \
+}
 
 #endif /* _COMMON_UI_H */

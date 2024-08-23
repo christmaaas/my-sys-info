@@ -1,4 +1,4 @@
-#include "time_ui.h"
+#include "time.h"
 
 #include <ncurses.h>
 #include <panel.h>

@@ -1,7 +1,8 @@
 #ifndef _SENSORS_UI_H
 #define _SENSORS_UI_H
 
-#include "common_ui.h"
+#include "common.h"
+
 #include "../logic/info/sys.h"
 
 void print_sensors_page(WINDOW* main_page, 

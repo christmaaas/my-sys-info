@@ -1,7 +1,7 @@
 #include "pci_utils.h"
 
-#include "../../utils/file_utils.h"
-#include "../../utils/string_utils.h"
+#include "../../utils/file.h"
+#include "../../utils/string.h"
 
 #include <stdlib.h>
 #include <dirent.h>

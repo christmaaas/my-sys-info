@@ -1,7 +1,8 @@
 #ifndef _MEM_UI_H
 #define _MEM_UI_H
 
-#include "common_ui.h"
+#include "common.h"
+
 #include "../logic/info/sys.h"
 
 void print_memory_page(WINDOW* main_page, mem_t* memory);

@@ -1,4 +1,4 @@
-#include "mem_ui.h"
+#include "mem.h"
 
 #define NUMBER_OF_MEMORY_GRAPHS 6
 #define LOAD_LINE_START_POINT 	0

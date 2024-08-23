@@ -1,4 +1,4 @@
-#include "menu_ui.h"
+#include "menu.h"
 
 #include <ncurses.h>
 #include <panel.h>

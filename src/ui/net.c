@@ -1,4 +1,4 @@
-#include "net_ui.h"
+#include "net.h"
 
 #define MAX_NETWORK_GRAPH_HEIGHT 12  
 

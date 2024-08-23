@@ -1,4 +1,4 @@
-#include "pci_ui.h"
+#include "pci.h"
 
 void print_pci_devices_page(WINDOW* main_page, pci_t* pci, const int pci_dev_id)
 {
